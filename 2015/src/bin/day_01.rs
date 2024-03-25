@@ -14,9 +14,8 @@ fn part_1(input: &str) -> i64 {
     up - down
 }
 
-fn part_2(input: &str) -> i64 {
+fn part_2(input: &str) -> usize {
     let mut floor = 0_i64;
-    let mut out = 0_i64;
     for (pos, c) in input.chars().enumerate() {
         match c {
             '(' => floor += 1,
@@ -24,9 +23,9 @@ fn part_2(input: &str) -> i64 {
             _ => panic!("invalid character, pos {pos}")
         }
         if floor == -1 {
-            out = pos as i64;
-            break;
+            // problem is 1-indexed, enumerate() is 0-indexed
+            return pos + 1;
         }
     }
-    out + 1
+    unreachable!("Never reached basement")
 }
