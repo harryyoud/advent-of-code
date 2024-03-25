@@ -33,14 +33,14 @@ fn main() {
 
 fn part_1(input: &str) -> u32 {
     let mut cache = HashMap::new();
-    let circuit = parse_input(&input);
+    let circuit = parse_input(input);
 
     calculate_input_recursive(&mut cache, &circuit, "a")
 }
 
 fn part_2(input: &str) -> u32 {
     let mut cache = HashMap::new();
-    let mut circuit = parse_input(&input);
+    let mut circuit = parse_input(input);
 
     let a_result = calculate_input_recursive(&mut cache, &circuit, "a");
     
@@ -140,7 +140,7 @@ fn parse_input(input: &str) -> HashMap<String, Input> {
                 parse_wire(rshift_left),
                 parse_wire(rshift_right),
             )));
-        } else if lhs.chars().all(|x| x.is_digit(10)) {
+        } else if lhs.chars().all(|x| x.is_ascii_digit()) {
             let num = lhs.parse::<u32>().unwrap();
             wires.insert(rhs.to_string(), Input::Number(num));
         } else {

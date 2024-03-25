@@ -23,7 +23,7 @@ fn part_2(grid: &Grid, start: (Point, Tile, Axis)) -> usize {
 fn solve(grid: &Grid, start: (Point, Tile, Axis)) -> Vec<(char, usize)> {
     let path = dijkstra_all(
         &start,
-        |x| neighbours(&grid, *x).into_iter().map(|a| (a, 1))
+        |x| neighbours(grid, *x).into_iter().map(|a| (a, 1))
     );
     
     path
@@ -96,8 +96,7 @@ fn parse_input(input: &str) -> (Grid, (Point, Tile, Axis)) {
 
     for (point, cell) in input.lines()
         .enumerate()
-        .map(|(y, row)| row.chars().enumerate().map(move |(x, cell)| ((x as isize, y as isize), cell)))
-        .flatten()
+        .flat_map(|(y, row)| row.chars().enumerate().map(move |(x, cell)| ((x as isize, y as isize), cell)))
         .filter(|(_point, cell)| !cell.is_whitespace())
     {
         grid.insert(point, match cell {

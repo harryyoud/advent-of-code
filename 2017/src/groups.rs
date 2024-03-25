@@ -13,7 +13,7 @@ pub fn count_groups<T: Eq + PartialEq + Hash + Clone>(mut to_visit: HashSet<T>, 
         group_count += 1;
         let connections = dijkstra_all(
             &x,
-            |a| neighbours(&a).into_iter().map(|b| (b, 1))
+            |a| neighbours(a).into_iter().map(|b| (b, 1))
         );
         for point in connections.keys() {
             assert!(to_visit.remove(point));

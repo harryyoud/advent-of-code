@@ -20,7 +20,7 @@ fn main() {
 
 fn part_1(set: &HashSet<&str>, map: &HashMap<(&str, &str), i32>) -> i32 {
     let mut maximum = i32::MIN;
-    for arrangement in set.iter().map(|s| *s).permutations(set.len()) {
+    for arrangement in set.iter().copied().permutations(set.len()) {
         maximum = maximum.max(calculate_total_happiness(&arrangement, map));
     }
     maximum
@@ -30,7 +30,7 @@ fn part_2(set: &HashSet<&str>, map: &HashMap<(&str, &str), i32>) -> i32 {
     part_1(set, map)
 }
 
-fn parse_input<'a>(input: &'a str) -> (HashSet<&'a str>, HashMap<(&'a str, &'a str), i32>) {
+fn parse_input(input: &str) -> (HashSet<&str>, HashMap<(&str, &str), i32>) {
     let mut map = HashMap::new();
     let mut set = HashSet::new();
     for line in input.lines() {

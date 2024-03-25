@@ -80,8 +80,8 @@ fn parse_input(input: &str) -> Vec<Brick> {
     let names = ["A", "B", "C", "D", "E", "F", "G"];
 
     for (idx, line) in input.lines().enumerate() {
-        let (start, end) = line.split("~").map(|a| {
-            let (x, y, z) = a.split(",").map(|b| b.parse::<u32>().unwrap()).collect_tuple().unwrap();
+        let (start, end) = line.split('~').map(|a| {
+            let (x, y, z) = a.split(',').map(|b| b.parse::<u32>().unwrap()).collect_tuple().unwrap();
             Vec3d { x, y, z }
         }).collect_tuple().unwrap();
         bricks.push(Brick { name: names[idx].to_owned(), start, end });

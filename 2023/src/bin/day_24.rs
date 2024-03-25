@@ -83,7 +83,7 @@ impl Hailstone {
 
 fn main() {
     let input = get_input(24);
-    let paths = input.lines().map(|l| parse_path(l)).collect::<Vec<Hailstone>>();
+    let paths = input.lines().map(parse_path).collect::<Vec<Hailstone>>();
     let mut total_possible_collisions = 0u32;
 
     for (hailstone_a, hailstone_b) in paths.iter().tuple_combinations::<(&Hailstone, &Hailstone)>() {
@@ -106,12 +106,12 @@ fn main() {
         println!("({}, {})", hailstone_b.point.x, hailstone_b.point.y);
         println!("x={}", LOWER_LIMIT);
         println!("x={}", UPPER_LIMIT);
-        println!("");
+        println!();
     };
 
     dbg!(total_possible_collisions);
 
-    ()
+    
 }
 
 fn parse_path(line: &str) -> Hailstone {
@@ -160,5 +160,5 @@ fn get_outcome(hailstone_a: &Hailstone, hailstone_b: &Hailstone) -> Outcome {
         }
         return Outcome::FutureCollisionInTestArea(intersection);
     }
-    return Outcome::NoCollisionPossible;
+    Outcome::NoCollisionPossible
 }

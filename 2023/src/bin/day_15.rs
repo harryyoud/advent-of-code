@@ -10,14 +10,14 @@ fn main() {
 }
 
 fn part_a(input: &str) -> u32 {
-    input.lines().next().unwrap().trim().split(",").map(get_hash_for_str).sum()
+    input.lines().next().unwrap().trim().split(',').map(get_hash_for_str).sum()
 }
 
 fn part_b(input: &str) -> u32 {
     let mut boxes: [Vec<(&str, u8)>; 256] = iter::repeat(Vec::new()).take(256).collect::<Vec<_>>().try_into().unwrap();
-    for step in input.lines().next().unwrap().trim().split(",") {
+    for step in input.lines().next().unwrap().trim().split(',') {
         if step.contains('=') {
-            let (label, focal_len) = step.split("=").collect_tuple().unwrap();
+            let (label, focal_len) = step.split('=').collect_tuple().unwrap();
             let label_hash = get_hash_for_str(label) as usize;
             let focal_len = focal_len.parse::<u8>().unwrap();
 

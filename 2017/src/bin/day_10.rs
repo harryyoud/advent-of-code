@@ -11,7 +11,7 @@ fn main() {
 fn part_1(input: &str) -> usize {
     let instructions = input
         .trim()
-        .split(",")
+        .split(',')
         .map(|x| x.parse().unwrap())
         .collect_vec();
 

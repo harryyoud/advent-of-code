@@ -42,7 +42,7 @@ fn part_1(replacements: &[(&str, &str)], molecule: &str) -> u64 {
 //     (results.unwrap().len() - 1) as u64
 // }
 
-fn parse_input<'a>(input: &'a String) -> (Vec<(&'a str, &'a str)>, &'a str) {
+fn parse_input(input: &String) -> (Vec<(&str, &str)>, &str) {
     let (replacements, mut molecule) = input.paragraphs().collect_tuple().unwrap();
     let replacements = replacements.into_iter().map(|s| s.split(" => ").collect_tuple().unwrap()).collect_vec();
     let molecule = molecule.pop().unwrap();

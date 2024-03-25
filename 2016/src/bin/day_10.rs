@@ -29,9 +29,7 @@ fn process(bots: &mut HashMap<u32, Bot>, outputs: &mut HashMap<u32, u32>) {
 
     while let Some(next_bot) = bots
         .iter()
-        .filter(|(_bot_num, bot)| bot.can_process())
-        .filter(|(bot_num, _bot)| !processed.contains(*bot_num))
-        .next()
+        .filter(|(_bot_num, bot)| bot.can_process()).find(|(bot_num, _bot)| !processed.contains(*bot_num))
     {
         processed.insert(*next_bot.0);
 

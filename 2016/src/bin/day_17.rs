@@ -10,15 +10,15 @@ fn main() {
     let input = get_input(17);
     let input = input.trim();
 
-    dbg!(part_1(&input));
-    dbg!(part_2(&input));
+    dbg!(part_1(input));
+    dbg!(part_2(input));
 }
 
 fn part_1(input: &str) -> String {
     let mut min_path_len = usize::MAX;
     let mut shortest_path = vec![];
 
-    solve_with_dfs(input, &vec![], &START, &mut min_path_len, &mut shortest_path, SearchType::Shortest);
+    solve_with_dfs(input, &[], &START, &mut min_path_len, &mut shortest_path, SearchType::Shortest);
 
     shortest_path.iter().map(|x| x.as_char()).collect::<String>()
 }
@@ -26,14 +26,14 @@ fn part_1(input: &str) -> String {
 fn part_2(input: &str) -> usize {
     let mut max_path_len = usize::MIN;
 
-    solve_with_dfs(input, &vec![], &START, &mut max_path_len, &mut vec![], SearchType::Longest);
+    solve_with_dfs(input, &[], &START, &mut max_path_len, &mut vec![], SearchType::Longest);
 
     max_path_len
 }
 
 fn solve_with_dfs(input: &str, path: &[Direction], current_point: &Point, len_result: &mut usize, path_result: &mut Vec<Direction>, search_type: SearchType) {
-    let open_doors = get_open_doors(input, &path);
-    let possible_movements = possible_movements(&open_doors, &current_point);
+    let open_doors = get_open_doors(input, path);
+    let possible_movements = possible_movements(&open_doors, current_point);
 
     if search_type.is_shortest() && path.len() > *len_result {
         return;
@@ -43,14 +43,12 @@ fn solve_with_dfs(input: &str, path: &[Direction], current_point: &Point, len_re
         if search_type.is_shortest() {
             if *len_result > path.len() {
                 *len_result = path.len();
-                *path_result = path.to_owned();
+                path.clone_into(path_result);
             }
-        } else {
-            if *len_result < path.len() {
-                // don't bother updating path_result as it isn't needed
-                *len_result = path.len();
-                *path_result = path.to_owned();
-            }
+        } else if *len_result < path.len() {
+            // don't bother updating path_result as it isn't needed
+            *len_result = path.len();
+            path.clone_into(path_result);
         }
         return;
     }

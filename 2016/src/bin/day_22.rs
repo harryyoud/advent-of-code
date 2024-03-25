@@ -113,7 +113,7 @@ fn parse_input(input: &str) -> Map {
     let mut map: HashMap<(usize, usize), Node> = HashMap::new();
     let re = Regex::new(r#"\/dev\/grid\/node-x(?<x>\d+)-y(?<y>\d+)\s+\d+T\s+(?<used>\d+)T\s+(?<available>\d+)T\s+(\d+)%"#).unwrap();
     for (line_num, line) in lines {
-        let capture = re.captures(line).expect(&format!("Invalid line: line {line_num}"));
+        let capture = re.captures(line).unwrap_or_else(|| panic!("Invalid line: line {line_num}"));
         let x = capture.name("x").unwrap().as_str().parse().unwrap();
         let y = capture.name("y").unwrap().as_str().parse().unwrap();
         let used = capture.name("used").unwrap().as_str().parse().unwrap();

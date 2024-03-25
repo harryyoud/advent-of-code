@@ -34,7 +34,7 @@ impl fmt::Display for Grid {
         for y in 0..self.y_len {
             for x in 0..self.x_len {
                 if self.is_energised(x, y) {
-                    write!(f, "{}", '#')?;
+                    write!(f, "#")?;
                     continue;
                 }
                 write!(f, "{}", match self.tiles.get(&(x, y)).unwrap() {
@@ -45,7 +45,7 @@ impl fmt::Display for Grid {
                     Tile::VerticalSplitter => '|',
                 })?
             }
-            writeln!(f, "")?;
+            writeln!(f)?;
         }
         Ok(())
     }

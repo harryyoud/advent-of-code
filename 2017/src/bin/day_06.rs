@@ -31,7 +31,6 @@ fn solve(allocator: &Allocator) -> (usize, usize) {
 
 fn parse_input(input: &str) -> Allocator {
     let banks: [Bank; BANK_COUNT] = input
-        .trim()
         .split_whitespace()
         .map(|x| x.parse().unwrap())
         .map(|x| Bank { blocks: x })

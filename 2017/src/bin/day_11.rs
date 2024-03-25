@@ -12,7 +12,7 @@ fn main() {
 
 fn solve(directions: &[Direction]) -> (usize, usize) {
     let start = Coordinate::new(0isize, 0);
-    let mut current = start.clone();
+    let mut current = start;
     let mut max_distance = 0usize;
 
     for dir in directions {
@@ -24,7 +24,7 @@ fn solve(directions: &[Direction]) -> (usize, usize) {
 }
 
 fn parse_input(input: &str) -> Vec<Direction> {
-    input.trim().split(",").map(|x| match x {
+    input.trim().split(',').map(|x| match x {
         "n" => Direction::YZ,
         "ne" => Direction::XZ,
         "se" => Direction::XY,

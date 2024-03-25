@@ -77,7 +77,7 @@ fn get_rule_result_recursive(rules: &Rules, grid: &Grid, attempt: usize, max_att
 fn parse_input(input: &str) -> HashMap<Grid, Grid> {
     input.lines().map(|line| {
         line.split(" => ").map(|grid| {
-            grid.split("/").map(|row| {
+            grid.split('/').map(|row| {
                 row.chars().map(|cell| cell == '#').collect_vec()
             }).collect_vec()
         }).collect_tuple().unwrap()
@@ -92,7 +92,7 @@ type Rules = HashMap<Grid, Grid>;
 // 6 7 8         0 3 6
 fn rotate_grid<T: Copy>(grid: &Vec<Vec<T>>) -> Vec<Vec<T>> {
     let length = grid.len();
-    (1..=length).into_iter().map(|a| (0..length).map(|b| grid[b][length - a]).collect_vec()).collect_vec().try_into().unwrap()
+    (1..=length).map(|a| (0..length).map(|b| grid[b][length - a]).collect_vec()).collect_vec().try_into().unwrap()
 }
 
 // 0 1 2 3            square 0: [0, 1, 4, 5]
@@ -109,8 +109,8 @@ fn split_into_n<T: Copy>(grid: &Vec<Vec<T>>, n: usize) -> Vec<Vec<Vec<T>>> {
         let to_row = from_row + n;
         let to_col = from_col + n;
 
-        (from_col..to_col).into_iter().map(|col_num| {
-            (from_row..to_row).into_iter().map(|row_num| {
+        (from_col..to_col).map(|col_num| {
+            (from_row..to_row).map(|row_num| {
                 grid[col_num][row_num]
             }).collect_vec()
         }).collect_vec()
@@ -118,7 +118,6 @@ fn split_into_n<T: Copy>(grid: &Vec<Vec<T>>, n: usize) -> Vec<Vec<Vec<T>>> {
 
     (0..new_len)
         .cartesian_product(0..new_len)
-        .into_iter()
         .map(|(col, row)| get_square(row, col))
         .collect_vec()
 }
@@ -139,12 +138,12 @@ fn rejoin_split_square<T: Copy + std::fmt::Debug>(squares: &Vec<Vec<Vec<T>>>) ->
     let get_row = |row: usize| -> Vec<T> {
         let start = (row / inner_square_len) * squares_per_side;
         let outer_range = start..(start + squares_per_side);
-        outer_range.map(|x| {
+        outer_range.flat_map(|x| {
             squares[x][row % inner_square_len].iter().copied()
-        }).flatten().collect_vec()
+        }).collect_vec()
     };
 
-    (0..new_len).map(|x| get_row(x)).collect_vec()
+    (0..new_len).map(get_row).collect_vec()
 }
 
 #[test]

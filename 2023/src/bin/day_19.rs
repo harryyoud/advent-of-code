@@ -56,7 +56,7 @@ struct Function {
 
 impl Function {
     fn from_str(input: &str) -> Self {
-        let (function, result) = input.split(":").collect_tuple().unwrap();
+        let (function, result) = input.split(':').collect_tuple().unwrap();
         let result = FunctionResult::from_str(result);
         let (left_hand_side, function_type) = function.chars().take(2).collect_tuple().unwrap();
         let left_hand_side = RatingType::from_char(left_hand_side);
@@ -78,16 +78,16 @@ impl Function {
         match self.function_type {
             FunctionType::LessThan => {
                 if part.get(self.left_hand_side) < self.right_hand_side {
-                    return self.result.clone();
+                    self.result.clone()
                 } else {
-                    return FunctionResult::Continue;
+                    FunctionResult::Continue
                 }
             },
             FunctionType::GreaterThan => {
                 if part.get(self.left_hand_side) > self.right_hand_side {
-                    return self.result.clone();
+                    self.result.clone()
                 } else {
-                    return FunctionResult::Continue;
+                    FunctionResult::Continue
                 }
             },
         }
@@ -150,7 +150,7 @@ fn main() {
     let mut workflows: HashMap<&str, Workflow> = HashMap::new();
 
     for line in lines.take_while_ref(|l| !l.is_empty()) {
-        let (name, flow) = line.trim_end_matches('}').split("{").collect_tuple().unwrap();
+        let (name, flow) = line.trim_end_matches('}').split('{').collect_tuple().unwrap();
         let mut functions = vec![];
         let mut flow = flow.split(',').peekable();
         while let Some(s) = flow.next() {
@@ -171,8 +171,8 @@ fn main() {
 
     for line in lines {
         let mut part = Part {x: 0, m: 0, a: 0, s: 0};
-        for rating in line.trim_start_matches('{').trim_end_matches('}').split(",") {
-            let (rating_type, rating_number) = rating.split("=").collect_tuple().unwrap();
+        for rating in line.trim_start_matches('{').trim_end_matches('}').split(',') {
+            let (rating_type, rating_number) = rating.split('=').collect_tuple().unwrap();
             part.update(RatingType::from_char(rating_type.chars().next().unwrap()), rating_number.parse::<u32>().unwrap());
         }
         if matches!(run_recursive(&workflows, "in", &part), FunctionResult::Accepted) {

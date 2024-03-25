@@ -33,7 +33,7 @@ fn get_code_number_for(row_aim: u32, col_aim: u32) -> u32 {
 fn parse_input(input: &str) -> (u32, u32) {
     let start = input.find("row").unwrap();
     let (row, column) = input[start..].trim().trim_end_matches('.').split_once(", ").unwrap();
-    let (_, row) = row.split_once(" ").unwrap();
-    let (_, column) = column.split_once(" ").unwrap();
+    let (_, row) = row.split_once(' ').unwrap();
+    let (_, column) = column.split_once(' ').unwrap();
     (row.parse().unwrap(), column.parse().unwrap())
 }

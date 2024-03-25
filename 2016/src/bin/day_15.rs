@@ -12,7 +12,7 @@ fn main() {
 }
 
 fn part_1(discs: &HashMap<u64, Disc>) -> u64 {
-    is_possible_to_pass(&discs)
+    is_possible_to_pass(discs)
 }
 
 fn part_2(discs: &HashMap<u64, Disc>) -> u64 {

@@ -10,7 +10,7 @@ pub fn hash(plaintext: &str) -> Vec<u8> {
 }
 
 pub fn twist(instructions: &[u8], rounds: usize) -> Vec<u8> {
-    let mut list = (u8::MIN..=u8::MAX).into_iter().collect_vec();
+    let mut list = (u8::MIN..=u8::MAX).collect_vec();
 
     let mut cursor = 0usize;
     let mut skip_size = 0usize;
@@ -51,7 +51,7 @@ fn xor_shrink(input: &[u8]) -> Vec<u8> {
 pub fn bytes_to_hex(input: &[u8]) -> String {
     let mut out = String::with_capacity(input.len() * 2);
 
-    input.into_iter().for_each(|x| {
+    input.iter().for_each(|x| {
         out.push_str(&format!("{x:02x}"));
     });
 

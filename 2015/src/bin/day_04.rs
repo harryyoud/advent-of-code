@@ -4,8 +4,8 @@ fn main() {
     let input = get_input(4);
     let input = input.trim();
     
-    dbg!(part_1(&input));
-    dbg!(part_2(&input));
+    dbg!(part_1(input));
+    dbg!(part_2(input));
 }
 
 fn get_md5_suffix(input: &str, suffix: u64) -> md5::Digest {

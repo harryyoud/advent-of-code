@@ -56,7 +56,7 @@ fn dance(dancers: &mut VecDeque<char>, moves: &[DanceMove]) {
 }
 
 fn parse_input(input: &str) -> Vec<DanceMove> {
-    input.trim().split(",").map(parse_dance_move).collect_vec()
+    input.trim().split(',').map(parse_dance_move).collect_vec()
 }
 
 fn parse_dance_move(input: &str) -> DanceMove {
@@ -66,7 +66,7 @@ fn parse_dance_move(input: &str) -> DanceMove {
             DanceMove::Spin(input[1..].parse().unwrap())
         },
         'x' => {
-            let (a, b) = input[1..].split_once("/").unwrap();
+            let (a, b) = input[1..].split_once('/').unwrap();
             DanceMove::Exchange(a.parse().unwrap(), b.parse().unwrap())
         },
         'p' => {

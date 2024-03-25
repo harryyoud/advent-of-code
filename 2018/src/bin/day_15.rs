@@ -16,7 +16,7 @@ fn main() {
 #.....#
 #######";
 
-    let mut game = parse_game_from_string(&input);
+    let mut game = parse_game_from_string(input);
     let mut iterations = 0usize;
 
     for i in 0.. {
@@ -267,7 +267,7 @@ impl Game {
     }
 
     fn is_finished(&self) -> bool {
-        self.elves.len() == 0 || self.goblins.len() == 0
+        self.elves.is_empty() || self.goblins.is_empty()
     }
 
     fn clean_dead(&mut self) {

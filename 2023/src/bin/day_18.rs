@@ -68,7 +68,7 @@ fn parse_line_b(line: &str) -> (&str, i64) {
 
 fn get_area(corners: &[Point], edge_length: i64) -> i64 {
     let mut total_area = 0;
-    for (point_a, point_b) in corners.into_iter().circular_tuple_windows() {
+    for (point_a, point_b) in corners.iter().circular_tuple_windows() {
         // matrix determinant
         total_area += (point_a.0 * point_b.1) - (point_a.1 * point_b.0);
     }

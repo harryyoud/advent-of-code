@@ -154,7 +154,7 @@ fn parse_input(input: &str) -> Firewall {
 
 impl fmt::Display for Firewall {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "")?;
+        writeln!(f)?;
         let max_depth = self.layers
             .iter()
             .filter_map(|x| x.as_ref().map(|a| a.depth))
@@ -181,12 +181,10 @@ impl fmt::Display for Firewall {
                             } else {
                                 write!(f, "     ")?
                             }
+                        } else if self.position as usize == layer_num && depth == 0 {
+                            write!(f, "(  ) ")?
                         } else {
-                            if self.position as usize == layer_num && depth == 0 {
-                                write!(f, "(  ) ")?
-                            } else {
-                                write!(f, "[  ] ")?
-                            }
+                            write!(f, "[  ] ")?
                         }
                     },
                     None => {

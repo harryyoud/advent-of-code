@@ -85,7 +85,7 @@ fn optimised(initial_b: isize) -> isize {
 
         for d in 2..upper {
             if b % d == 0 {
-                h = h + 1;
+                h += 1;
                 break;
             }
         }

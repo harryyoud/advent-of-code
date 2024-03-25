@@ -32,7 +32,7 @@ impl fmt::Display for Grid {
                     Tile::Empty => '.',
                 })?
             }
-            writeln!(f, "")?;
+            writeln!(f)?;
         }
         Ok(())
     }
@@ -107,7 +107,7 @@ fn tilt_grid(grid: &mut Grid, direction: Direction) -> bool {
                 Tile::Empty => {},
             }
         }
-        if swaps.len() > 0 {
+        if !swaps.is_empty() {
             changed = true;
         }
         for (right1, right2) in swaps {

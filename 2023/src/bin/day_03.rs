@@ -27,7 +27,7 @@ impl Schematic {
     fn get_gear_neighbour(&self, y: usize, x: usize) -> Vec<(usize, usize)> {
         self.get_neighbours(y, x).iter().filter_map(|(y, x)| {
             if matches!(self.inner[*y][*x], Square::Asterisk) {
-                return Some((y.clone(), x.clone()));
+                return Some((*y, *x));
             }
             None
         }).collect()
@@ -94,11 +94,11 @@ fn main() {
     for (y, line) in input.lines().enumerate() {
         for caps in re.captures_iter(line) {
             let mat = caps.get(0).unwrap();
-            if (mat.start()..mat.end()).into_iter().any(|x| schematic.has_symbol_neighbour(y, x)) {
+            if (mat.start()..mat.end()).any(|x| schematic.has_symbol_neighbour(y, x)) {
                 part_number_total += mat.as_str().parse::<u32>().unwrap();
             }
             let mut our_gears = HashSet::new();
-            for gear_neighbour in (mat.start()..mat.end()).into_iter().map(|x| schematic.get_gear_neighbour(y, x)).flatten() {
+            for gear_neighbour in (mat.start()..mat.end()).flat_map(|x| schematic.get_gear_neighbour(y, x)) {
                 our_gears.insert(gear_neighbour);
             }
             for gear in our_gears {

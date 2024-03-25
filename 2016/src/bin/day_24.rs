@@ -13,7 +13,7 @@ fn main() {
 }
 
 fn part_1(grid: &Grid) -> usize {
-    let pair_distances = pair_distances(&grid);
+    let pair_distances = pair_distances(grid);
     let mut min_distance = usize::MAX;
 
     for order in grid.to_visit.iter().permutations(grid.to_visit.len()).filter(|x| x.first().unwrap().1 == 0) {
@@ -25,7 +25,7 @@ fn part_1(grid: &Grid) -> usize {
 }
 
 fn part_2(grid: &Grid) -> usize {
-    let pair_distances = pair_distances(&grid);
+    let pair_distances = pair_distances(grid);
     let mut min_distance = usize::MAX;
 
     for order in grid.to_visit.iter().permutations(grid.to_visit.len()).filter(|x| x.first().unwrap().1 == 0) {

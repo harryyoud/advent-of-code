@@ -100,15 +100,14 @@ fn main() {
         .split_whitespace()
         .map(|s| s.parse::<u64>().unwrap())
         .tuples()
-        .map(|(start, length)| {
+        .filter_map(|(start, length)| {
             (start..(start + length))
                 .into_par_iter()
                 .progress_with(progress.clone())
-                .map(|s| Seed::from_u64(s))
+                .map(Seed::from_u64)
                 .map(|seed| resolver.full_resolve(&seed))
                 .min()
         })
-        .flatten()
         .min()
     );
 }

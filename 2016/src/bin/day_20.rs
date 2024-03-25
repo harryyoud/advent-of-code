@@ -30,7 +30,7 @@ fn parse_input(input: &str) -> Firewall {
     let mut map = RangeInclusiveMap::new();
     map.insert(0..=u32::MAX, Status::Allowed);
     input.lines().for_each(|line| {
-        let (lower, upper) = line.split_once("-").unwrap();
+        let (lower, upper) = line.split_once('-').unwrap();
         let (lower, upper) = (lower.parse().unwrap(), upper.parse().unwrap());
         map.insert(lower..=upper, Status::Blocked);
     });

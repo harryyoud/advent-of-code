@@ -49,7 +49,7 @@ fn calculate_routes(set: &HashSet<&str>, map: &HashMap<Connection, u32>) -> (u32
     (minimum, maximum)
 }
 
-fn parse_input<'a>(input: &'a str) -> (HashSet<&'a str>, HashMap<Connection<'a>, u32>) {
+fn parse_input(input: &str) -> (HashSet<&str>, HashMap<Connection<'_>, u32>) {
     let mut map = HashMap::new();
     let mut set = HashSet::new();
     input.lines().map(parse_line).for_each(|(a, b, dist)| {
@@ -60,7 +60,7 @@ fn parse_input<'a>(input: &'a str) -> (HashSet<&'a str>, HashMap<Connection<'a>,
     (set, map)
 }
 
-fn parse_line<'a>(line: &'a str) -> (&'a str, &'a str, u32) {
+fn parse_line(line: &str) -> (&str, &str, u32) {
     let (dests, distance) = line.split(" = ").collect_tuple().unwrap();
     let (from, to) = dests.split(" to ").collect_tuple().unwrap();
     (from, to, distance.parse().unwrap())

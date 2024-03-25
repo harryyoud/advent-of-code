@@ -40,14 +40,14 @@ pub fn get_input_year(year: usize, day: usize) -> String {
 pub type Paragraph<'a> = Batching<Lines<'a>, fn(&mut Lines<'a>) -> Option<Vec<&'a str>>>;
 
 pub trait Paragraphs {
-    fn paragraphs<'a>(&'a self) -> Paragraph<'a>;
+    fn paragraphs(&self) -> Paragraph<'_>;
 }
 
 impl Paragraphs for &str {
     fn paragraphs<'a>(&'a self) -> Paragraph<'a> {
         fn inner_batch<'a>(lines: &mut Lines<'a>) -> Option<Vec<&'a str>> {
             let out = lines.take_while(|line| !line.is_empty()).collect_vec();
-            (!out.is_empty()).then(|| out)
+            (!out.is_empty()).then_some(out)
         }
         self.lines().batching(inner_batch as fn(&mut Lines<'a>) -> Option<Vec<&'a str>>)
     }
@@ -57,7 +57,7 @@ impl Paragraphs for String {
     fn paragraphs<'a>(&'a self) -> Paragraph<'a> {
         fn inner_batch<'a>(lines: &mut Lines<'a>) -> Option<Vec<&'a str>> {
             let out = lines.take_while(|line| !line.is_empty()).collect_vec();
-            (!out.is_empty()).then(|| out)
+            (!out.is_empty()).then_some(out)
         }
         self.lines().batching(inner_batch as fn(&mut Lines<'a>) -> Option<Vec<&'a str>>)
     }

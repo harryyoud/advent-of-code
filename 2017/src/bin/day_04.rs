@@ -11,14 +11,14 @@ fn main() {
 fn part_1(input: &str) -> usize {
     input
         .lines()
-        .filter(|x| !contains_repeated_words(*x))
+        .filter(|x| !contains_repeated_words(x))
         .count()
 }
 
 fn part_2(input: &str) -> usize {
     input
         .lines()
-        .filter(|x| !contains_anagrams(*x))
+        .filter(|x| !contains_anagrams(x))
         .count()
 }
 

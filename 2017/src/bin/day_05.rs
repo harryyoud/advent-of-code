@@ -63,7 +63,7 @@ impl Machine {
             (self.on_each_step)(&mut self.cursor, instruction);
             self.step_count += 1;
         }
-        return self.step_count;
+        self.step_count
     }
 }
 

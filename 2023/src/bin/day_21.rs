@@ -45,9 +45,9 @@ impl Grid {
         ];
         neighbours
             .into_iter()
-            .filter_map(|x| x)
+            .flatten()
             .filter(|x| self.is_in_bounds(*x))
-            .filter(|x| !self.rocks.contains(&x))
+            .filter(|x| !self.rocks.contains(x))
             .collect_vec()
     }
 

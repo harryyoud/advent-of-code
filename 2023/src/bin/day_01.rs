@@ -37,13 +37,13 @@ fn main() {
 }
 
 fn extract_calibration_value_numerical(line: &str) -> u32 {
-    let numbers: Vec<u32> = line.chars().map(|c| c.to_digit(10)).flatten().collect();
+    let numbers: Vec<u32> = line.chars().filter_map(|c| c.to_digit(10)).collect();
     (numbers.first().unwrap() * 10) + numbers.last().unwrap()
 }
 
 fn extract_calibration_value_alphanumeric(line: &str) -> u32 {
     let numbers: Vec<u32> = AC.find_overlapping_iter(line).map(|mat|
-        MAP.get(&line[mat.start()..mat.end()]).unwrap().clone()
+        *MAP.get(&line[mat.start()..mat.end()]).unwrap()
     ).collect();
     (numbers.first().unwrap() * 10) + numbers.last().unwrap()
 }

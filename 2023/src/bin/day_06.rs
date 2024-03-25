@@ -41,16 +41,16 @@ fn parse_lines_a(mut lines: Lines) -> Vec<(u64, u64)> {
 fn parse_lines_b(mut lines: Lines) -> (u64, u64) {
     (
         lines.next().unwrap()
-            .split(":")
+            .split(':')
             .skip(1)
             .collect::<String>()
-            .replace(" ", "")
+            .replace(' ', "")
             .parse::<u64>().unwrap(),
         lines.next().unwrap()
-            .split(":")
+            .split(':')
             .skip(1)
             .collect::<String>()
-            .replace(" ", "")
+            .replace(' ', "")
             .parse::<u64>().unwrap(),
 
     )

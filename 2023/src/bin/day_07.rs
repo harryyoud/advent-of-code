@@ -60,7 +60,7 @@ fn calculate_best_rank(cards: &Vec<Card>) -> HandRank {
     };
     CARDS.iter().filter(|x| !matches!(x, Card::Jack)).map(|possible_card| {
         calculate_rank(&cards.clone().into_iter().map(|x|
-            if x == Card::Joker { possible_card.clone() } else { x }
+            if x == Card::Joker { *possible_card } else { x }
         ).collect_vec())
     }).max().unwrap()
 }
@@ -89,7 +89,7 @@ pub struct Hand {
 
 impl PartialOrd for Hand {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(&other))
+        Some(self.cmp(other))
     }
 }
 impl Ord for Hand {
@@ -97,7 +97,7 @@ impl Ord for Hand {
         if self.hand_type.eq(&other.hand_type) {
             return self.cards.cmp(&other.cards);
         }
-        return self.hand_type.cmp(&other.hand_type);
+        self.hand_type.cmp(&other.hand_type)
     }
 }
 
@@ -197,7 +197,7 @@ impl HandRank {
 
 impl PartialOrd for HandRank {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(&other))
+        Some(self.cmp(other))
     }
 }
 

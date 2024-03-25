@@ -136,6 +136,6 @@ pub mod parsing {
     }
 
     pub fn parse_instructions(input: &str) -> Vec<Result<Instruction, InstructionParseError>> {
-        input.lines().map(|x| Instruction::from_str(x)).collect_vec()
+        input.lines().map(Instruction::from_str).collect_vec()
     }
 }

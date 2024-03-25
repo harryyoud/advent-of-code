@@ -67,13 +67,13 @@ impl AssembunnyMachine<PreExecution> {
         };
         match instruction {
             Instruction::Copy(value, register) => {
-                let value = get_value(&self.registers, &value);
+                let value = get_value(&self.registers, value);
                 self.registers.insert(*register, value as u32);
                 self.cursor += 1;
             },
             Instruction::JumpIfNotZero(value, relative_jump) => {
-                let value = get_value(&self.registers, &value);
-                let relative_jump = get_value(&self.registers, &relative_jump);
+                let value = get_value(&self.registers, value);
+                let relative_jump = get_value(&self.registers, relative_jump);
                 if value == 0 {
                     self.cursor += 1;
                 } else {
@@ -93,14 +93,14 @@ impl AssembunnyMachine<PreExecution> {
                 self.cursor += 1;
             },
             Instruction::Toggle(value) => {
-                let offset = get_value(&self.registers, &value);
+                let offset = get_value(&self.registers, value);
                 if let Some(i) = self.instructions.get_mut(self.cursor.saturating_add_signed(offset as isize)) {
                     *i = i.toggle();
                 };
                 self.cursor += 1;
             },
             Instruction::Out(value) => {
-                self.out.push(get_value(&self.registers, &value));
+                self.out.push(get_value(&self.registers, value));
                 self.cursor += 1;
                 return MachineResult::PushedOut;
             }
@@ -108,7 +108,7 @@ impl AssembunnyMachine<PreExecution> {
                 self.cursor += 1;
             },
         }
-        return MachineResult::Ok;
+        MachineResult::Ok
     }
 
     pub fn pop_out(&mut self) -> Option<i32> {

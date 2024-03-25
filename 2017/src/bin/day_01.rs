@@ -7,8 +7,8 @@ fn main() {
     let input = get_input(1);
     let input = input.trim();
 
-    dbg!(part_1(&input));
-    dbg!(part_2(&input));
+    dbg!(part_1(input));
+    dbg!(part_2(input));
 }
 
 fn part_1(input: &str) -> u32 {

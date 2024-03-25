@@ -54,7 +54,7 @@ fn main() {
             possible_game_ids_sum += game_id;
         }
 
-        maximum_drawn_product_sum += max_colour_value_in_game.iter().map(|(_, max_drawn)| max_drawn).product::<u32>();
+        maximum_drawn_product_sum += max_colour_value_in_game.values().product::<u32>();
     }
 
     println!("Possible game ID sum: {possible_game_ids_sum}");
@@ -65,7 +65,7 @@ fn main() {
 fn extract_colors_and_numbers_from_set(set: &str) -> Vec<(CubeColour, u32)> {
     let mut out = vec![];
 
-    for draw in set.split(",").map(|s| s.trim()).map(|s| s.split(" ").collect::<Vec<&str>>()) {
+    for draw in set.split(',').map(|s| s.trim()).map(|s| s.split(' ').collect::<Vec<&str>>()) {
         let number = draw[0].parse::<u32>().unwrap();
         out.push((match draw[1] {
             "green" => CubeColour::Green,
@@ -79,9 +79,9 @@ fn extract_colors_and_numbers_from_set(set: &str) -> Vec<(CubeColour, u32)> {
 }
 
 fn extract_game_id(line: &str) -> u32 {
-    line.split(":").next().unwrap().split(" ").last().unwrap().parse::<u32>().unwrap()
+    line.split(':').next().unwrap().split(' ').last().unwrap().parse::<u32>().unwrap()
 }
 
 fn extract_sets_from_line(line: &str) -> Vec<&str> {
-    line.split(":").last().unwrap().trim().split(";").map(|s| s.trim()).collect()
+    line.split(':').last().unwrap().trim().split(';').map(|s| s.trim()).collect()
 }

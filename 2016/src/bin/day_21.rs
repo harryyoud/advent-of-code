@@ -24,7 +24,7 @@ fn part_1(operations: &[Operation]) -> String {
 
 fn part_2(operations: &[Operation]) -> String {
     let mut string = "fbgdceah".chars().collect::<VecDeque<char>>();
-    for operation in operations.into_iter().rev() {
+    for operation in operations.iter().rev() {
         apply_inverse_operation(&mut string, *operation);
     }
     return string.iter().collect::<String>();
@@ -108,7 +108,7 @@ fn apply_inverse_operation(string: &mut VecDeque<char>, op: Operation) {
 
 fn parse_input(input: &str) -> Vec<Operation> {
     input.lines().map(|line| {
-        match line.splitn(3, " ").collect_tuple::<(_, _, _)>().unwrap() {
+        match line.splitn(3, ' ').collect_tuple::<(_, _, _)>().unwrap() {
             ("swap", "position", _) => {
                 let (_, x, y) = regex_captures!(r#"swap position (\d+) with position (\d+)"#, line).expect("Couldn't parse SwapPosition");
                 Operation::SwapPosition(x.parse().unwrap(), y.parse().unwrap())

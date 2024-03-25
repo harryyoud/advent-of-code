@@ -19,7 +19,7 @@ fn main() {
 fn part_1(initial_state: &State) -> usize {
     let Some(x) = dijkstra(
         initial_state,
-        |x| next_state(x),
+        next_state,
         |x| x.solved()
     ) else {
         panic!("No solution found!");
@@ -141,10 +141,10 @@ impl Device {
         matches!(self, Self::Generator(_))
     }
 
-    fn radiotype<'a>(&'a self) -> &'a str {
+    fn radiotype(&self) -> &str {
         match self {
-            Device::Generator(x) => &x,
-            Device::Microchip(x) => &x,
+            Device::Generator(x) => x,
+            Device::Microchip(x) => x,
         }
     }
 
@@ -164,7 +164,7 @@ impl Device {
         }) {
             return false;
         }
-        return true;
+        true
     }
 }
 
@@ -179,7 +179,7 @@ fn parse_input(input: &str) -> BTreeMap<usize, BTreeSet<Device>> {
 }
 
 fn parse_line(line: &str) -> (usize, BTreeSet<Device>) {
-    let (floor_info, items) = line.trim_end_matches(".").split(" contains ").collect_tuple().unwrap();
+    let (floor_info, items) = line.trim_end_matches('.').split(" contains ").collect_tuple().unwrap();
     let floor_info = floor_info.trim_start_matches("The ").trim_end_matches(" floor");
     let floor_info = match floor_info {
         "first" => 1,
@@ -195,14 +195,13 @@ fn parse_line(line: &str) -> (usize, BTreeSet<Device>) {
 
     let items = items
         .split(", ")
-        .map(|s| s.split("and "))
-        .flatten()
+        .flat_map(|s| s.split("and "))
         .filter(|s| !s.is_empty())
         .map(|s| s.trim_start_matches("a "))
         .map(|s| s.trim())
         .map(|item| {
-            let (radiotype, item_type) = item.split(" ").collect_tuple().unwrap();
-            let radiotype = radiotype.split("-").next().unwrap().to_string();
+            let (radiotype, item_type) = item.split(' ').collect_tuple().unwrap();
+            let radiotype = radiotype.split('-').next().unwrap().to_string();
             match item_type {
                 "microchip" => Device::Microchip(radiotype),
                 "generator" => Device::Generator(radiotype),

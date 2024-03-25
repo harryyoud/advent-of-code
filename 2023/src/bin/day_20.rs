@@ -31,7 +31,7 @@ impl ModuleType {
                             Some(Pulse::High)
                         }
                     },
-                    Pulse::High => return None,
+                    Pulse::High => None,
                 }
             },
             ModuleType::Conjunction(ref mut state) => {
@@ -96,7 +96,7 @@ fn main() {
     let mut low_pulse_count = 0;
     let mut high_pulse_count = 0;
 
-    let mut leads_to_rx: HashMap<String, Option<u64>> = HashMap::from_iter(reverse_lookup.get("rx").unwrap().iter().map(|x| reverse_lookup.get(x).unwrap().clone()).flatten().map(|x| (x, None)));
+    let mut leads_to_rx: HashMap<String, Option<u64>> = HashMap::from_iter(reverse_lookup.get("rx").unwrap().iter().flat_map(|x| reverse_lookup.get(x).unwrap().clone()).map(|x| (x, None)));
 
     for i in 1u64.. {
         let res = press_button(i, &mut modules, &mut next_visits, &mut leads_to_rx);
@@ -117,7 +117,7 @@ fn main() {
             break;
         }
 
-        if next_visits.len() == 0 {
+        if next_visits.is_empty() {
             next_visits.push(("button".to_string(), "broadcaster".to_string(), Pulse::Low));
         }
     }
@@ -126,7 +126,7 @@ fn main() {
 fn press_button(cycle_count: u64, modules: &mut HashMap<String, Module>, next_visits: &mut Vec<(String, String, Pulse)>, leads_to_rx: &mut HashMap<String, Option<u64>>) -> (u64, u64) {
     let mut low_pulses = 0;
     let mut high_pulses = 0;
-    while next_visits.len() > 0 {
+    while !next_visits.is_empty() {
         for visit in std::mem::take(next_visits).iter() {
             match visit.2 {
                 Pulse::Low => low_pulses += 1,

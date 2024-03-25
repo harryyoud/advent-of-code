@@ -40,7 +40,7 @@ fn main() {
     let input = get_input(8);
     let mut input = input.lines();
     let mut map: HashMap<String, Waypoint> = HashMap::new();
-    let directions: Vec<Direction> = input.next().unwrap().chars().map(|d| Direction::from_char(d)).collect();
+    let directions: Vec<Direction> = input.next().unwrap().chars().map(Direction::from_char).collect();
     input.next().unwrap();
     
     for line in input {

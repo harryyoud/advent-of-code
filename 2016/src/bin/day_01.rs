@@ -34,14 +34,14 @@ fn solve(movements: impl Iterator<Item=(char, i32)>) -> (u32, u32) {
             }
             if visited_twice.is_none() {
                 if visited.contains(&(x, y)) {
-                    visited_twice = Some(x.abs() as u32 + y.abs() as u32)
+                    visited_twice = Some(x.unsigned_abs() + y.unsigned_abs())
                 }
                 visited.insert((x, y));
             }
         }
     }
 
-    (x.abs() as u32 + y.abs() as u32, visited_twice.unwrap())
+    (x.unsigned_abs() + y.unsigned_abs(), visited_twice.unwrap())
 }
 
 enum Direction {

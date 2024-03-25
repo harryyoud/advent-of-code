@@ -19,7 +19,7 @@ fn part_1(min_presents: u64) -> u64 {
             if presents < min_presents {
                 return None;
             }
-            return Some(house);
+            Some(house)
         })
         .unwrap()
 }
@@ -34,7 +34,7 @@ fn part_2(min_presents: u64) -> u64 {
         if presents < min_presents {
             return None;
         }
-        return Some(house);
+        Some(house)
     })
     .unwrap()
 }

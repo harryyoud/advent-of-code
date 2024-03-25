@@ -27,7 +27,7 @@ struct Node {
 }
 
 impl Node {
-    fn find_uneven_weight_recursive<'a>(&'a self) -> Option<usize> {
+    fn find_uneven_weight_recursive(&self) -> Option<usize> {
         if self.are_children_balanced() {
             return None;
         }
@@ -48,7 +48,7 @@ impl Node {
             .unwrap();
 
         match uneven_child.find_uneven_weight_recursive() {
-            Some(x) => return Some(x),
+            Some(x) => Some(x),
             None => Some(
                 uneven_child.weight.checked_add_signed(others as isize - odd_one_out as isize).unwrap()
             ),
@@ -106,8 +106,7 @@ fn find_root(mapping: &HashMap<&str, Vec<&str>>) -> String {
         .map(|(a, _b)| *a)
         .collect::<HashSet<_>>();
     let children = mapping.iter()
-        .map(|(_name, children)| children)
-        .flatten()
+        .flat_map(|(_name, children)| children)
         .cloned()
         .collect::<HashSet<_>>();
 

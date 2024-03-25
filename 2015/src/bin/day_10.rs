@@ -27,7 +27,7 @@ fn transform(input: String) -> String {
     let mut temp = vec![(prev_char, 1)];
     let mut cursor = 0;
 
-    while let Some(c) = chars.next() {
+    for c in chars {
         if prev_char == c {
             temp[cursor].1 += 1;
             continue;

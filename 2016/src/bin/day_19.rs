@@ -13,11 +13,11 @@ fn main() {
 }
 
 fn part_1(elves: &[Elf]) -> usize {
-    solve(Strategy::FromLeft, &elves)
+    solve(Strategy::FromLeft, elves)
 }
 
 fn part_2(elves: &[Elf]) -> usize {
-    solve(Strategy::FromOpposite, &elves)
+    solve(Strategy::FromOpposite, elves)
 }
 
 fn solve(strategy: Strategy, elves: &[Elf]) -> usize {

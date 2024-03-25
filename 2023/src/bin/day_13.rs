@@ -67,7 +67,7 @@ fn get_reflection_b(lines: &Vec<Vec<char>>) -> Option<u32> {
 
 fn is_similar(line_a: &Vec<char>, line_b: &Vec<char>) -> bool {
     // if only one difference, then true, otherwise false
-    line_a.iter().zip(line_b).filter_map(|(a, b)| (a != b).then(|| ())).count() == 1
+    line_a.iter().zip(line_b).filter_map(|(a, b)| (a != b).then_some(())).count() == 1
 }
 
 fn transpose<T: Clone>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {

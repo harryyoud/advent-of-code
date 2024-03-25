@@ -65,23 +65,23 @@ fn parse_input(input: &str) -> Vec<Instruction> {
     let mut instructions = vec![];
 
     for line in input.lines() {
-        let (instruction, detail) = line.split_once(" ").unwrap();
+        let (instruction, detail) = line.split_once(' ').unwrap();
         instructions.push(match instruction {
-            "hlf" => Instruction::Half { register: detail.chars().nth(0).unwrap() },
-            "tpl" => Instruction::Triple { register: detail.chars().nth(0).unwrap() },
-            "inc" => Instruction::Increment { register: detail.chars().nth(0).unwrap() },
+            "hlf" => Instruction::Half { register: detail.chars().next().unwrap() },
+            "tpl" => Instruction::Triple { register: detail.chars().next().unwrap() },
+            "inc" => Instruction::Increment { register: detail.chars().next().unwrap() },
             "jmp" => Instruction::Jump { amount: detail.parse().unwrap() },
             "jie" => {
                 let (register, amount) = detail.split_once(", ").unwrap();
                 Instruction::JumpIfEven {
-                    register: register.chars().nth(0).unwrap(),
+                    register: register.chars().next().unwrap(),
                     amount: amount.parse().unwrap(),
                 }
             },
             "jio" => {
                 let (register, amount) = detail.split_once(", ").unwrap();
                 Instruction::JumpIfOne {
-                    register: register.chars().nth(0).unwrap(),
+                    register: register.chars().next().unwrap(),
                     amount: amount.parse().unwrap(),
                 }
             },

@@ -29,7 +29,7 @@ struct Machine<'a> {
 }
 
 impl Machine<'_> {
-    fn new<'a>(instructions: Vec<Instruction<'a>>) -> Machine<'a> {
+    fn new(instructions: Vec<Instruction<'_>>) -> Machine<'_> {
         Machine {
             instructions,
             cursor: 0,
@@ -66,7 +66,7 @@ impl Machine<'_> {
     }
 }
 
-fn parse_input<'a>(input: &'a str) -> Vec<Instruction<'a>> {
+fn parse_input(input: &str) -> Vec<Instruction<'_>> {
     let re = Regex::new(r#"(?<register>\w+)\s+(?<operation_type>inc|dec)\s+(?<operation_num>-?\d+)\s+if\s+(?<comparison_left>\w+)\s+(?<comparison_type>[!><=]+)\s+(?<comparison_right>-?\d+)"#).unwrap();
     let mut instructions = vec![];
     for line in input.lines() {

@@ -165,7 +165,7 @@ impl Point {
 }
 
 fn parse_input(input: &str) -> Cluster {
-    let infected_nodes = input.lines().enumerate().map(|(y, line)| {
+    let infected_nodes = input.lines().enumerate().flat_map(|(y, line)| {
         line.chars().enumerate().filter_map(move |(x, c)| {
             match c {
                 '.' => None,
@@ -173,7 +173,7 @@ fn parse_input(input: &str) -> Cluster {
                 _ => panic!("Invalid character in input (line {x}, char {y}): {c}"),
             }
         })
-    }).flatten().collect::<HashMap<_, _>>();
+    }).collect::<HashMap<_, _>>();
 
     Cluster {
         nodes: infected_nodes,

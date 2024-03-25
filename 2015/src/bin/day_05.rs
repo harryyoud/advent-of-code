@@ -65,8 +65,8 @@ fn is_nice_part_1(word: &str) -> bool {
     ];
     let vowels = ['a', 'e', 'i', 'o', 'u'];
 
-    let bad_list = AhoCorasick::new(&bad_list).unwrap();
-    let good_list = AhoCorasick::new(&good_list).unwrap();
+    let bad_list = AhoCorasick::new(bad_list).unwrap();
+    let good_list = AhoCorasick::new(good_list).unwrap();
 
     if bad_list.find(word).is_some() {
         return false;

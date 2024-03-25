@@ -32,7 +32,7 @@ fn part_2(results: &HashMap<u64, u64>) -> u64 {
 }
 
 fn solve_iterative(containers: &[i64]) -> HashMap<u64, u64> {
-    assert!(containers.len() > 0);
+    assert!(!containers.is_empty());
 
     let mut out = HashMap::new();
     let mut to_visit: VecDeque<(Vec<usize>, i64)> = VecDeque::new();
@@ -41,7 +41,7 @@ fn solve_iterative(containers: &[i64]) -> HashMap<u64, u64> {
 
     while let Some((stack, remaining)) = to_visit.pop_front() {
         let candidates = (0..containers.len())
-            .filter(|x| x >= stack.last().or_else(|| Some(&0)).unwrap())
+            .filter(|x| x >= stack.last().unwrap_or(&0))
             .filter(|x| !stack.contains(x));
 
         for candidate in candidates {

@@ -33,7 +33,7 @@ fn part_2(ingredients: &[Ingredient]) -> u32 {
     ingredients
         .iter()
         .combinations_with_replacement(100)
-        .filter(|x| calculate_cookie_calories(&x) == 500)
+        .filter(|x| calculate_cookie_calories(x) == 500)
         .map(|x| calculate_cookie_score(&x))
         .max()
         .unwrap()

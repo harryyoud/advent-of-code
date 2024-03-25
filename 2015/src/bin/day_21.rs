@@ -79,11 +79,11 @@ fn part_1(
 ) -> u64 {
     let mut min_cost: u64 = u64::MAX;
 
-    for (weapon, armour, rings) in get_shop_combinations(weapons, armour, rings).into_iter() {
+    for (weapon, armour, rings) in get_shop_combinations(weapons, armour, rings) {
         let cost = weapon.cost +
-            armour.and_then(|x| Some(x.cost)).unwrap_or(0) +
-            rings.0.and_then(|x| Some(x.cost)).unwrap_or(0) +
-            rings.1.and_then(|x| Some(x.cost)).unwrap_or(0);
+            armour.map(|x| x.cost).unwrap_or(0) +
+            rings.0.map(|x| x.cost).unwrap_or(0) +
+            rings.1.map(|x| x.cost).unwrap_or(0);
 
         match get_fight_outcome(boss, player, weapon, armour, rings) {
             Outcome::BossWins => (),
@@ -105,11 +105,11 @@ fn part_2(
 ) -> u64 {
     let mut max_cost: u64 = u64::MIN;
 
-    for (weapon, armour, rings) in get_shop_combinations(weapons, armour, rings).into_iter() {
+    for (weapon, armour, rings) in get_shop_combinations(weapons, armour, rings) {
         let cost = weapon.cost +
-            armour.and_then(|x| Some(x.cost)).unwrap_or(0) +
-            rings.0.and_then(|x| Some(x.cost)).unwrap_or(0) +
-            rings.1.and_then(|x| Some(x.cost)).unwrap_or(0);
+            armour.map(|x| x.cost).unwrap_or(0) +
+            rings.0.map(|x| x.cost).unwrap_or(0) +
+            rings.1.map(|x| x.cost).unwrap_or(0);
 
         match get_fight_outcome(boss, player, weapon, armour, rings) {
             Outcome::BossWins => {
@@ -125,11 +125,11 @@ fn part_2(
 fn get_shop_combinations<'a>(weapons: &'a [Item], armour: &'a [Item], rings: &'a [Item]) -> impl Iterator<Item = (&'a Item, Option<&'a Item>, (Option<&'a Item>, Option<&'a Item>))> {
     weapons.iter()
         .cartesian_product(armour.iter()
-            .map(|x| Some(x))
+            .map(Some)
             .chain(iter::once(None))
         )
         .cartesian_product(rings.iter()
-            .map(|x| Some(x))
+            .map(Some)
             .chain(iter::once(None))
             .chain(iter::once(None))
             .tuple_combinations::<(_, _)>()
@@ -185,13 +185,13 @@ fn parse_shop() -> (Vec<Item>, Vec<Item>, Vec<Item>) {
 
     for paragraph in SHOP.paragraphs() {
         let mut lines = paragraph.into_iter();
-        let v = match lines.next().unwrap().split_once(":").unwrap().0 {
+        let v = match lines.next().unwrap().split_once(':').unwrap().0 {
             "Weapons" => &mut weapons,
             "Armor" => &mut armour,
             "Rings" => &mut rings,
             s => panic!("Invalid item type: {s}")
         };
-        while let Some(line) = lines.next() {
+        for line in lines {
             v.push(parse_item(line));
         }
     }

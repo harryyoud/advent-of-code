@@ -15,9 +15,9 @@ fn main() {
     dbg!(part_a);
 }
 
-fn parse_line<'a>(line: &'a str) -> (&'a str, Vec<u32>) {
+fn parse_line(line: &str) -> (&str, Vec<u32>) {
     let (template, groups) = line.split_whitespace().collect_tuple().unwrap();
-    let groups = groups.split(",").map(|s| s.parse::<u32>().unwrap()).collect_vec();
+    let groups = groups.split(',').map(|s| s.parse::<u32>().unwrap()).collect_vec();
     (template, groups)
 }
 
@@ -27,11 +27,11 @@ fn get_solutions(template: &str, groups: Vec<u32>) -> u32 {
     let max_inner_gap_size: usize = template.len() - (groups.len() - 1) - groups.iter().sum::<u32>() as usize;
 
     let mut gaps = vec![];
-    gaps.push(iter::once(0).into_iter().chain(1..=max_inner_gap_size).collect_vec());
+    gaps.push(iter::once(0).chain(1..=max_inner_gap_size).collect_vec());
     for _ in 0..(groups.len() - 1) {
-        gaps.push(iter::once(1).into_iter().chain(2..=max_inner_gap_size).collect_vec());
+        gaps.push(iter::once(1).chain(2..=max_inner_gap_size).collect_vec());
     }
-    gaps.push(iter::once(0).into_iter().chain(1..=max_inner_gap_size).collect_vec());
+    gaps.push(iter::once(0).chain(1..=max_inner_gap_size).collect_vec());
 
     let mut completed_solutions = 0u32;
 

@@ -28,13 +28,13 @@ fn solve(input: &str, recursions: usize) -> u64 {
     for i in 0.. {
         let hash = calculate_hash_recursive(&format!("{input}{i}"), recursions, cache.clone());
         if let Some(c) = first_pass(&hash) {
-            if let Some(_) = ((i + 1)..=(i + 1000)).into_par_iter().find_map_first(|x| {
+            if ((i + 1)..=(i + 1000)).into_par_iter().find_map_first(|x| {
                 if second_pass(&calculate_hash_recursive(&format!("{input}{x}"), recursions, cache.clone()), c) {
                     Some(())
                 } else {
                     None
                 }
-            }) {
+            }).is_some() {
                 out.push(i);
             }
         }
@@ -55,7 +55,7 @@ fn calculate_hash_recursive(plaintext: &str, number_of_recursions: usize, cache:
         |x| {
             md5::compute(format!("{x:x}"))
         }
-    ).skip(number_of_recursions - 1).next().unwrap();
+    ).nth(number_of_recursions - 1).unwrap();
     cache.write().unwrap().insert(plaintext, out);
     format!("{out:x}")
 }

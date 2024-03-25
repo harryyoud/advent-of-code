@@ -26,7 +26,7 @@ fn calculate_increase_sequence_n(sequence: &Vec<i32>) -> Vec<Vec<i32>> {
 fn get_next_in_top_sequence(sequences: Vec<Vec<i32>>) -> i32 {
     let mut last_extra = 0_i32;
     for sequence in sequences.iter().rev().skip(1) {
-        last_extra = sequence.last().unwrap() + last_extra;
+        last_extra += sequence.last().unwrap();
     }
     last_extra
 }

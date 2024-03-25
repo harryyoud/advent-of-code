@@ -67,7 +67,7 @@ impl EncryptedRoom {
                 }
             }
         }
-        return true;
+        true
     }
 
     fn decrypted_name(&self) -> String {

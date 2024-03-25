@@ -73,8 +73,7 @@ fn extract_numbers(line: &str) -> (usize, usize, usize, usize) {
     line
         .trim_start_matches(|x: char| x.is_alphabetic() || x.is_whitespace())
         .split(" through ")
-        .map(|x| x.split(",").map(|a| a.parse::<usize>().unwrap()).collect_vec())
-        .flatten()
+        .flat_map(|x| x.split(',').map(|a| a.parse::<usize>().unwrap()).collect_vec())
         .collect_tuple()
         .unwrap()
 }

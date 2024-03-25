@@ -24,7 +24,7 @@ fn main() {
 
 fn part_1(candidates: &[Sue], template: &Sue) -> u32 {
     candidates
-        .into_iter()
+        .iter()
         .enumerate()
         .filter(|(_idx, x)| x.is_match_exact(template))
         .map(|(idx, _x)| (idx + 1) as u32)
@@ -34,7 +34,7 @@ fn part_1(candidates: &[Sue], template: &Sue) -> u32 {
 
 fn part_2(candidates: &[Sue], template: &Sue) -> u32 {
     candidates
-        .into_iter()
+        .iter()
         .enumerate()
         .filter(|(_idx, x)| x.is_match_ranges(template))
         .map(|(idx, _x)| (idx + 1) as u32)
@@ -85,7 +85,7 @@ impl Sue {
 }
 
 fn parse_input(input: &str) -> Vec<Sue> {
-    input.lines().map(|line| parse_sue(line)).collect_vec()
+    input.lines().map(parse_sue).collect_vec()
 }
 
 fn parse_sue(input: &str) -> Sue {

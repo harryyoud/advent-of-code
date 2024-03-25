@@ -10,7 +10,7 @@ fn main() {
 
 fn parse_input(line: &str) -> [u64; 3] {
     line
-        .split("x")
+        .split('x')
         .map(|x| x.parse::<u64>().unwrap())
         .collect_vec()
         .try_into()

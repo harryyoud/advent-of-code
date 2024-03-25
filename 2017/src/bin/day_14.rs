@@ -25,24 +25,22 @@ fn part_1(grid: &Grid) -> usize {
 
 fn part_2(grid: &Grid) -> usize {
     let f = |x: &(usize, usize)| -> Vec<(usize, usize)> {
-        used_neighbours(&grid, *x)
+        used_neighbours(grid, *x)
     };
 
-    count_groups(find_used_cells(&grid), f)
+    count_groups(find_used_cells(grid), f)
 }
 
 fn find_used_cells(grid: &Grid) -> HashSet<(usize, usize)> {
     HashSet::from_iter(
         grid.iter()
             .enumerate()
-            .map(|(y, row)| 
+            .flat_map(|(y, row)| 
                 row.iter()
                     .enumerate()
                     .filter(|(_x, cell)| **cell)
                     .map(|(x, _cell)| (x, y))
-                    .collect_vec()
-            )
-            .flatten()
+                    .collect_vec())
     )
 }
 
@@ -65,8 +63,7 @@ fn build_grid(input: &str) -> Grid {
         .map(|x| 
             knot_hasher::hash(&format!("{input}-{x}"))
             .iter()
-            .map(|u| format!("{u:8b}").chars().map(|v| v == '1').collect_vec())
-            .flatten()
+            .flat_map(|u| format!("{u:8b}").chars().map(|v| v == '1').collect_vec())
             .collect_vec()
             .try_into()
             .unwrap()
