@@ -200,9 +200,9 @@ dependencies = [
 
 [[package]]
 name = "btree_monstrousity"
-version = "0.0.4"
+version = "0.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b4d0977e9c15f276380f16f2e9594257c258172b23af39ffd2e4cf5971cb38c7"
+checksum = "2ec92912346b936c974181a172d9abc81f50d41e40118fc101dac8aa8134bee3"
 dependencies = [
  "cfg-if",
  "rustversion",
@@ -950,13 +950,12 @@ dependencies = [
 
 [[package]]
 name = "nodit"
-version = "0.8.0"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a45df50fdf709378848cf0b178b431076224233350844cb6306114d2bddb7d3"
+checksum = "f74369f80df24efd2266602fdcd8fcd56a17c2e2c94ab48d2f7a15eaa137bf49"
 dependencies = [
  "btree_monstrousity",
- "itertools 0.12.1",
- "serde",
+ "itertools 0.13.0",
  "smallvec",
 ]
 
@@ -1590,9 +1589,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.41.1"
+version = "1.42.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22cfb5bee7a6a52939ca9224d6ac897bb669134078daa8735560897f69de4d33"
+checksum = "5cec9b21b0450273377fc97bd4c33a8acffc8c996c987a7c5b319a0083707551"
 dependencies = [
  "backtrace",
  "bytes",
