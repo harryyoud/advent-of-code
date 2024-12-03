@@ -1,6 +1,7 @@
 use std::{collections::{HashMap, VecDeque}, str::FromStr};
+use itertools::Itertools;
 use aoc_2017::get_input;
-use aoc_lib::Paragraphs;
+use aoc_lib::paragraphs::Paragraphs;
 use regex::Regex;
 
 fn main() {
@@ -72,7 +73,7 @@ impl Machine {
 
 fn parse_input(input: &str) -> (StateKey, usize, HashMap<StateKey, State>) {
     let mut paragraphs = input.paragraphs();
-    let (starting_state, checksum_step) = extract_starting_state(&paragraphs.next().unwrap());
+    let (starting_state, checksum_step) = extract_starting_state(paragraphs.next().unwrap());
 
     let re = Regex::new(r#"In state (?<state_key>\w):
   If the current value is 0:
@@ -85,7 +86,7 @@ fn parse_input(input: &str) -> (StateKey, usize, HashMap<StateKey, State>) {
     - Continue with state (?<value_1_next>\w)\."#).unwrap();
 
     (starting_state, checksum_step, paragraphs.map(|p| {
-        let p = p.join("\n");
+        let p = p.into_iter().join("\n");
         let capture = re.captures(&p).unwrap();
         (capture["state_key"].chars().next().unwrap(), State {
             if_false: Instruction {
@@ -110,12 +111,12 @@ fn parse_input(input: &str) -> (StateKey, usize, HashMap<StateKey, State>) {
     }).collect())
 }
 
-fn extract_starting_state(paragraph: &[&str]) -> (StateKey, usize) {
+fn extract_starting_state(mut paragraph: impl Iterator<Item = &str>) -> (StateKey, usize) {
     let re_start = Regex::new(r#"^Begin in state (?<starting_state>[A-Z])\.$"#).unwrap();
-    let capture_start = re_start.captures(paragraph[0]).unwrap();
+    let capture_start = re_start.captures(paragraph.next().unwrap()).unwrap();
     
     let re_checksum = Regex::new(r#"^Perform a diagnostic checksum after (?<checksum_steps>\d+) steps.$"#).unwrap();
-    let capture_checksum = re_checksum.captures(paragraph[1]).unwrap();
+    let capture_checksum = re_checksum.captures(paragraph.next().unwrap()).unwrap();
 
     (
         capture_start["starting_state"].chars().next().unwrap(),

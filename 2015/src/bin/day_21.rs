@@ -1,7 +1,7 @@
 use std::iter;
 
 use aoc_2015::get_input;
-use aoc_lib::Paragraphs;
+use aoc_lib::paragraphs::Paragraphs;
 use itertools::Itertools;
 
 const SHOP: &str = 

@@ -1,6 +1,6 @@
 
 use aoc_2023::get_input;
-use aoc_lib::Paragraphs;
+use aoc_lib::paragraphs::Paragraphs;
 use itertools::Itertools;
 
 fn main() {
@@ -9,7 +9,7 @@ fn main() {
     let mut part_a = 0u32;
     let mut part_b = 0u32;
 
-    for puzzle in input.paragraphs().map(|p| p.iter().map(|l| l.chars().collect_vec()).collect_vec()) {
+    for puzzle in input.paragraphs().map(|p| p.into_iter().map(|l| l.chars().collect_vec()).collect_vec()) {
         if let Some(horizontal_reflection_idx) = get_reflection_a(&puzzle) {
             part_a += horizontal_reflection_idx * 100
         } else if let Some(vertical_reflection_idx) = get_reflection_a(&transpose(puzzle.clone())) {

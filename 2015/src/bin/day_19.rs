@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::str::FromStr;
 
 use aoc_2015::get_input;
-use aoc_lib::Paragraphs;
+use aoc_lib::paragraphs::Paragraphs;
 use itertools::Itertools;
 use pathfinding::prelude::dijkstra;
 
@@ -47,7 +47,7 @@ fn part_2(replacements: &[(&str, &str)], molecule: &str) -> u64 {
 fn parse_input(input: &String) -> (Vec<(&str, &str)>, &str) {
     let (replacements, mut molecule) = input.paragraphs().collect_tuple().unwrap();
     let replacements = replacements.into_iter().map(|s| s.split(" => ").collect_tuple().unwrap()).collect_vec();
-    let molecule = molecule.pop().unwrap();
+    let molecule = molecule.last().unwrap();
 
     (replacements, molecule)
 }
