@@ -1,0 +1,9 @@
+[package]
+name = "aoc-2024"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+aoc_lib = { version = "0.1.0", path = "../aoc_lib" }
+itertools = "0.12.1"
+lazy-regex = "3.3.0"
