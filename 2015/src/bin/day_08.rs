@@ -15,6 +15,7 @@ fn part_2(input: &str) -> u32 {
     input.lines().map(|s| re_escape_len(s) - s.len() as u32).sum()
 }
 
+// returns (length_in_memory, length_after escapes)
 fn lengths(line: &str) -> (u32, u32) {
     let mem_len = line.len() as u32;
 

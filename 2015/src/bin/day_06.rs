@@ -86,7 +86,7 @@ impl Grid {
     }
 
     fn iterate(&self, rectangle: Rectangle) -> impl Iterator<Item = u8> + '_ {
-        std::iter::from_coroutine(move || {
+        std::iter::from_coroutine(#[coroutine] move || {
             for y in rectangle.start_y..=rectangle.end_y {
                 for x in rectangle.start_x..=rectangle.end_x {
                     yield self.grid[y][x]
@@ -96,7 +96,7 @@ impl Grid {
     }
 
     fn iterate_mut(&mut self, rectangle: Rectangle) -> impl Iterator<Item = &mut u8> {
-        std::iter::from_coroutine(move || {
+        std::iter::from_coroutine(#[coroutine] move || {
             for row in self.grid.iter_mut().take(rectangle.end_y + 1).skip(rectangle.start_y) {
                 for cell in row.iter_mut().take(rectangle.end_x + 1).skip(rectangle.start_x) {
                     yield cell;

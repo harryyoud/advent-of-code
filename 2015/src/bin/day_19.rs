@@ -4,13 +4,14 @@ use std::str::FromStr;
 use aoc_2015::get_input;
 use aoc_lib::Paragraphs;
 use itertools::Itertools;
+use pathfinding::prelude::dijkstra;
 
 fn main() {
     let input = get_input(19);
     let (replacements, molecule) = parse_input(&input);
 
     dbg!(part_1(&replacements, molecule));
-    // dbg!(part_2(&replacements, molecule));
+    dbg!(part_2(&replacements, molecule));
 }
 
 fn part_1(replacements: &[(&str, &str)], molecule: &str) -> u64 {
@@ -27,20 +28,21 @@ fn part_1(replacements: &[(&str, &str)], molecule: &str) -> u64 {
     set.len() as u64
 }
 
-// fn part_2(replacements: &[(&str, &str)], molecule: &str) -> u64 {
-//     let results = dijkstra(
-//         molecule.to_string(),
-//         |x: &str| replacements.iter().map(|(from, to)| {
-//             x.match_indices(to).filter_map(move |(idx, _match)| {
-//                 let mut s: String = String::from_str(&x[0..idx]).unwrap();
-//                 s.push_str(&x[idx..].replacen(to, from, 1));
-//                 Some(s)
-//             })
-//         }),
-//         |x| x == "e"
-//     );
-//     (results.unwrap().len() - 1) as u64
-// }
+fn part_2(replacements: &[(&str, &str)], molecule: &str) -> u64 {
+    unimplemented!("This is just a CPU destroyer");
+    let results = dijkstra(
+        &molecule.to_string(),
+        |x: &String| replacements.iter().flat_map(|(from, to)| {
+            x.match_indices(to).filter_map(move |(idx, _match)| {
+                let mut s: String = String::from_str(&x[0..idx]).unwrap();
+                s.push_str(&x[idx..].replacen(to, from, 1));
+                Some((s, 1))
+            }).collect_vec()
+        }).collect_vec(),
+        |x| *x == "e"
+    );
+    (results.unwrap().0.len() - 1) as u64
+}
 
 fn parse_input(input: &String) -> (Vec<(&str, &str)>, &str) {
     let (replacements, mut molecule) = input.paragraphs().collect_tuple().unwrap();

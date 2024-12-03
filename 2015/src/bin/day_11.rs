@@ -33,7 +33,8 @@ fn is_valid(password: &str) -> bool {
         .filter(|(_idx, (a, b))| a == b)
         .map(|(idx, (_a, _b))| idx)
         .tuple_combinations()
-        .any(|(x, y)| x.abs_diff(y) > 2) {
+        .any(|(x, y)| x.abs_diff(y) > 2)
+    {
         return false;
     }
 

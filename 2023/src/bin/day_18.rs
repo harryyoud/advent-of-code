@@ -1,7 +1,6 @@
-#![feature(int_roundings)]
-
 use aoc_2023::get_input;
 use itertools::Itertools;
+use num::Integer;
 
 type Point = (i64, i64);
 
@@ -73,5 +72,6 @@ fn get_area(corners: &[Point], edge_length: i64) -> i64 {
         total_area += (point_a.0 * point_b.1) - (point_a.1 * point_b.0);
     }
     total_area = total_area.abs() + edge_length;
-    total_area.div_ceil(2)
+    // div_ceil only available on unsigned types for now, feature int_rounding on nightly
+    (total_area as u64).div_ceil(2) as i64
 }
