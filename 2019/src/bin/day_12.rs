@@ -73,12 +73,12 @@ fn parse_input(input: &str) -> Vec<Body<N>> {
     for (line_number, line) in input.lines().enumerate() {
         let caps = re.captures(line).expect(&format!("Line {line_number} is not in expected format: {line}"));
         bodies.push(Body {
-            position: Position::from([
+            position: Position::new([
                 caps["x"].parse().unwrap(),
                 caps["y"].parse().unwrap(),
                 caps["z"].parse().unwrap(),
             ]),
-            velocity: Velocity::at_rest(),
+            velocity: Velocity::default(),
         });
     }
 
@@ -86,77 +86,10 @@ fn parse_input(input: &str) -> Vec<Body<N>> {
 }
 
 mod types {
-    use std::ops::DerefMut;
-    use std::ops::Deref;
+    use aoc_lib::vector::Vector;
 
-    #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
-    pub struct Vector<const DIMENSIONS: usize>([i32; DIMENSIONS]);
-
-    impl<const DIMENSIONS: usize> Deref for Vector<DIMENSIONS> {
-        type Target = [i32; DIMENSIONS];
-
-        fn deref(&self) -> &Self::Target {
-            &self.0
-        }
-    }
-
-    impl<const DIMENSIONS: usize> DerefMut for Vector<DIMENSIONS> {
-        fn deref_mut(&mut self) -> &mut Self::Target {
-            &mut self.0
-        }
-    }
-
-    impl<const DIMENSIONS: usize> Default for Vector<DIMENSIONS> {
-        fn default() -> Self {
-            Vector([0; DIMENSIONS])
-        }
-    }
-
-    #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
-    pub struct Velocity<const DIMENSIONS: usize>(Vector<DIMENSIONS>);
-
-    impl<const DIMENSIONS: usize> Deref for Velocity<DIMENSIONS> {
-        type Target = Vector<DIMENSIONS>;
-
-        fn deref(&self) -> &Self::Target {
-            &self.0
-        }
-    }
-
-    impl<const DIMENSIONS: usize> DerefMut for Velocity<DIMENSIONS> {
-        fn deref_mut(&mut self) -> &mut Self::Target {
-            &mut self.0
-        }
-    }
-
-    impl<const DIMENSIONS: usize> Velocity<DIMENSIONS> {
-        pub fn at_rest() -> Self {
-            Self(Vector::default())
-        }
-    }
-
-    #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
-    pub struct Position<const DIMENSIONS: usize>(Vector<DIMENSIONS>);
-
-    impl<const DIMENSIONS: usize> Deref for Position<DIMENSIONS> {
-        type Target = Vector<DIMENSIONS>;
-
-        fn deref(&self) -> &Self::Target {
-            &self.0
-        }
-    }
-
-    impl<const DIMENSIONS: usize> DerefMut for Position<DIMENSIONS> {
-        fn deref_mut(&mut self) -> &mut Self::Target {
-            &mut self.0
-        }
-    }
-
-    impl<const DIMENSIONS: usize> From<[i32; DIMENSIONS]> for Position<DIMENSIONS> {
-        fn from(inner: [i32; DIMENSIONS]) -> Self {
-            Self(Vector(inner))
-        }
-    }
+    pub type Position<const N: usize> = Vector<N>;
+    pub type Velocity<const N: usize> = Vector<N>;
 
     #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
     pub struct Body<const DIMENSIONS: usize> {
@@ -167,8 +100,8 @@ mod types {
     impl<const DIMENSIONS: usize> Body<DIMENSIONS> {
         pub fn to_single_dimension(&self, dimension: usize) -> Body<1> {
             Body {
-                position: Position(Vector([self.position[dimension]])),
-                velocity: Velocity(Vector([self.velocity[dimension]])),
+                position: Position::new([self.position[dimension]]),
+                velocity: Velocity::new([self.velocity[dimension]]),
             }
         }
 

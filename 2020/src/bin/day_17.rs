@@ -1,7 +1,7 @@
 use aoc_2020::get_input;
 use itertools::Itertools;
 use std::collections::HashSet;
-use types::*;
+use aoc_lib::vector::Vector;
 
 fn main() {
     let input = get_input(17);
@@ -13,8 +13,8 @@ fn main() {
             match cha {
                 '.' => {},
                 '#' => {
-                    grid_3d.insert(Vector([x as i32, y as i32, 0_i32]));
-                    grid_4d.insert(Vector([x as i32, y as i32, 0_i32, 0i32]));
+                    grid_3d.insert(Vector::new([x as i32, y as i32, 0_i32]));
+                    grid_4d.insert(Vector::new([x as i32, y as i32, 0_i32, 0i32]));
                 },
                 _ => panic!("Invalid character: {cha} at line {y} char {x}"),
             };
@@ -55,7 +55,7 @@ fn neighbours<const DIMENSIONS: usize>(point: Vector<DIMENSIONS>) -> Vec<Vector<
         .into_iter()
         .map(|d| (d - 1)..=(d +1))
         .multi_cartesian_product()
-        .map(|p| Vector(p.try_into().unwrap()))
+        .map(|p| Vector::new(p.try_into().unwrap()))
         .filter(|v| *v != point)
         .collect_vec()
 }
@@ -80,33 +80,5 @@ fn limits_iter<const DIMENSIONS: usize>(
             }
         })
         .multi_cartesian_product()
-        .map(|v| Vector(v.try_into().unwrap()))
-}
-
-mod types {
-    use std::ops::Deref;
-    use std::ops::DerefMut;
-
-    #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
-    pub struct Vector<const DIMENSIONS: usize>(pub [i32; DIMENSIONS]);
-
-    impl<const DIMENSIONS: usize> Deref for Vector<DIMENSIONS> {
-        type Target = [i32; DIMENSIONS];
-
-        fn deref(&self) -> &Self::Target {
-            &self.0
-        }
-    }
-
-    impl<const DIMENSIONS: usize> DerefMut for Vector<DIMENSIONS> {
-        fn deref_mut(&mut self) -> &mut Self::Target {
-            &mut self.0
-        }
-    }
-
-    impl<const DIMENSIONS: usize> Default for Vector<DIMENSIONS> {
-        fn default() -> Self {
-            Vector([0; DIMENSIONS])
-        }
-    }
+        .map(|v| Vector::new(v.try_into().unwrap()))
 }

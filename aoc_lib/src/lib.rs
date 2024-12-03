@@ -1,4 +1,5 @@
 pub mod paragraphs;
+pub mod vector;
 
 use std::{env, path::PathBuf};
 
