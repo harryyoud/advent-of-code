@@ -1,6 +1,6 @@
-use itertools::Itertools;
 use aoc_2019::get_input;
 use aoc_2019::intcode::{parse_input, Machine, MachineState};
+use itertools::Itertools;
 
 const MACHINE_COUNT: usize = 5;
 
@@ -43,7 +43,10 @@ fn part_2(instructions: &[i64]) -> i64 {
                 machine.run();
                 last = *machine.outputs.last().unwrap();
             }
-            if machines.iter().all(|x| matches!(x.state, MachineState::HitStopInstruction)) {
+            if machines
+                .iter()
+                .all(|x| matches!(x.state, MachineState::HitStopInstruction))
+            {
                 break;
             }
         }

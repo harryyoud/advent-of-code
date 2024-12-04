@@ -1,8 +1,13 @@
-use std::{collections::{HashMap, VecDeque}, str::FromStr};
-use itertools::Itertools;
+#![feature(anonymous_lifetime_in_impl_trait)]
+
 use aoc_2017::get_input;
 use aoc_lib::paragraphs::Paragraphs;
+use itertools::Itertools;
 use regex::Regex;
+use std::{
+    collections::{HashMap, VecDeque},
+    str::FromStr,
+};
 
 fn main() {
     let input = get_input(25);
@@ -11,7 +16,11 @@ fn main() {
     dbg!(part_1(starting_state, checksum_step, states));
 }
 
-fn part_1(starting_state: StateKey, checksum_step: usize, states: HashMap<StateKey, State>) -> usize {
+fn part_1(
+    starting_state: StateKey,
+    checksum_step: usize,
+    states: HashMap<StateKey, State>,
+) -> usize {
     let mut machine = Machine::new(starting_state, states);
     machine.run_n(checksum_step);
     machine.tape.iter().filter(|x| **x).count()
@@ -70,12 +79,12 @@ impl Machine {
     }
 }
 
-
 fn parse_input(input: &str) -> (StateKey, usize, HashMap<StateKey, State>) {
     let mut paragraphs = input.paragraphs();
     let (starting_state, checksum_step) = extract_starting_state(paragraphs.next().unwrap());
 
-    let re = Regex::new(r#"In state (?<state_key>\w):
+    let re = Regex::new(
+        r#"In state (?<state_key>\w):
   If the current value is 0:
     - Write the value (?<value_0_writes>\d)\.
     - Move one slot to the (?<value_0_moves>left|right)\.
@@ -83,39 +92,52 @@ fn parse_input(input: &str) -> (StateKey, usize, HashMap<StateKey, State>) {
   If the current value is 1:
     - Write the value (?<value_1_writes>\d)\.
     - Move one slot to the (?<value_1_moves>left|right)\.
-    - Continue with state (?<value_1_next>\w)\."#).unwrap();
+    - Continue with state (?<value_1_next>\w)\."#,
+    )
+    .unwrap();
 
-    (starting_state, checksum_step, paragraphs.map(|p| {
-        let p = p.into_iter().join("\n");
-        let capture = re.captures(&p).unwrap();
-        (capture["state_key"].chars().next().unwrap(), State {
-            if_false: Instruction {
-                write: match &capture["value_0_writes"] {
-                    "0" => false,
-                    "1" => true,
-                    _ => panic!("Invalid write, can only be 1 or 0"),
-                },
-                direction: Direction::from_str(&capture["value_0_moves"]).unwrap(),
-                next_state: capture["value_0_next"].chars().next().unwrap(),
-            },
-            if_true: Instruction {
-                write: match &capture["value_1_writes"] {
-                    "0" => false,
-                    "1" => true,
-                    _ => panic!("Invalid write, can only be 1 or 0"),
-                },
-                direction: Direction::from_str(&capture["value_1_moves"]).unwrap(),
-                next_state: capture["value_1_next"].chars().next().unwrap(),
-            },
-        })
-    }).collect())
+    (
+        starting_state,
+        checksum_step,
+        paragraphs
+            .map(|p| {
+                let p = p.into_iter().join("\n");
+                let capture = re.captures(&p).unwrap();
+                (
+                    capture["state_key"].chars().next().unwrap(),
+                    State {
+                        if_false: Instruction {
+                            write: match &capture["value_0_writes"] {
+                                "0" => false,
+                                "1" => true,
+                                _ => panic!("Invalid write, can only be 1 or 0"),
+                            },
+                            direction: Direction::from_str(&capture["value_0_moves"]).unwrap(),
+                            next_state: capture["value_0_next"].chars().next().unwrap(),
+                        },
+                        if_true: Instruction {
+                            write: match &capture["value_1_writes"] {
+                                "0" => false,
+                                "1" => true,
+                                _ => panic!("Invalid write, can only be 1 or 0"),
+                            },
+                            direction: Direction::from_str(&capture["value_1_moves"]).unwrap(),
+                            next_state: capture["value_1_next"].chars().next().unwrap(),
+                        },
+                    },
+                )
+            })
+            .collect(),
+    )
 }
 
 fn extract_starting_state(mut paragraph: impl Iterator<Item = &str>) -> (StateKey, usize) {
     let re_start = Regex::new(r#"^Begin in state (?<starting_state>[A-Z])\.$"#).unwrap();
     let capture_start = re_start.captures(paragraph.next().unwrap()).unwrap();
-    
-    let re_checksum = Regex::new(r#"^Perform a diagnostic checksum after (?<checksum_steps>\d+) steps.$"#).unwrap();
+
+    let re_checksum =
+        Regex::new(r#"^Perform a diagnostic checksum after (?<checksum_steps>\d+) steps.$"#)
+            .unwrap();
     let capture_checksum = re_checksum.captures(paragraph.next().unwrap()).unwrap();
 
     (
@@ -123,9 +145,6 @@ fn extract_starting_state(mut paragraph: impl Iterator<Item = &str>) -> (StateKe
         capture_checksum["checksum_steps"].parse().unwrap(),
     )
 }
-
-
-
 
 struct State {
     if_false: Instruction,
@@ -139,7 +158,8 @@ struct Instruction {
 }
 
 enum Direction {
-    Left, Right
+    Left,
+    Right,
 }
 
 impl FromStr for Direction {

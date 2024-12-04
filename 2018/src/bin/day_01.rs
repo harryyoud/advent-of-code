@@ -15,7 +15,8 @@ fn part_1(operations: &[isize]) -> isize {
 
 fn part_2(operations: &[isize]) -> isize {
     let mut i = 0;
-    operations.iter()
+    operations
+        .iter()
         .cycle()
         .map(|x| {
             i += *x;
@@ -27,7 +28,8 @@ fn part_2(operations: &[isize]) -> isize {
 }
 
 fn parse_input(input: &str) -> Vec<isize> {
-    input.lines()
+    input
+        .lines()
         .map(|line| line.trim_start_matches('+'))
         .map(|line| line.parse().unwrap())
         .collect_vec()

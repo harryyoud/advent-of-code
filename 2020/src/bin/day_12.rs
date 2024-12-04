@@ -5,7 +5,8 @@ use aoc_2020::{get_input, Vec2d};
 fn main() {
     let input = get_input(12);
 
-    let instructions: Vec<Instruction> = input.lines()
+    let instructions: Vec<Instruction> = input
+        .lines()
         .map(Instruction::try_from)
         .try_collect()
         .unwrap();
@@ -48,10 +49,10 @@ impl Ship {
         match instruction {
             Instruction::TurnLeft(degrees) => {
                 self.direction = self.direction.counterclockwise_deg(degrees);
-            },
+            }
             Instruction::TurnRight(degrees) => {
                 self.direction = self.direction.clockwise_deg(degrees);
-            },
+            }
             Instruction::MoveDirection(direction, amount) => {
                 self.position = move_n(self.position, direction, amount)
             }
@@ -68,19 +69,19 @@ impl Ship {
                     // rotating a point counterclockwise round the origin results in (x, y) -> (-y, x)
                     self.waypoint_offset = Vec2d {
                         x: -self.waypoint_offset.y,
-                        y:  self.waypoint_offset.x
+                        y: self.waypoint_offset.x,
                     }
                 }
-            },
+            }
             Instruction::TurnRight(degrees) => {
                 for _ in 0..((degrees / 90) % 4) {
                     // rotating a point clockwise round the origin results in (x, y) -> (y, -x)
                     self.waypoint_offset = Vec2d {
-                        x:  self.waypoint_offset.y,
-                        y: -self.waypoint_offset.x
+                        x: self.waypoint_offset.y,
+                        y: -self.waypoint_offset.x,
                     }
                 }
-            },
+            }
             Instruction::MoveDirection(direction, amount) => {
                 self.waypoint_offset = move_n(self.waypoint_offset, direction, amount)
             }
@@ -162,8 +163,8 @@ impl TryFrom<&str> for Instruction {
     type Error = ();
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        use Instruction::*;
         use Direction::*;
+        use Instruction::*;
         let number = value[1..].parse::<usize>().unwrap();
         Ok(match value.chars().next() {
             None => return Err(()),

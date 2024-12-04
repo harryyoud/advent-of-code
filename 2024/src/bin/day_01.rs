@@ -1,5 +1,5 @@
-use itertools::Itertools;
 use aoc_2024::get_input;
+use itertools::Itertools;
 
 fn main() {
     let input = get_input(1);
@@ -7,7 +7,12 @@ fn main() {
     let (mut left_list, mut right_list): (Vec<_>, Vec<_>) = input
         .lines()
         .map(|line| line.split_once("   ").unwrap())
-        .map(|(left_id, right_id)| (left_id.parse::<usize>().unwrap(), right_id.parse::<usize>().unwrap()))
+        .map(|(left_id, right_id)| {
+            (
+                left_id.parse::<usize>().unwrap(),
+                right_id.parse::<usize>().unwrap(),
+            )
+        })
         .unzip();
 
     left_list.sort();

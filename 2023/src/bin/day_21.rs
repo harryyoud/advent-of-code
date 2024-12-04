@@ -4,10 +4,18 @@ use aoc_2023::get_input;
 use itertools::Itertools;
 
 trait Position {
-    fn up(&self) -> Option<Self> where Self: Sized;
-    fn down(&self) -> Option<Self> where Self: Sized;
-    fn left(&self) -> Option<Self> where Self: Sized;
-    fn right(&self) -> Option<Self> where Self: Sized;
+    fn up(&self) -> Option<Self>
+    where
+        Self: Sized;
+    fn down(&self) -> Option<Self>
+    where
+        Self: Sized;
+    fn left(&self) -> Option<Self>
+    where
+        Self: Sized;
+    fn right(&self) -> Option<Self>
+    where
+        Self: Sized;
 }
 
 impl Position for (u32, u32) {
@@ -37,12 +45,7 @@ struct Grid {
 
 impl Grid {
     fn find_viable_neighbours(&self, point: (u32, u32)) -> Vec<(u32, u32)> {
-        let neighbours = vec![
-            point.up(),
-            point.down(),
-            point.right(),
-            point.left(),
-        ];
+        let neighbours = vec![point.up(), point.down(), point.right(), point.left()];
         neighbours
             .into_iter()
             .flatten()
@@ -85,20 +88,24 @@ fn parse_input(input: &str) -> Grid {
 
     let mut starting_position = None;
     let mut rocks: HashSet<(u32, u32)> = HashSet::new();
-    
+
     for (y, line) in input.lines().enumerate() {
         for (x, cha) in line.chars().enumerate() {
             match cha {
-                '#' => {rocks.insert((x as u32, y as u32));},
-                'S' => {starting_position = Some((x as u32, y as u32))},
+                '#' => {
+                    rocks.insert((x as u32, y as u32));
+                }
+                'S' => starting_position = Some((x as u32, y as u32)),
                 '.' => continue,
                 _ => panic!("Invalid character \"{cha}\" line {x}, character {y}"),
-            } 
+            }
         }
     }
 
     Grid {
         starting_position: starting_position.expect("Could not find starting position S"),
-        rocks, x_len, y_len
+        rocks,
+        x_len,
+        y_len,
     }
 }

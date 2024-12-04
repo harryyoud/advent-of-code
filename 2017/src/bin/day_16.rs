@@ -50,7 +50,7 @@ fn dance(dancers: &mut VecDeque<char>, moves: &[DanceMove]) {
                 let a_pos = dancers.iter().position(|x| *x == *a).unwrap();
                 let b_pos = dancers.iter().position(|x| *x == *b).unwrap();
                 dancers.swap(a_pos, b_pos);
-            },
+            }
         }
     }
 }
@@ -62,20 +62,22 @@ fn parse_input(input: &str) -> Vec<DanceMove> {
 fn parse_dance_move(input: &str) -> DanceMove {
     let mut chars = input.chars();
     let out = match chars.next().unwrap() {
-        's' => {
-            DanceMove::Spin(input[1..].parse().unwrap())
-        },
+        's' => DanceMove::Spin(input[1..].parse().unwrap()),
         'x' => {
             let (a, b) = input[1..].split_once('/').unwrap();
             DanceMove::Exchange(a.parse().unwrap(), b.parse().unwrap())
-        },
+        }
         'p' => {
             let a = chars.next().unwrap();
             assert!(chars.next().unwrap() == '/');
             let b = chars.next().unwrap();
-            assert_eq!(chars.next(), None, "Should be no left over characters: {input}");
+            assert_eq!(
+                chars.next(),
+                None,
+                "Should be no left over characters: {input}"
+            );
             DanceMove::Partner(a, b)
-        },
+        }
         _ => panic!("Invalid dance move"),
     };
     out

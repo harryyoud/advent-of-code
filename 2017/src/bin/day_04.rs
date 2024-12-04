@@ -16,23 +16,18 @@ fn part_1(input: &str) -> usize {
 }
 
 fn part_2(input: &str) -> usize {
-    input
-        .lines()
-        .filter(|x| !contains_anagrams(x))
-        .count()
+    input.lines().filter(|x| !contains_anagrams(x)).count()
 }
 
 fn contains_repeated_words(line: &str) -> bool {
-    line
-        .split_whitespace()
+    line.split_whitespace()
         .counts()
         .iter()
         .any(|(_, count)| *count > 1)
 }
 
 fn contains_anagrams(line: &str) -> bool {
-    line
-        .split_whitespace()
+    line.split_whitespace()
         .map(|word| word.chars().sorted().collect_vec())
         .counts()
         .iter()

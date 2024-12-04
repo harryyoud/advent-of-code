@@ -35,8 +35,12 @@ fn parse_input(input: &str) -> (HashSet<&str>, HashMap<(&str, &str), i32>) {
     let mut set = HashSet::new();
     for line in input.lines() {
         let line = line.trim_end_matches('.');
-        let (lhs, next_to) = line.split(" happiness units by sitting next to ").collect_tuple().unwrap();
-        let (person, _would, gain_or_lose, amount) = lhs.split_whitespace().collect_tuple().unwrap();
+        let (lhs, next_to) = line
+            .split(" happiness units by sitting next to ")
+            .collect_tuple()
+            .unwrap();
+        let (person, _would, gain_or_lose, amount) =
+            lhs.split_whitespace().collect_tuple().unwrap();
         let mut amount = amount.parse::<i32>().unwrap();
         amount *= match gain_or_lose {
             "gain" => 1,
@@ -52,7 +56,11 @@ fn parse_input(input: &str) -> (HashSet<&str>, HashMap<(&str, &str), i32>) {
 
 fn calculate_total_happiness(arrangement: &[&str], map: &HashMap<(&str, &str), i32>) -> i32 {
     let mut total = 0;
-    for (a, b) in arrangement.iter().chain(std::iter::once(&arrangement[0])).tuple_windows() {
+    for (a, b) in arrangement
+        .iter()
+        .chain(std::iter::once(&arrangement[0]))
+        .tuple_windows()
+    {
         total += map.get(&(a, b)).unwrap();
         total += map.get(&(b, a)).unwrap();
     }

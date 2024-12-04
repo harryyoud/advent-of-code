@@ -12,13 +12,13 @@ fn part_1(all_chars: &Vec<Vec<char>>) -> String {
     let mut message = String::with_capacity(all_chars.len());
 
     for pos in all_chars {
-        message.push(pos
-            .iter()
-            .counts()
-            .into_iter()
-            .max_by_key(|(_c, count)| *count)
-            .map(|(cha, _count)| *cha)
-            .unwrap()
+        message.push(
+            pos.iter()
+                .counts()
+                .into_iter()
+                .max_by_key(|(_c, count)| *count)
+                .map(|(cha, _count)| *cha)
+                .unwrap(),
         );
     }
 
@@ -29,13 +29,13 @@ fn part_2(all_chars: &Vec<Vec<char>>) -> String {
     let mut message = String::with_capacity(all_chars.len());
 
     for pos in all_chars {
-        message.push(pos
-            .iter()
-            .counts()
-            .into_iter()
-            .min_by_key(|(_c, count)| *count)
-            .map(|(cha, _count)| *cha)
-            .unwrap()
+        message.push(
+            pos.iter()
+                .counts()
+                .into_iter()
+                .min_by_key(|(_c, count)| *count)
+                .map(|(cha, _count)| *cha)
+                .unwrap(),
         );
     }
 

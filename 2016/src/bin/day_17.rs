@@ -18,20 +18,44 @@ fn part_1(input: &str) -> String {
     let mut min_path_len = usize::MAX;
     let mut shortest_path = vec![];
 
-    solve_with_dfs(input, &[], &START, &mut min_path_len, &mut shortest_path, SearchType::Shortest);
+    solve_with_dfs(
+        input,
+        &[],
+        &START,
+        &mut min_path_len,
+        &mut shortest_path,
+        SearchType::Shortest,
+    );
 
-    shortest_path.iter().map(|x| x.as_char()).collect::<String>()
+    shortest_path
+        .iter()
+        .map(|x| x.as_char())
+        .collect::<String>()
 }
 
 fn part_2(input: &str) -> usize {
     let mut max_path_len = usize::MIN;
 
-    solve_with_dfs(input, &[], &START, &mut max_path_len, &mut vec![], SearchType::Longest);
+    solve_with_dfs(
+        input,
+        &[],
+        &START,
+        &mut max_path_len,
+        &mut vec![],
+        SearchType::Longest,
+    );
 
     max_path_len
 }
 
-fn solve_with_dfs(input: &str, path: &[Direction], current_point: &Point, len_result: &mut usize, path_result: &mut Vec<Direction>, search_type: SearchType) {
+fn solve_with_dfs(
+    input: &str,
+    path: &[Direction],
+    current_point: &Point,
+    len_result: &mut usize,
+    path_result: &mut Vec<Direction>,
+    search_type: SearchType,
+) {
     let open_doors = get_open_doors(input, path);
     let possible_movements = possible_movements(&open_doors, current_point);
 
@@ -56,7 +80,14 @@ fn solve_with_dfs(input: &str, path: &[Direction], current_point: &Point, len_re
     for (dir, next_point) in possible_movements {
         let mut new_path = path.to_owned();
         new_path.push(dir);
-        solve_with_dfs(input, &new_path, &next_point, len_result, path_result, search_type);
+        solve_with_dfs(
+            input,
+            &new_path,
+            &next_point,
+            len_result,
+            path_result,
+            search_type,
+        );
     }
 }
 
@@ -65,24 +96,26 @@ fn calculate_hash(input: &str) -> String {
 }
 
 fn get_hash_with_path(input: &str, path: &[Direction]) -> String {
-    let path_taken_hash_suffix = path
-        .iter()
-        .map(|dir| dir.as_char())
-        .collect::<String>();
+    let path_taken_hash_suffix = path.iter().map(|dir| dir.as_char()).collect::<String>();
     calculate_hash(&format!("{input}{path_taken_hash_suffix}"))
 }
 
 fn get_open_doors(input: &str, path: &[Direction]) -> Vec<Direction> {
     let hash = get_hash_with_path(input, path);
-    hash
-        .chars()
+    hash.chars()
         .take(4)
-        .zip([Direction::Up, Direction::Down, Direction::Left, Direction::Right].iter())
-        .filter_map(|(c, dir)| {
-            match c {
-                'b' | 'c' | 'd' | 'e' | 'f' => Some(*dir),
-                _ => None,
-            }
+        .zip(
+            [
+                Direction::Up,
+                Direction::Down,
+                Direction::Left,
+                Direction::Right,
+            ]
+            .iter(),
+        )
+        .filter_map(|(c, dir)| match c {
+            'b' | 'c' | 'd' | 'e' | 'f' => Some(*dir),
+            _ => None,
         })
         .collect_vec()
 }
@@ -108,7 +141,10 @@ fn possible_movements(open_doors: &[Direction], current_point: &Point) -> Vec<(D
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Direction {
-    Up, Down, Left, Right
+    Up,
+    Down,
+    Left,
+    Right,
 }
 
 impl Direction {

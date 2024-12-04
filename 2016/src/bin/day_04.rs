@@ -30,7 +30,10 @@ fn parse_input(input: &str) -> Vec<EncryptedRoom> {
     let mut v = vec![];
     for line in input.lines() {
         let (room_name, sec_and_checksum) = line.rsplit_once('-').unwrap();
-        let (sector_id, checksum) = sec_and_checksum.trim_end_matches(']').split_once('[').unwrap();
+        let (sector_id, checksum) = sec_and_checksum
+            .trim_end_matches(']')
+            .split_once('[')
+            .unwrap();
         v.push(EncryptedRoom {
             name: room_name.to_string(),
             sector_id: sector_id.parse().unwrap(),
@@ -72,16 +75,18 @@ impl EncryptedRoom {
 
     fn decrypted_name(&self) -> String {
         let shift = ('a'..='z').cycle();
-        
+
         self.name
             .chars()
             .map(|c| {
                 if c == '-' {
                     return ' ';
                 }
-                shift.clone().nth(self.sector_id as usize + c as usize - 'a' as usize).unwrap()
+                shift
+                    .clone()
+                    .nth(self.sector_id as usize + c as usize - 'a' as usize)
+                    .unwrap()
             })
             .collect()
     }
-    
 }

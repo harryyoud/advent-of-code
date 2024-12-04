@@ -21,24 +21,24 @@ fn run_to_completion(input: &str) -> (usize, usize) {
             ('!', _) => {
                 // skip next character
                 let _ = chars.next();
-            },
+            }
             ('<', false) => {
                 state.in_garbage = true;
-            },
+            }
             ('>', true) => {
                 state.in_garbage = false;
             }
             ('}', false) => {
                 state.nested_group -= 1;
-            },
+            }
             ('{', false) => {
                 state.nested_group += 1;
                 state.score += state.nested_group;
-            },
+            }
             (_, true) => {
                 state.garbage_count += 1;
-            },
-            _ => {},
+            }
+            _ => {}
         }
     }
 

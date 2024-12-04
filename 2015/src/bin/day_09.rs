@@ -1,4 +1,7 @@
-use std::{collections::{HashMap, HashSet}, hash::Hash};
+use std::{
+    collections::{HashMap, HashSet},
+    hash::Hash,
+};
 
 use aoc_2015::get_input;
 use itertools::Itertools;
@@ -14,8 +17,7 @@ impl Hash for Connection<'_> {
 
 impl PartialEq for Connection<'_> {
     fn eq(&self, other: &Self) -> bool {
-        self.0.min(self.1) == other.0.min(other.1) &&
-        self.0.max(self.1) == other.0.max(other.1)
+        self.0.min(self.1) == other.0.min(other.1) && self.0.max(self.1) == other.0.max(other.1)
     }
 }
 
@@ -40,9 +42,11 @@ fn calculate_routes(set: &HashSet<&str>, map: &HashMap<Connection, u32>) -> (u32
     let mut minimum = u32::MAX;
     let mut maximum = u32::MIN;
     for path in set.iter().permutations(set.len()) {
-        let cost = path.iter().tuple_windows().map(|(a, b)| {
-            map.get(&(**a, **b).into()).unwrap()
-        }).sum();
+        let cost = path
+            .iter()
+            .tuple_windows()
+            .map(|(a, b)| map.get(&(**a, **b).into()).unwrap())
+            .sum();
         minimum = minimum.min(cost);
         maximum = maximum.max(cost);
     }

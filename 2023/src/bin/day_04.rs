@@ -1,4 +1,4 @@
-use std::collections::{HashSet, HashMap};
+use std::collections::{HashMap, HashSet};
 
 use aoc_2023::get_input;
 
@@ -12,23 +12,22 @@ fn main() {
         let card_number = card_number + 1;
 
         let matched_numbers = match line.char_indices().skip_while(|(_, c)| c != &':').nth(1) {
-                Some((pos, _)) => &line[pos..],
-                None => "",
-            }
-            .split('|')
-            .map(|s|
-                HashSet::from_iter(s.split_whitespace().map(|s| s.parse::<u32>().unwrap()))
-            )
-            .reduce(|acc: HashSet<u32>, x| acc.intersection(&x).cloned().collect())
-            .unwrap()
-            .len();
+            Some((pos, _)) => &line[pos..],
+            None => "",
+        }
+        .split('|')
+        .map(|s| HashSet::from_iter(s.split_whitespace().map(|s| s.parse::<u32>().unwrap())))
+        .reduce(|acc: HashSet<u32>, x| acc.intersection(&x).cloned().collect())
+        .unwrap()
+        .len();
 
         if matched_numbers > 0 {
             part_a_total += 2_u32.pow(matched_numbers as u32 - 1);
         }
 
         for i in (card_number + 1)..(card_number + 1 + matched_numbers) {
-            *card_counts.entry(i as u32).or_insert(1) += *card_counts.entry(card_number as u32).or_insert(1);
+            *card_counts.entry(i as u32).or_insert(1) +=
+                *card_counts.entry(card_number as u32).or_insert(1);
         }
     }
 

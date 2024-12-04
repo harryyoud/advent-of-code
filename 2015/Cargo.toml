@@ -9,6 +9,7 @@ edition = "2021"
 aho-corasick = "1.1.2"
 aoc_lib = { version = "0.1.0", path = "../aoc_lib" }
 itertools = "0.12.1"
+lazy-regex = "3.3.0"
 md5 = "0.7.0"
 num = "0.4.1"
 pathfinding = "4.8.2"

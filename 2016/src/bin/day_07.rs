@@ -10,17 +10,11 @@ fn main() {
 }
 
 fn part_1(input: &str) -> u32 {
-    input
-        .lines()
-        .filter(supports_tls)
-        .count() as u32
+    input.lines().filter(supports_tls).count() as u32
 }
 
 fn part_2(input: &str) -> u32 {
-    input
-        .lines()
-        .filter(supports_ssl)
-        .count() as u32
+    input.lines().filter(supports_ssl).count() as u32
 }
 
 fn supports_tls(line: &&str) -> bool {

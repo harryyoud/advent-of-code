@@ -20,11 +20,9 @@ pub enum Instruction {
 impl Instruction {
     pub fn try_as_receive(&self) -> Result<Self, ()> {
         match self {
-            Instruction::Recover(x) => {
-                match x {
-                    Operand::RegisterName(x) => Ok(Instruction::Receive(*x)),
-                    Operand::Value(_) => Err(()),
-                }
+            Instruction::Recover(x) => match x {
+                Operand::RegisterName(x) => Ok(Instruction::Receive(*x)),
+                Operand::Value(_) => Err(()),
             },
             _ => Err(()),
         }
@@ -58,7 +56,7 @@ pub mod parsing {
 
     impl FromStr for Operand {
         type Err = InvalidRegisterName;
-    
+
         fn from_str(s: &str) -> Result<Self, Self::Err> {
             if let Ok(x) = s.parse::<isize>() {
                 return Ok(Operand::Value(x));
@@ -66,9 +64,7 @@ pub mod parsing {
             if s.len() != 1 {
                 return Err(InvalidRegisterName);
             }
-            Ok(Operand::RegisterName(
-                parse_register_name(s)?
-            ))
+            Ok(Operand::RegisterName(parse_register_name(s)?))
         }
     }
 
@@ -79,7 +75,7 @@ pub mod parsing {
     #[derive(Debug)]
     pub enum InstructionParseError {
         InvalidInstructionType,
-        OperandParseError(InvalidRegisterName)
+        OperandParseError(InvalidRegisterName),
     }
 
     impl From<InvalidRegisterName> for InstructionParseError {
@@ -90,19 +86,18 @@ pub mod parsing {
 
     impl FromStr for Instruction {
         type Err = InstructionParseError;
-    
+
         fn from_str(s: &str) -> Result<Self, Self::Err> {
             let words = s.split_whitespace().collect_vec();
             let instruction = words[0];
-    
+
             assert!(words.len() >= 2);
-    
+
             Ok(match instruction {
                 "snd" => Instruction::Send(Operand::from_str(words[1])?),
-                "set" => Instruction::Set(
-                    parse_register_name(words[1])?,
-                    Operand::from_str(words[2])?,
-                ),
+                "set" => {
+                    Instruction::Set(parse_register_name(words[1])?, Operand::from_str(words[2])?)
+                }
                 "add" => Instruction::AddAssign(
                     parse_register_name(words[1])?,
                     Operand::from_str(words[2])?,
@@ -115,9 +110,7 @@ pub mod parsing {
                     parse_register_name(words[1])?,
                     Operand::from_str(words[2])?,
                 ),
-                "rcv" => Instruction::Recover(
-                    Operand::from_str(words[1])?,
-                ),
+                "rcv" => Instruction::Recover(Operand::from_str(words[1])?),
                 "jgz" => Instruction::JumpIfGreaterThanZero(
                     Operand::from_str(words[1])?,
                     Operand::from_str(words[2])?,
@@ -130,7 +123,7 @@ pub mod parsing {
                     parse_register_name(words[1])?,
                     Operand::from_str(words[2])?,
                 ),
-                _ => return Err(InstructionParseError::InvalidInstructionType)
+                _ => return Err(InstructionParseError::InvalidInstructionType),
             })
         }
     }

@@ -37,7 +37,11 @@ fn parse_input(input: &str, part_b: bool) -> (Vec<Point>, i64) {
     let mut edge_length = 1;
 
     for line in input.lines() {
-        let (direction, distance) = if part_b { parse_line_b(line) } else { parse_line_a(line) };
+        let (direction, distance) = if part_b {
+            parse_line_b(line)
+        } else {
+            parse_line_a(line)
+        };
         let point = corners.last().unwrap().move_dir(direction, distance);
         edge_length += distance;
         corners.push(point);
@@ -53,17 +57,17 @@ fn parse_line_a(line: &str) -> (&str, i64) {
 
 fn parse_line_b(line: &str) -> (&str, i64) {
     let (_, _, colour) = line.split_whitespace().collect_tuple().unwrap();
-    (   match colour.chars().nth(7).unwrap() {
+    (
+        match colour.chars().nth(7).unwrap() {
             '0' => "R",
             '1' => "D",
             '2' => "L",
             '3' => "U",
             x => panic!("Invalid direction: {x}"),
         },
-        i64::from_str_radix(&colour[2..7], 16).unwrap()
+        i64::from_str_radix(&colour[2..7], 16).unwrap(),
     )
 }
-
 
 fn get_area(corners: &[Point], edge_length: i64) -> i64 {
     let mut total_area = 0;

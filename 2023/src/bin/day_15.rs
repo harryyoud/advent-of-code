@@ -10,23 +10,36 @@ fn main() {
 }
 
 fn part_a(input: &str) -> u32 {
-    input.lines().next().unwrap().trim().split(',').map(get_hash_for_str).sum()
+    input
+        .lines()
+        .next()
+        .unwrap()
+        .trim()
+        .split(',')
+        .map(get_hash_for_str)
+        .sum()
 }
 
 fn part_b(input: &str) -> u32 {
-    let mut boxes: [Vec<(&str, u8)>; 256] = iter::repeat(Vec::new()).take(256).collect::<Vec<_>>().try_into().unwrap();
+    let mut boxes: [Vec<(&str, u8)>; 256] = iter::repeat(Vec::new())
+        .take(256)
+        .collect::<Vec<_>>()
+        .try_into()
+        .unwrap();
     for step in input.lines().next().unwrap().trim().split(',') {
         if step.contains('=') {
             let (label, focal_len) = step.split('=').collect_tuple().unwrap();
             let label_hash = get_hash_for_str(label) as usize;
             let focal_len = focal_len.parse::<u8>().unwrap();
 
-            if let Some(position) = boxes[label_hash].iter().position(|(lab, _focal_len)| *lab == label) {
+            if let Some(position) = boxes[label_hash]
+                .iter()
+                .position(|(lab, _focal_len)| *lab == label)
+            {
                 boxes[label_hash][position] = (label, focal_len);
             } else {
                 boxes[label_hash].push((label, focal_len));
             }
-
         } else if step.contains('-') {
             let label = step.trim_end_matches('-');
             let label_hash = get_hash_for_str(label);
@@ -36,14 +49,18 @@ fn part_b(input: &str) -> u32 {
         }
     }
 
-    boxes.iter().enumerate().map(|(box_num, boxx)| {
-        boxx.iter()
-            .enumerate()
-            .map(|(slot_num, (_label, focal_len))| {
-                (box_num as u32 + 1) * (slot_num as u32 + 1) * (*focal_len as u32)
-            })
-            .sum::<u32>()
-    }).sum::<u32>()
+    boxes
+        .iter()
+        .enumerate()
+        .map(|(box_num, boxx)| {
+            boxx.iter()
+                .enumerate()
+                .map(|(slot_num, (_label, focal_len))| {
+                    (box_num as u32 + 1) * (slot_num as u32 + 1) * (*focal_len as u32)
+                })
+                .sum::<u32>()
+        })
+        .sum::<u32>()
 }
 
 fn get_byte_hash(current_value: &mut u32, byte: u8) {

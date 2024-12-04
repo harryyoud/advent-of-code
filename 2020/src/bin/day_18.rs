@@ -1,12 +1,13 @@
-use std::collections::{HashMap, VecDeque};
-use itertools::Itertools;
 use aoc_2020::get_input;
+use itertools::Itertools;
+use std::collections::{HashMap, VecDeque};
 
 fn main() {
     let input = "((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2";
 
     let input = input.replace("(", "( ").replace(")", " )");
-    let input = input.lines()
+    let input = input
+        .lines()
         .map(|x| x.split_whitespace())
         .map(|mut line| {
             let mut out = vec![];
@@ -25,10 +26,7 @@ fn part_1<'a>(input: &[Vec<Node>]) -> u64 {
         .sum::<u64>()
 }
 
-fn solve_recursive<'a>(
-    iter: &mut impl Iterator<Item = &'a Node>
-) -> u64 {
-
+fn solve_recursive<'a>(iter: &mut impl Iterator<Item = &'a Node>) -> u64 {
     let mut left = match iter.next().unwrap() {
         Node::Literal(x) => *x,
         Node::Unary(_) => panic!(),
@@ -41,12 +39,7 @@ fn solve_recursive<'a>(
         use Node::*;
         left = match right {
             Literal(y) => operator.apply(left, *y),
-            Expression(y) => {
-                operator.apply(
-                    left,
-                    solve_recursive(&mut y.into_iter()),
-                )
-            },
+            Expression(y) => operator.apply(left, solve_recursive(&mut y.into_iter())),
             _ => panic!("Invalid combination!"),
         };
     }
@@ -64,7 +57,7 @@ fn parse_recursive<'a>(
                 let mut nodes = vec![];
                 parse_recursive(iter, &mut nodes);
                 Node::Expression(nodes)
-            },
+            }
             '0'..='9' => Node::Literal(n.parse().unwrap()),
             '+' => Node::Unary(Operator::Add),
             '*' => Node::Unary(Operator::Multiply),

@@ -24,13 +24,17 @@ fn solve(directions: &[Direction]) -> (usize, usize) {
 }
 
 fn parse_input(input: &str) -> Vec<Direction> {
-    input.trim().split(',').map(|x| match x {
-        "n" => Direction::YZ,
-        "ne" => Direction::XZ,
-        "se" => Direction::XY,
-        "s" => Direction::ZY,
-        "sw" => Direction::ZX,
-        "nw" => Direction::YX,
-        s => panic!("Invalid direction: {s}"),
-    }).collect_vec()
+    input
+        .trim()
+        .split(',')
+        .map(|x| match x {
+            "n" => Direction::YZ,
+            "ne" => Direction::XZ,
+            "se" => Direction::XY,
+            "s" => Direction::ZY,
+            "sw" => Direction::ZX,
+            "nw" => Direction::YX,
+            s => panic!("Invalid direction: {s}"),
+        })
+        .collect_vec()
 }

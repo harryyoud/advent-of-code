@@ -23,7 +23,8 @@ fn part_2(grid: &Grid) -> (usize, usize, usize) {
 }
 
 fn find_square_with_highest_power(grid: &Grid) -> (usize, usize, usize) {
-    (1usize..=GRID_WIDTH).into_par_iter()
+    (1usize..=GRID_WIDTH)
+        .into_par_iter()
         .map(|size| {
             dbg!(size);
             (find_square_size_with_highest_power(grid, size), size)
@@ -33,17 +34,21 @@ fn find_square_with_highest_power(grid: &Grid) -> (usize, usize, usize) {
         .unwrap()
 }
 
-fn find_square_size_with_highest_power(grid: &Grid, square_width: usize) -> ((usize, usize), isize) {
+fn find_square_size_with_highest_power(
+    grid: &Grid,
+    square_width: usize,
+) -> ((usize, usize), isize) {
     let upper_limit = GRID_WIDTH - (square_width - 1);
 
-    (1..=upper_limit).cartesian_product(1..=upper_limit)
+    (1..=upper_limit)
+        .cartesian_product(1..=upper_limit)
         .par_bridge()
         .into_par_iter()
         .map(|(start_x, start_y)| {
-        (
-            (start_x, start_y),
-            grid.square_power(square_width, start_x, start_y)
-        )
+            (
+                (start_x, start_y),
+                grid.square_power(square_width, start_x, start_y),
+            )
         })
         .max_by_key(|(_pos, power)| *power)
         .unwrap()
@@ -59,9 +64,7 @@ impl Grid {
         for (x, y) in (1..=GRID_WIDTH).cartesian_product(1..=GRID_WIDTH) {
             power_levels.insert((x, y), Grid::calculate_power_level(serial_number, x, y));
         }
-        Grid {
-            power_levels,
-        }
+        Grid { power_levels }
     }
 
     fn calculate_power_level(serial_number: usize, x: usize, y: usize) -> isize {

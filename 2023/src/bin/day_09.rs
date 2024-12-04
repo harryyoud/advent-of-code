@@ -8,7 +8,11 @@ fn main() {
 }
 
 fn calculate_forwards_sequence(sequence: &Vec<i32>) -> Vec<i32> {
-    sequence.iter().tuple_windows::<(&i32, &i32)>().map(|(a, b)| b - a).collect()
+    sequence
+        .iter()
+        .tuple_windows::<(&i32, &i32)>()
+        .map(|(a, b)| b - a)
+        .collect()
 }
 
 fn calculate_increase_sequence_n(sequence: &Vec<i32>) -> Vec<Vec<i32>> {
@@ -32,11 +36,29 @@ fn get_next_in_top_sequence(sequences: Vec<Vec<i32>>) -> i32 {
 }
 
 fn part_a(input: &str) -> i32 {
-    input.lines().map(|s| s.split_whitespace().map(|s| s.parse::<i32>().unwrap()).collect_vec()).map(|sequence| get_next_in_top_sequence(calculate_increase_sequence_n(&sequence))).sum()
+    input
+        .lines()
+        .map(|s| {
+            s.split_whitespace()
+                .map(|s| s.parse::<i32>().unwrap())
+                .collect_vec()
+        })
+        .map(|sequence| get_next_in_top_sequence(calculate_increase_sequence_n(&sequence)))
+        .sum()
 }
 
 fn part_b(input: &str) -> i32 {
-    input.lines().map(|s| s.split_whitespace().map(|s| s.parse::<i32>().unwrap()).collect_vec()).map(|sequence| {
-        get_next_in_top_sequence(calculate_increase_sequence_n(&sequence.into_iter().rev().collect_vec()))
-    }).sum()
+    input
+        .lines()
+        .map(|s| {
+            s.split_whitespace()
+                .map(|s| s.parse::<i32>().unwrap())
+                .collect_vec()
+        })
+        .map(|sequence| {
+            get_next_in_top_sequence(calculate_increase_sequence_n(
+                &sequence.into_iter().rev().collect_vec(),
+            ))
+        })
+        .sum()
 }

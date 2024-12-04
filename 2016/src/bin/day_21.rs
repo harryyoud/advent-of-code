@@ -44,15 +44,13 @@ enum Operation {
 fn apply_operation(string: &mut VecDeque<char>, op: Operation) {
     match op {
         Operation::SwapPosition(x, y) => string.swap(x, y),
-        Operation::SwapChar(x, y) => {
-            string.iter_mut().for_each(|a| {
-                if *a == x {
-                    *a = y;
-                } else if *a == y {
-                    *a = x;
-                }
-            })
-        },
+        Operation::SwapChar(x, y) => string.iter_mut().for_each(|a| {
+            if *a == x {
+                *a = y;
+            } else if *a == y {
+                *a = x;
+            }
+        }),
         Operation::RotateLeft(x) => string.rotate_left(x),
         Operation::RotateRight(x) => string.rotate_right(x),
         Operation::RotateAt(x) => {
@@ -62,16 +60,16 @@ fn apply_operation(string: &mut VecDeque<char>, op: Operation) {
             }
             pos += 1;
             string.rotate_right(pos % string.len());
-        },
+        }
         Operation::ReverseAt(x, y) => {
             let mut stuff = string.make_contiguous()[x..=y].to_owned();
             stuff.reverse();
             string.make_contiguous()[x..=y].copy_from_slice(&stuff);
-        },
+        }
         Operation::Move(x, y) => {
             let out = string.remove(x).unwrap();
             string.insert(y, out);
-        },
+        }
     };
 }
 
@@ -97,47 +95,61 @@ fn apply_inverse_operation(string: &mut VecDeque<char>, op: Operation) {
                 _ => panic!("String is too long!"),
             };
             string.rotate_left(shift_by % string.len());
-        },
+        }
         Operation::ReverseAt(_, _) => apply_operation(string, op),
         Operation::Move(x, y) => {
             let out = string.remove(y).unwrap();
             string.insert(x, out);
-        },
+        }
     };
 }
 
 fn parse_input(input: &str) -> Vec<Operation> {
-    input.lines().map(|line| {
-        match line.splitn(3, ' ').collect_tuple::<(_, _, _)>().unwrap() {
-            ("swap", "position", _) => {
-                let (_, x, y) = regex_captures!(r#"swap position (\d+) with position (\d+)"#, line).expect("Couldn't parse SwapPosition");
-                Operation::SwapPosition(x.parse().unwrap(), y.parse().unwrap())
+    input
+        .lines()
+        .map(
+            |line| match line.splitn(3, ' ').collect_tuple::<(_, _, _)>().unwrap() {
+                ("swap", "position", _) => {
+                    let (_, x, y) =
+                        regex_captures!(r#"swap position (\d+) with position (\d+)"#, line)
+                            .expect("Couldn't parse SwapPosition");
+                    Operation::SwapPosition(x.parse().unwrap(), y.parse().unwrap())
+                }
+                ("swap", "letter", _) => {
+                    let (_, x, y) = regex_captures!(r#"swap letter (\w) with letter (\w)"#, line)
+                        .expect("Couldn't parse SwapChar");
+                    Operation::SwapChar(x.chars().next().unwrap(), y.chars().next().unwrap())
+                }
+                ("rotate", "left", _) => {
+                    let (_, x) = regex_captures!(r#"rotate left (\d+)"#, line)
+                        .expect("Couldn't parse RotateLeft");
+                    Operation::RotateLeft(x.parse().unwrap())
+                }
+                ("rotate", "right", _) => {
+                    let (_, x) = regex_captures!(r#"rotate right (\d+)"#, line)
+                        .expect("Couldn't parse RotateRight");
+                    Operation::RotateRight(x.parse().unwrap())
+                }
+                ("rotate", "based", _) => {
+                    let (_, x) =
+                        regex_captures!(r#"rotate based on position of letter (\w)"#, line)
+                            .expect("Couldn't parse RotateAt");
+                    Operation::RotateAt(x.chars().next().unwrap())
+                }
+                ("reverse", "positions", _) => {
+                    let (_, x, y) =
+                        regex_captures!(r#"reverse positions (\d+) through (\d+)"#, line)
+                            .expect("Couldn't parse ReverseAt");
+                    Operation::ReverseAt(x.parse().unwrap(), y.parse().unwrap())
+                }
+                ("move", "position", _) => {
+                    let (_, x, y) =
+                        regex_captures!(r#"move position (\d+) to position (\d+)"#, line)
+                            .expect("Couldn't parse Move");
+                    Operation::Move(x.parse().unwrap(), y.parse().unwrap())
+                }
+                _ => panic!("Invalid operation: {line}"),
             },
-            ("swap", "letter", _) => {
-                let (_, x, y) = regex_captures!(r#"swap letter (\w) with letter (\w)"#, line).expect("Couldn't parse SwapChar");
-                Operation::SwapChar(x.chars().next().unwrap(), y.chars().next().unwrap())
-            },
-            ("rotate", "left", _) => {
-                let (_, x) = regex_captures!(r#"rotate left (\d+)"#, line).expect("Couldn't parse RotateLeft");
-                Operation::RotateLeft(x.parse().unwrap())
-            },
-            ("rotate", "right", _) => {
-                let (_, x) = regex_captures!(r#"rotate right (\d+)"#, line).expect("Couldn't parse RotateRight");
-                Operation::RotateRight(x.parse().unwrap())
-            },
-            ("rotate", "based", _) => {
-                let (_, x) = regex_captures!(r#"rotate based on position of letter (\w)"#, line).expect("Couldn't parse RotateAt");
-                Operation::RotateAt(x.chars().next().unwrap())
-            },
-            ("reverse", "positions", _) => {
-                let (_, x, y) = regex_captures!(r#"reverse positions (\d+) through (\d+)"#, line).expect("Couldn't parse ReverseAt");
-                Operation::ReverseAt(x.parse().unwrap(), y.parse().unwrap())
-            },
-            ("move", "position", _) => {
-                let (_, x, y) = regex_captures!(r#"move position (\d+) to position (\d+)"#, line).expect("Couldn't parse Move");
-                Operation::Move(x.parse().unwrap(), y.parse().unwrap())
-            },
-            _ => panic!("Invalid operation: {line}"),
-        }
-    }).collect_vec()
+        )
+        .collect_vec()
 }

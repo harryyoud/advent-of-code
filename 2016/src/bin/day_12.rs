@@ -1,4 +1,7 @@
-use aoc_2016::{assembunny::{self, AssembunnyMachine}, get_input};
+use aoc_2016::{
+    assembunny::{self, AssembunnyMachine},
+    get_input,
+};
 
 fn main() {
     let input = get_input(12);

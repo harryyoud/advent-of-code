@@ -8,11 +8,18 @@ fn main() {
 }
 
 fn part_1(input: &str) -> u32 {
-    input.lines().map(lengths).map(|(mem_len, acc_len)| mem_len - acc_len).sum()
+    input
+        .lines()
+        .map(lengths)
+        .map(|(mem_len, acc_len)| mem_len - acc_len)
+        .sum()
 }
 
 fn part_2(input: &str) -> u32 {
-    input.lines().map(|s| re_escape_len(s) - s.len() as u32).sum()
+    input
+        .lines()
+        .map(|s| re_escape_len(s) - s.len() as u32)
+        .sum()
 }
 
 // returns (length_in_memory, length_after escapes)
@@ -29,10 +36,10 @@ fn lengths(line: &str) -> (u32, u32) {
                     chars.next();
                     chars.next();
                     acc_len += 1;
-                },
+                }
                 '\\' | '"' => {
                     acc_len += 1;
-                },
+                }
                 _ => panic!("Invalid escape"),
             },
             _ => acc_len += 1,
@@ -43,8 +50,11 @@ fn lengths(line: &str) -> (u32, u32) {
 }
 
 fn re_escape_len(line: &str) -> u32 {
-    line.chars().map(|c| match c {
-        '"' | '\\' => 2,
-        _ => 1,
-    }).sum::<u32>() + 2
+    line.chars()
+        .map(|c| match c {
+            '"' | '\\' => 2,
+            _ => 1,
+        })
+        .sum::<u32>()
+        + 2
 }

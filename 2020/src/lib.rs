@@ -1,5 +1,5 @@
-use std::ops::{Add, AddAssign};
 use aoc_lib::get_input_year;
+use std::ops::{Add, AddAssign};
 
 pub fn get_input(day: usize) -> String {
     get_input_year(2020, day)
@@ -7,35 +7,59 @@ pub fn get_input(day: usize) -> String {
 
 impl Vec2d {
     pub fn left(&self) -> Vec2d {
-        Self { x: self.x - 1, y: self.y }
+        Self {
+            x: self.x - 1,
+            y: self.y,
+        }
     }
 
     pub fn left_n(&self, n: usize) -> Vec2d {
-        Self { x: self.x - n as isize, y: self.y }
+        Self {
+            x: self.x - n as isize,
+            y: self.y,
+        }
     }
 
     pub fn right(&self) -> Vec2d {
-        Self { x: self.x + 1, y: self.y }
+        Self {
+            x: self.x + 1,
+            y: self.y,
+        }
     }
 
     pub fn right_n(&self, n: usize) -> Vec2d {
-        Self { x: self.x + n as isize, y: self.y }
+        Self {
+            x: self.x + n as isize,
+            y: self.y,
+        }
     }
 
     pub fn up(&self) -> Vec2d {
-        Self { x: self.x, y: self.y - 1 }
+        Self {
+            x: self.x,
+            y: self.y - 1,
+        }
     }
 
     pub fn up_n(&self, n: usize) -> Vec2d {
-        Self { x: self.x, y: self.y - n as isize }
+        Self {
+            x: self.x,
+            y: self.y - n as isize,
+        }
     }
 
     pub fn down(&self) -> Vec2d {
-        Self { x: self.x, y: self.y + 1 }
+        Self {
+            x: self.x,
+            y: self.y + 1,
+        }
     }
 
     pub fn down_n(&self, n: usize) -> Vec2d {
-        Self { x: self.x, y: self.y + n as isize }
+        Self {
+            x: self.x,
+            y: self.y + n as isize,
+        }
     }
 
     pub fn neighbours(&self) -> Vec<Vec2d> {
@@ -70,7 +94,10 @@ impl From<(isize, isize)> for Vec2d {
 
 impl From<(usize, usize)> for Vec2d {
     fn from((x, y): (usize, usize)) -> Self {
-        Self { x: x as isize, y: y as isize }
+        Self {
+            x: x as isize,
+            y: y as isize,
+        }
     }
 }
 

@@ -18,12 +18,22 @@ fn part_1(map: &Map) -> usize {
 }
 
 fn part_2(map: &Map) -> usize {
-    let state = State { goal_data: (map.width - 1, 0), blank: map.find_blank() };
+    let state = State {
+        goal_data: (map.width - 1, 0),
+        blank: map.find_blank(),
+    };
     dijkstra(
         &state,
-        |x| next_states(x, map).into_iter().map(|x| (x, 1)).collect_vec(),
-        |x| x.goal_data == (0, 0)
-    ).expect("No solution found").1
+        |x| {
+            next_states(x, map)
+                .into_iter()
+                .map(|x| (x, 1))
+                .collect_vec()
+        },
+        |x| x.goal_data == (0, 0),
+    )
+    .expect("No solution found")
+    .1
 }
 
 #[derive(Debug)]
@@ -35,14 +45,18 @@ struct Map {
 
 impl Map {
     fn viable_pairs(&self) -> Vec<((usize, usize), (usize, usize))> {
-        self.inner.iter().permutations(2).filter_map(|x| {
-            let (a_pos, a) = x.first().unwrap();
-            let (b_pos, b) = x.last().unwrap();
-            if (!a.is_empty()) && a.used <= b.available {
-                return Some((**a_pos, **b_pos));
-            }
-            None
-        }).collect_vec()
+        self.inner
+            .iter()
+            .permutations(2)
+            .filter_map(|x| {
+                let (a_pos, a) = x.first().unwrap();
+                let (b_pos, b) = x.last().unwrap();
+                if (!a.is_empty()) && a.used <= b.available {
+                    return Some((**a_pos, **b_pos));
+                }
+                None
+            })
+            .collect_vec()
     }
 
     fn neighbours(&self, (x, y): (usize, usize)) -> Vec<(usize, usize)> {
@@ -113,14 +127,14 @@ fn parse_input(input: &str) -> Map {
     let mut map: HashMap<(usize, usize), Node> = HashMap::new();
     let re = Regex::new(r#"\/dev\/grid\/node-x(?<x>\d+)-y(?<y>\d+)\s+\d+T\s+(?<used>\d+)T\s+(?<available>\d+)T\s+(\d+)%"#).unwrap();
     for (line_num, line) in lines {
-        let capture = re.captures(line).unwrap_or_else(|| panic!("Invalid line: line {line_num}"));
+        let capture = re
+            .captures(line)
+            .unwrap_or_else(|| panic!("Invalid line: line {line_num}"));
         let x = capture.name("x").unwrap().as_str().parse().unwrap();
         let y = capture.name("y").unwrap().as_str().parse().unwrap();
         let used = capture.name("used").unwrap().as_str().parse().unwrap();
         let available = capture.name("available").unwrap().as_str().parse().unwrap();
-        map.insert((x, y), Node {
-            used, available
-        });
+        map.insert((x, y), Node { used, available });
     }
 
     Map {
@@ -130,8 +144,7 @@ fn parse_input(input: &str) -> Map {
     }
 }
 
-#[derive(Clone, Copy)]
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 struct Node {
     used: usize,
     available: usize,

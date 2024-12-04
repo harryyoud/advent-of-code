@@ -2,7 +2,6 @@ use std::{collections::HashMap, marker::PhantomData};
 
 use itertools::Itertools;
 
-
 mod private {
     pub trait Sealed {}
 }
@@ -70,7 +69,7 @@ impl AssembunnyMachine<PreExecution> {
                 let value = get_value(&self.registers, value);
                 self.registers.insert(*register, value as u32);
                 self.cursor += 1;
-            },
+            }
             Instruction::JumpIfNotZero(value, relative_jump) => {
                 let value = get_value(&self.registers, value);
                 let relative_jump = get_value(&self.registers, relative_jump);
@@ -79,26 +78,31 @@ impl AssembunnyMachine<PreExecution> {
                 } else {
                     self.cursor = self.cursor.saturating_add_signed(relative_jump as isize);
                 }
-            },
+            }
             Instruction::Increment(register) => {
-                self.registers.entry(*register)
+                self.registers
+                    .entry(*register)
                     .and_modify(|x| *x += 1)
                     .or_insert(1);
                 self.cursor += 1;
-            },
+            }
             Instruction::Decrement(register) => {
-                self.registers.entry(*register)
+                self.registers
+                    .entry(*register)
                     .and_modify(|x| *x -= 1)
                     .or_insert(1);
                 self.cursor += 1;
-            },
+            }
             Instruction::Toggle(value) => {
                 let offset = get_value(&self.registers, value);
-                if let Some(i) = self.instructions.get_mut(self.cursor.saturating_add_signed(offset as isize)) {
+                if let Some(i) = self
+                    .instructions
+                    .get_mut(self.cursor.saturating_add_signed(offset as isize))
+                {
                     *i = i.toggle();
                 };
                 self.cursor += 1;
-            },
+            }
             Instruction::Out(value) => {
                 self.out.push(get_value(&self.registers, value));
                 self.cursor += 1;
@@ -106,7 +110,7 @@ impl AssembunnyMachine<PreExecution> {
             }
             Instruction::Noop => {
                 self.cursor += 1;
-            },
+            }
         }
         MachineResult::Ok
     }
@@ -145,19 +149,11 @@ pub fn parse_instruction(line: &str) -> Instruction {
             parse_value(split.next().unwrap()),
             parse_value(split.next().unwrap()),
         ),
-        "inc" => Instruction::Increment(
-            split.next().unwrap().chars().next().unwrap().into(),
-        ),
-        "dec" => Instruction::Decrement(
-            split.next().unwrap().chars().next().unwrap().into(),
-        ),
-        "tgl" => Instruction::Toggle(
-            parse_value(split.next().unwrap()),
-        ),
-        "out" => Instruction::Out(
-            parse_value(split.next().unwrap()),
-        ),
-        s => panic!("Invalid instruction: {s} (from line: {line})")
+        "inc" => Instruction::Increment(split.next().unwrap().chars().next().unwrap().into()),
+        "dec" => Instruction::Decrement(split.next().unwrap().chars().next().unwrap().into()),
+        "tgl" => Instruction::Toggle(parse_value(split.next().unwrap())),
+        "out" => Instruction::Out(parse_value(split.next().unwrap())),
+        s => panic!("Invalid instruction: {s} (from line: {line})"),
     }
 }
 
@@ -175,33 +171,22 @@ pub enum Instruction {
 impl Instruction {
     pub fn toggle(&self) -> Self {
         match self {
-            Instruction::Copy(a, b) => {
-                Instruction::JumpIfNotZero(*a, Value::Register(*b))
+            Instruction::Copy(a, b) => Instruction::JumpIfNotZero(*a, Value::Register(*b)),
+            Instruction::JumpIfNotZero(a, b) => match b {
+                Value::Number(_x) => Instruction::Noop,
+                Value::Register(x) => Instruction::Copy(*a, *x),
             },
-            Instruction::JumpIfNotZero(a, b) => {
-                match b {
-                    Value::Number(_x) => Instruction::Noop,
-                    Value::Register(x) => Instruction::Copy(*a, *x),
-                }
-            },
-            Instruction::Increment(x) => {
-                Instruction::Decrement(*x)
-            },
-            Instruction::Decrement(x) => {
-                Instruction::Increment(*x)
-            },
-            Instruction::Toggle(val) => {
-                match val {
-                    Value::Number(_x) => Instruction::Noop,
-                    Value::Register(x) => Instruction::Increment(*x),
-                }
+            Instruction::Increment(x) => Instruction::Decrement(*x),
+            Instruction::Decrement(x) => Instruction::Increment(*x),
+            Instruction::Toggle(val) => match val {
+                Value::Number(_x) => Instruction::Noop,
+                Value::Register(x) => Instruction::Increment(*x),
             },
             Instruction::Out(_) => self.clone(),
-            Instruction::Noop => Instruction::Noop
+            Instruction::Noop => Instruction::Noop,
         }
     }
 }
-
 
 #[derive(Debug, Copy, Clone)]
 pub enum Value {

@@ -16,7 +16,12 @@ fn part_1(grid: &Grid) -> usize {
     let pair_distances = pair_distances(grid);
     let mut min_distance = usize::MAX;
 
-    for order in grid.to_visit.iter().permutations(grid.to_visit.len()).filter(|x| x.first().unwrap().1 == 0) {
+    for order in grid
+        .to_visit
+        .iter()
+        .permutations(grid.to_visit.len())
+        .filter(|x| x.first().unwrap().1 == 0)
+    {
         let order = order.iter().map(|x| x.1).collect_vec();
         min_distance = min_distance.min(calculate_distance(&order, &pair_distances));
     }
@@ -28,7 +33,12 @@ fn part_2(grid: &Grid) -> usize {
     let pair_distances = pair_distances(grid);
     let mut min_distance = usize::MAX;
 
-    for order in grid.to_visit.iter().permutations(grid.to_visit.len()).filter(|x| x.first().unwrap().1 == 0) {
+    for order in grid
+        .to_visit
+        .iter()
+        .permutations(grid.to_visit.len())
+        .filter(|x| x.first().unwrap().1 == 0)
+    {
         let mut order = order.iter().map(|x| x.1).collect_vec();
         order.push(0);
         min_distance = min_distance.min(calculate_distance(&order, &pair_distances));
@@ -50,7 +60,12 @@ fn pair_distances(grid: &Grid) -> HashMap<(u32, u32), usize> {
     for ((a_pos, a), (b_pos, b)) in grid.to_visit.iter().tuple_combinations() {
         let Some((_path, distance)) = dijkstra(
             a_pos,
-            |x| grid.neighbours(*x).into_iter().map(|y| (y, 1)).collect_vec(),
+            |x| {
+                grid.neighbours(*x)
+                    .into_iter()
+                    .map(|y| (y, 1))
+                    .collect_vec()
+            },
             |x| x == b_pos,
         ) else {
             panic!();
@@ -67,19 +82,25 @@ fn parse_input(input: &str) -> Grid {
     let width = input.lines().next().unwrap().len();
     for (y, line) in input.lines().enumerate() {
         for (x, c) in line.chars().enumerate() {
-            map.insert(Point {x, y}, match c {
-                '#' => Tile::Wall,
-                '0'..='9' => {
-                    to_visit.insert((Point {x, y}, c.to_digit(10).unwrap()));
-                    Tile::Number
+            map.insert(
+                Point { x, y },
+                match c {
+                    '#' => Tile::Wall,
+                    '0'..='9' => {
+                        to_visit.insert((Point { x, y }, c.to_digit(10).unwrap()));
+                        Tile::Number
+                    }
+                    '.' => Tile::Empty,
+                    _ => panic!("Invalid character at line {y}, character {x}: {c}"),
                 },
-                '.' => Tile::Empty,
-                _ => panic!("Invalid character at line {y}, character {x}: {c}"),
-            });
+            );
         }
     }
     Grid {
-        map, to_visit, width, height
+        map,
+        to_visit,
+        width,
+        height,
     }
 }
 
@@ -119,16 +140,28 @@ struct Point {
 
 impl Point {
     fn down(&self) -> Point {
-        Point {x: self.x, y: self.y - 1}
+        Point {
+            x: self.x,
+            y: self.y - 1,
+        }
     }
     fn up(&self) -> Point {
-        Point {x: self.x, y: self.y + 1}
+        Point {
+            x: self.x,
+            y: self.y + 1,
+        }
     }
     fn right(&self) -> Point {
-        Point {x: self.x + 1, y: self.y}
+        Point {
+            x: self.x + 1,
+            y: self.y,
+        }
     }
     fn left(&self) -> Point {
-        Point {x: self.x - 1, y: self.y}
+        Point {
+            x: self.x - 1,
+            y: self.y,
+        }
     }
 }
 

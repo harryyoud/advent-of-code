@@ -20,19 +20,17 @@ enum ModuleType {
 impl ModuleType {
     fn push_input(&mut self, pulse: Pulse, from: &str) -> Option<Pulse> {
         match self {
-            ModuleType::FlipFlow(ref mut state) => {
-                match pulse {
-                    Pulse::Low => {
-                        if state.on() {
-                            state.flip();
-                            Some(Pulse::Low)
-                        } else {
-                            state.flip();
-                            Some(Pulse::High)
-                        }
-                    },
-                    Pulse::High => None,
+            ModuleType::FlipFlow(ref mut state) => match pulse {
+                Pulse::Low => {
+                    if state.on() {
+                        state.flip();
+                        Some(Pulse::Low)
+                    } else {
+                        state.flip();
+                        Some(Pulse::High)
+                    }
                 }
+                Pulse::High => None,
             },
             ModuleType::Conjunction(ref mut state) => {
                 state.inputs.insert(from.to_string(), pulse);
@@ -41,7 +39,7 @@ impl ModuleType {
                 } else {
                     Some(Pulse::High)
                 }
-            },
+            }
             ModuleType::Broadcaster => Some(pulse),
         }
     }
@@ -96,14 +94,22 @@ fn main() {
     let mut low_pulse_count = 0;
     let mut high_pulse_count = 0;
 
-    let mut leads_to_rx: HashMap<String, Option<u64>> = HashMap::from_iter(reverse_lookup.get("rx").unwrap().iter().flat_map(|x| reverse_lookup.get(x).unwrap().clone()).map(|x| (x, None)));
+    let mut leads_to_rx: HashMap<String, Option<u64>> = HashMap::from_iter(
+        reverse_lookup
+            .get("rx")
+            .unwrap()
+            .iter()
+            .flat_map(|x| reverse_lookup.get(x).unwrap().clone())
+            .map(|x| (x, None)),
+    );
 
     for i in 1u64.. {
         let res = press_button(i, &mut modules, &mut next_visits, &mut leads_to_rx);
         low_pulse_count += res.0;
         high_pulse_count += res.1;
 
-        if i == 1000 { // part a
+        if i == 1000 {
+            // part a
             dbg!(low_pulse_count * high_pulse_count);
         }
 
@@ -111,8 +117,13 @@ fn main() {
             println!("Cycle {i}");
         }
 
-        if leads_to_rx.iter().all(|(_name, cycle_count)| cycle_count.is_some()) {
-            let cycle = leads_to_rx.iter().fold(1u64, |acc, (_name, cycle_count)| lcm(acc, cycle_count.unwrap()));
+        if leads_to_rx
+            .iter()
+            .all(|(_name, cycle_count)| cycle_count.is_some())
+        {
+            let cycle = leads_to_rx.iter().fold(1u64, |acc, (_name, cycle_count)| {
+                lcm(acc, cycle_count.unwrap())
+            });
             dbg!(cycle);
             break;
         }
@@ -123,7 +134,12 @@ fn main() {
     }
 }
 
-fn press_button(cycle_count: u64, modules: &mut HashMap<String, Module>, next_visits: &mut Vec<(String, String, Pulse)>, leads_to_rx: &mut HashMap<String, Option<u64>>) -> (u64, u64) {
+fn press_button(
+    cycle_count: u64,
+    modules: &mut HashMap<String, Module>,
+    next_visits: &mut Vec<(String, String, Pulse)>,
+    leads_to_rx: &mut HashMap<String, Option<u64>>,
+) -> (u64, u64) {
     let mut low_pulses = 0;
     let mut high_pulses = 0;
     while !next_visits.is_empty() {
@@ -132,7 +148,10 @@ fn press_button(cycle_count: u64, modules: &mut HashMap<String, Module>, next_vi
                 Pulse::Low => low_pulses += 1,
                 Pulse::High => high_pulses += 1,
             }
-            if visit.2.low() && leads_to_rx.contains_key(&visit.1) && leads_to_rx.get(&visit.1).unwrap().is_none() {
+            if visit.2.low()
+                && leads_to_rx.contains_key(&visit.1)
+                && leads_to_rx.get(&visit.1).unwrap().is_none()
+            {
                 leads_to_rx.insert(visit.1.clone(), Some(cycle_count));
             }
 
@@ -153,14 +172,18 @@ fn press_button(cycle_count: u64, modules: &mut HashMap<String, Module>, next_vi
     (low_pulses, high_pulses)
 }
 
-fn build_module_tree_from_input(input: &str) -> (HashMap<String, Module>, HashMap<String, Vec<String>>) {
+fn build_module_tree_from_input(
+    input: &str,
+) -> (HashMap<String, Module>, HashMap<String, Vec<String>>) {
     let mut modules: HashMap<String, Module> = HashMap::new();
     let mut reverse_lookup: HashMap<String, Vec<String>> = HashMap::new();
 
     for line in input.lines() {
         let module_type = match line.chars().next().unwrap() {
             '%' => ModuleType::FlipFlow(FlipFlowState::Off),
-            '&' => ModuleType::Conjunction(ConjunctionState {inputs: HashMap::new()}),
+            '&' => ModuleType::Conjunction(ConjunctionState {
+                inputs: HashMap::new(),
+            }),
             'b' => ModuleType::Broadcaster,
             _ => panic!("Invalid module type"),
         };
@@ -173,16 +196,27 @@ fn build_module_tree_from_input(input: &str) -> (HashMap<String, Module>, HashMa
             &split.next().unwrap()[1..]
         };
 
-        let connects_to = split.next().unwrap().split(", ").map(|s| s.to_string()).collect_vec();
+        let connects_to = split
+            .next()
+            .unwrap()
+            .split(", ")
+            .map(|s| s.to_string())
+            .collect_vec();
 
         for downstream_module in connects_to.iter() {
-            reverse_lookup.entry(downstream_module.clone()).or_default().push(name.to_string());
+            reverse_lookup
+                .entry(downstream_module.clone())
+                .or_default()
+                .push(name.to_string());
         }
 
-        modules.insert(name.to_string(), Module {
-            module_type,
-            connects_to: connects_to.clone()
-        });
+        modules.insert(
+            name.to_string(),
+            Module {
+                module_type,
+                connects_to: connects_to.clone(),
+            },
+        );
     }
 
     for (module_name, inputs) in reverse_lookup.iter() {
@@ -194,7 +228,7 @@ fn build_module_tree_from_input(input: &str) -> (HashMap<String, Module>, HashMa
                 for input in inputs.clone() {
                     state.inputs.insert(input, Pulse::Low);
                 }
-            },
+            }
             _ => (),
         }
     }

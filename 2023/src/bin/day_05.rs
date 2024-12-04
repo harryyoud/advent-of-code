@@ -1,33 +1,59 @@
-use std::{marker::PhantomData, str::Lines};
-
 use aoc_2023::get_input;
-use indicatif::{ParallelProgressIterator, ProgressBar};
+use aoc_lib::paragraphs::Paragraphs;
 use itertools::Itertools;
-use rangemap::RangeMap;
-use rayon::prelude::*;
+use rangemap::{RangeMap, RangeSet};
+use std::marker::PhantomData;
 
-struct RangeMapResolver<K, V> where K: RangeKey, V: RangeKey {
-    _marker1: PhantomData<K>,
-    _marker2: PhantomData<V>,
-    inner: RangeMap<u64, RangeMapInformation>,
-}
+// This solution is quite verbose mostly because we use individual types for each map
+// We could cut down number of lines quite a lot by using overlapping types, but that's boring
 
-impl<K, V> RangeMapResolver<K, V> where K: RangeKey, V: RangeKey {
-    fn from_range_map(map: RangeMap<u64, RangeMapInformation>) -> Self {
-        Self {
-            _marker1: PhantomData,
-            _marker2: PhantomData,
-            inner: map,
-        }
-    }
+fn main() {
+    let input = get_input(5);
 
-    fn resolve(&self, key: &K) -> V {
-        let rmi = self.inner.get(&key.to_u64());
-        let Some(rmi) = rmi else {
-            return V::from_u64(key.to_u64());
-        };
-        V::from_u64(key.to_u64() - rmi.source_start + rmi.destination_start)
-    }
+    let mut lines = input.paragraphs();
+
+    let seeds = lines
+        .next()
+        .unwrap()
+        .into_iter()
+        .next()
+        .unwrap()
+        .trim_start_matches("seeds: ")
+        .split_whitespace()
+        .map(|s| s.parse::<u64>().unwrap())
+        .collect_vec();
+
+    let resolver = FullResolver {
+        seed_soil_map: parse_map(lines.next().unwrap()),
+        soil_fertilizer_map: parse_map(lines.next().unwrap()),
+        fertilizer_water_map: parse_map(lines.next().unwrap()),
+        water_light_map: parse_map(lines.next().unwrap()),
+        light_temperature_map: parse_map(lines.next().unwrap()),
+        temperature_humidity_map: parse_map(lines.next().unwrap()),
+        humidity_location_map: parse_map(lines.next().unwrap()),
+    };
+
+    let part_1 = seeds
+        .iter()
+        .map(|seed| resolver.full_resolve(&Seed::from_u64(*seed)))
+        .min()
+        .unwrap()
+        .to_u64();
+
+    dbg!(part_1);
+
+    let seeds = seeds
+        .into_iter()
+        .tuples()
+        .map(|(l, r)| l..(l + r))
+        .collect::<RangeSet<_>>();
+
+    let part_2 = (0_u64..)
+        .filter(|n| seeds.contains(&resolver.reverse_resolve(&Location(*n)).0))
+        .next()
+        .unwrap();
+
+    dbg!(part_2);
 }
 
 struct FullResolver {
@@ -47,94 +73,133 @@ impl FullResolver {
                 &self.light_temperature_map.resolve(
                     &self.water_light_map.resolve(
                         &self.fertilizer_water_map.resolve(
-                            &self.soil_fertilizer_map.resolve(
-                                &self.seed_soil_map.resolve(seed)
-                            )
-                        )
-                    )
-                )
-            )
+                            &self
+                                .soil_fertilizer_map
+                                .resolve(&self.seed_soil_map.resolve(seed)),
+                        ),
+                    ),
+                ),
+            ),
+        )
+    }
+
+    fn reverse_resolve(&self, location: &Location) -> Seed {
+        self.seed_soil_map.reverse_resolve(
+            &self.soil_fertilizer_map.reverse_resolve(
+                &self.fertilizer_water_map.reverse_resolve(
+                    &self.water_light_map.reverse_resolve(
+                        &self.light_temperature_map.reverse_resolve(
+                            &self.temperature_humidity_map.reverse_resolve(
+                                &self.humidity_location_map.reverse_resolve(location),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
         )
     }
 }
- 
 
-fn main() {
-    let input = get_input(5);
-    let mut lines = input.lines();
-
-    let seeds_line = lines.next().unwrap();
-    let _ = lines.next().unwrap(); // remove blank line ready for next section of input
-
-    let resolver = FullResolver {
-        seed_soil_map: parse_map(&mut lines),
-        soil_fertilizer_map: parse_map(&mut lines),
-        fertilizer_water_map: parse_map(&mut lines),
-        water_light_map: parse_map(&mut lines),
-        light_temperature_map: parse_map(&mut lines),
-        temperature_humidity_map: parse_map(&mut lines),
-        humidity_location_map: parse_map(&mut lines),
-    };
-
-    dbg!(seeds_line
-        .trim_start_matches("seeds: ")
-        .split_whitespace()
-        .map(|s| Seed::from_u64(s.parse::<u64>().unwrap()))
-        .map(|seed| resolver.full_resolve(&seed))
-        .min()
-    );
-
-    let size: u64 = seeds_line
-        .trim_start_matches("seeds: ")
-        .split_whitespace()
-        .map(|s| s.parse::<u64>().unwrap())
-        .skip(1)
-        .step_by(2)
-        .sum();
-
-    let progress = ProgressBar::new(size);
-
-    dbg!(
-        seeds_line
-        .trim_start_matches("seeds: ")
-        .split_whitespace()
-        .map(|s| s.parse::<u64>().unwrap())
-        .tuples()
-        .filter_map(|(start, length)| {
-            (start..(start + length))
-                .into_par_iter()
-                .progress_with(progress.clone())
-                .map(Seed::from_u64)
-                .map(|seed| resolver.full_resolve(&seed))
-                .min()
-        })
-        .min()
-    );
-}
-
-fn parse_map<'a, K, V>(lines: &mut Lines) -> RangeMapResolver<K, V> where K: RangeKey, V: RangeKey {
-    let mut map: RangeMap<u64, RangeMapInformation> = RangeMap::new();
+fn parse_map<'a, K, V>(mut lines: impl Iterator<Item = &'a str>) -> RangeMapResolver<K, V>
+where
+    K: RangeKey,
+    V: RangeKey,
+{
     assert_eq!(
         lines.next().unwrap(),
-        format!("{}-to-{} map:",
-            std::any::type_name::<K>().to_lowercase().split("::").last().unwrap(),
-            std::any::type_name::<V>().to_lowercase().split("::").last().unwrap(),
-        )
+        format!(
+            "{}-to-{} map:",
+            std::any::type_name::<K>()
+                .to_lowercase()
+                .split("::")
+                .last()
+                .unwrap(),
+            std::any::type_name::<V>()
+                .to_lowercase()
+                .split("::")
+                .last()
+                .unwrap(),
+        ),
+        "Unexpected map in input"
     );
-    for rmi in lines
+    let forward = lines
         .take_while(|line| !line.is_empty())
-        .map(|s|
-            s.split_whitespace().map(
-                |x| x.parse::<u64>().unwrap()
-            ).collect_tuple().unwrap()
-        )
-        .map(|(destination_start, source_start, range_length)|
-            RangeMapInformation { destination_start, source_start, range_length }
-        )
-    {
-        map.insert(rmi.source_start..(rmi.source_start + rmi.range_length), rmi)
+        .map(|s| {
+            s.split_whitespace()
+                .map(|x| x.parse::<u64>().unwrap())
+                .collect_tuple()
+                .unwrap()
+        })
+        .map(|(destination_start, source_start, range_length)| {
+            (
+                source_start..(source_start + range_length),
+                RangeMapInformation {
+                    destination_start,
+                    source_start,
+                    range_length,
+                },
+            )
+        })
+        .collect();
+    RangeMapResolver::from_range_map(forward)
+}
+
+struct RangeMapResolver<K, V>
+where
+    K: RangeKey,
+    V: RangeKey,
+{
+    _marker1: PhantomData<K>,
+    _marker2: PhantomData<V>,
+    forward: RangeMap<u64, RangeMapInformation>,
+    reverse: RangeMap<u64, RangeMapInformation>,
+}
+
+impl<K, V> RangeMapResolver<K, V>
+where
+    K: RangeKey,
+    V: RangeKey,
+{
+    fn from_range_map(forward: RangeMap<u64, RangeMapInformation>) -> Self {
+        Self {
+            _marker1: PhantomData,
+            _marker2: PhantomData,
+            reverse: reverse_map(forward.clone()),
+            forward,
+        }
     }
-    RangeMapResolver::from_range_map(map)
+
+    fn resolve(&self, key: &K) -> V {
+        let rmi = self.forward.get(&key.to_u64());
+        let Some(rmi) = rmi else {
+            return V::from_u64(key.to_u64());
+        };
+        V::from_u64(key.to_u64() - rmi.source_start + rmi.destination_start)
+    }
+
+    fn reverse_resolve(&self, key: &V) -> K {
+        let rmi = self.reverse.get(&key.to_u64());
+        let Some(rmi) = rmi else {
+            return K::from_u64(key.to_u64());
+        };
+        K::from_u64(key.to_u64() - rmi.source_start + rmi.destination_start)
+    }
+}
+
+fn reverse_map(forward: RangeMap<u64, RangeMapInformation>) -> RangeMap<u64, RangeMapInformation> {
+    forward
+        .into_iter()
+        .map(|(_, rmi)| {
+            (
+                rmi.destination_start..(rmi.destination_start + rmi.range_length),
+                RangeMapInformation {
+                    source_start: rmi.destination_start,
+                    destination_start: rmi.source_start,
+                    range_length: rmi.range_length,
+                },
+            )
+        })
+        .collect()
 }
 
 pub trait RangeKey {
@@ -236,4 +301,3 @@ pub struct RangeMapInformation {
     pub destination_start: u64,
     pub range_length: u64,
 }
-

@@ -46,7 +46,7 @@ impl TryFrom<char> for Tile {
             'F' => Self::SouthToEast,
             '.' => Self::Ground,
             'S' => Self::StartingPoint,
-            _ => { return Err(()) }
+            _ => return Err(()),
         })
     }
 }
@@ -118,16 +118,32 @@ impl Grid {
     fn get_neighbours(&self, coords: &Coords) -> Vec<(Direction, Coords, Tile)> {
         let mut out = vec![];
         if coords.y < self.inner.len() as u32 {
-            out.push((Direction::South, coords.south(), self.get_tile_at(&coords.south())));
+            out.push((
+                Direction::South,
+                coords.south(),
+                self.get_tile_at(&coords.south()),
+            ));
         }
         if coords.y > 0 {
-            out.push((Direction::North, coords.north(), self.get_tile_at(&coords.north())));
+            out.push((
+                Direction::North,
+                coords.north(),
+                self.get_tile_at(&coords.north()),
+            ));
         }
         if coords.x < self.inner[0].len() as u32 {
-            out.push((Direction::East, coords.east(), self.get_tile_at(&coords.east())));
+            out.push((
+                Direction::East,
+                coords.east(),
+                self.get_tile_at(&coords.east()),
+            ));
         }
         if coords.x > 0 {
-            out.push((Direction::West, coords.west(), self.get_tile_at(&coords.west())));
+            out.push((
+                Direction::West,
+                coords.west(),
+                self.get_tile_at(&coords.west()),
+            ));
         }
         out
     }
@@ -135,20 +151,27 @@ impl Grid {
     fn get_tile_at(&self, coords: &Coords) -> Tile {
         self.inner[coords.y as usize][coords.x as usize].clone()
     }
-    
+
     fn get_connected_neighbours(&self, coords: &Coords) -> Vec<(Direction, Coords, Tile)> {
         let neighbours = self.get_neighbours(coords);
         let current_tile = self.get_tile_at(coords);
 
-        neighbours.into_iter().filter(|(direction, _neighbour_coord, neighbour_tile)| {
-            neighbour_tile.could_connect_to(&direction.opposite()) && current_tile.could_connect_to(direction)
-        }).collect_vec()
+        neighbours
+            .into_iter()
+            .filter(|(direction, _neighbour_coord, neighbour_tile)| {
+                neighbour_tile.could_connect_to(&direction.opposite())
+                    && current_tile.could_connect_to(direction)
+            })
+            .collect_vec()
     }
 }
 
 fn main() {
     let input = get_input(10);
-    let tiles = input.lines().map(|s| s.chars().map(|c| Tile::try_from(c).unwrap()).collect_vec()).collect_vec();
+    let tiles = input
+        .lines()
+        .map(|s| s.chars().map(|c| Tile::try_from(c).unwrap()).collect_vec())
+        .collect_vec();
 
     let mut start_position = None;
     for (row_idx, row) in tiles.iter().enumerate() {
@@ -162,7 +185,10 @@ fn main() {
 
     let grid = Grid {
         inner: tiles,
-        start: Coords { x: start_position.unwrap().0, y: start_position.unwrap().1 },
+        start: Coords {
+            x: start_position.unwrap().0,
+            y: start_position.unwrap().1,
+        },
     };
 
     let mut visited: HashMap<Coords, u32> = HashMap::new();

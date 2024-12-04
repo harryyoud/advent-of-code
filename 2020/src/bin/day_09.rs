@@ -1,13 +1,14 @@
 #![feature(coroutines)]
 #![feature(iter_from_coroutine)]
 
-use std::collections::VecDeque;
-use itertools::Itertools;
 use aoc_2020::get_input;
+use itertools::Itertools;
+use std::collections::VecDeque;
 
 fn main() {
     let input = get_input(9);
-    let input = input.lines()
+    let input = input
+        .lines()
         .map(|x| x.parse::<u64>().expect("Invalid number"))
         .collect_vec();
 
@@ -20,8 +21,13 @@ fn part_1(input: &[u64]) -> u64 {
     let mut to_consider = input.by_ref().copied().take(25).collect::<VecDeque<_>>();
 
     while let Some(candidate) = input.next() {
-        if !to_consider.iter().copied().tuple_combinations().any(|(x, y)| x + y == *candidate) {
-            return *candidate
+        if !to_consider
+            .iter()
+            .copied()
+            .tuple_combinations()
+            .any(|(x, y)| x + y == *candidate)
+        {
+            return *candidate;
         }
         to_consider.pop_front();
         to_consider.push_back(*candidate);
@@ -46,4 +52,3 @@ fn part_2(part_1: u64, input: &[u64]) -> u64 {
 
     unreachable!("No solution found")
 }
-

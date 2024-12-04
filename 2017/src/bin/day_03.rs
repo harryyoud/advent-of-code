@@ -23,7 +23,8 @@ fn part_2(input: usize) -> usize {
     map.insert(Point { x: 0, y: 0 }, 1_usize);
     loop {
         let point = spiral_iter.next().unwrap();
-        let value = point.neighbours()
+        let value = point
+            .neighbours()
             .into_iter()
             .map(|x| *map.get(&x).unwrap_or(&0))
             .sum();
@@ -37,7 +38,10 @@ fn part_2(input: usize) -> usize {
 
 #[derive(Copy, Clone, Debug)]
 enum Direction {
-    Up, Down, Left, Right
+    Up,
+    Down,
+    Left,
+    Right,
 }
 
 impl Direction {
@@ -66,10 +70,22 @@ impl fmt::Debug for Point {
 impl Point {
     fn move_dir(&self, direction: Direction) -> Self {
         match direction {
-            Direction::Up => Point { x: self.x, y: self.y + 1 },
-            Direction::Down => Point { x: self.x, y: self.y - 1 },
-            Direction::Left => Point { x: self.x - 1, y: self.y },
-            Direction::Right => Point { x: self.x + 1, y: self.y },
+            Direction::Up => Point {
+                x: self.x,
+                y: self.y + 1,
+            },
+            Direction::Down => Point {
+                x: self.x,
+                y: self.y - 1,
+            },
+            Direction::Left => Point {
+                x: self.x - 1,
+                y: self.y,
+            },
+            Direction::Right => Point {
+                x: self.x + 1,
+                y: self.y,
+            },
         }
     }
 
@@ -121,17 +137,17 @@ impl Iterator for SpiralIterator {
                     self.current_direction = Direction::Right;
                     // need to push into the next cycle
                     self.i = self.side_length_minus_1 + 1;
-                },
+                }
                 Direction::Right => {
                     self.current_direction = Direction::Up;
                     self.side_length_minus_1 += 2;
                     // we are already 1 above the bottom right corner
                     self.i = self.side_length_minus_1 - 1;
-                },
+                }
                 _ => {
                     self.current_direction = self.current_direction.next();
                     self.i = self.side_length_minus_1;
-                },
+                }
             }
         }
 

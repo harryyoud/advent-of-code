@@ -16,9 +16,7 @@ fn part_1(input: &str) -> String {
 }
 
 fn part_2(input: &str) -> String {
-    part_1(
-        &increment(part_1(input))
-    )
+    part_1(&increment(part_1(input)))
 }
 
 fn is_valid(password: &str) -> bool {
@@ -38,14 +36,12 @@ fn is_valid(password: &str) -> bool {
         return false;
     }
 
-    password
-        .chars()
-        .tuple_windows()
-        .any(|(x, y, z)| {
-            if y == 'z' || x == 'z' { return false };
-            z == next_char(y) &&
-            y == next_char(x)
-        })
+    password.chars().tuple_windows().any(|(x, y, z)| {
+        if y == 'z' || x == 'z' {
+            return false;
+        };
+        z == next_char(y) && y == next_char(x)
+    })
 }
 
 fn next_char(c: char) -> char {

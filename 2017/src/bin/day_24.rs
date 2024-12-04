@@ -22,11 +22,19 @@ fn build_bridge_recursive(
     path: &[(usize, usize)],
     strongest_bridge: &Mutex<usize>,
     longest_bridge: &Mutex<(usize, usize)>,
-    remaining_components: &HashSet<(usize, usize)>
+    remaining_components: &HashSet<(usize, usize)>,
 ) {
     let exposed_port = path.last().unwrap_or(&(0, 0)).1;
-    let lefts = remaining_components.iter().filter(|(a, _)| *a == exposed_port).copied().collect_vec();
-    let rights = remaining_components.iter().filter(|(_, b)| *b == exposed_port).copied().collect_vec();
+    let lefts = remaining_components
+        .iter()
+        .filter(|(a, _)| *a == exposed_port)
+        .copied()
+        .collect_vec();
+    let rights = remaining_components
+        .iter()
+        .filter(|(_, b)| *b == exposed_port)
+        .copied()
+        .collect_vec();
 
     if lefts.is_empty() && rights.is_empty() {
         let current_strength = calculate_strength(path);
@@ -34,11 +42,11 @@ fn build_bridge_recursive(
         *inner = current_strength.max(*inner);
 
         let mut inner = longest_bridge.lock().unwrap();
-        if path.len() > inner.1 || (path.len() == inner.1 && current_strength > inner.0 ){
+        if path.len() > inner.1 || (path.len() == inner.1 && current_strength > inner.0) {
             *inner = (current_strength, path.len());
         }
 
-        return
+        return;
     }
 
     lefts.into_par_iter().for_each(|left| {
@@ -65,8 +73,11 @@ fn flip(x: (usize, usize)) -> (usize, usize) {
 }
 
 fn parse_input(input: &str) -> HashSet<(usize, usize)> {
-    input.lines().map(|s| {
-        let (a, b) = s.split_once('/').unwrap();
-        (a.parse().unwrap(), b.parse().unwrap())
-    }).collect()
+    input
+        .lines()
+        .map(|s| {
+            let (a, b) = s.split_once('/').unwrap();
+            (a.parse().unwrap(), b.parse().unwrap())
+        })
+        .collect()
 }

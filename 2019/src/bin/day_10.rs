@@ -1,6 +1,6 @@
-use std::collections::{HashMap, HashSet};
-use itertools::Itertools;
 use aoc_2019::{gcd, get_input};
+use itertools::Itertools;
+use std::collections::{HashMap, HashSet};
 use types::*;
 
 fn main() {
@@ -26,7 +26,9 @@ fn find_best_location(asteroids: &HashSet<Point>) -> (Point, u32) {
         }
     }
 
-    seen.into_iter().max_by_key(|(_point, count)| *count).unwrap()
+    seen.into_iter()
+        .max_by_key(|(_point, count)| *count)
+        .unwrap()
 }
 
 fn run_laser(mut asteroids: HashSet<Point>, laser: Point) -> Vec<(Point, f64)> {
@@ -67,8 +69,10 @@ fn parse_input(input: &str) -> HashSet<Point> {
     for (y, line) in input.lines().enumerate() {
         for (x, c) in line.chars().enumerate() {
             match c {
-                '#' => { asteroids.insert((x, y).into()); },
-                '.' => {},
+                '#' => {
+                    asteroids.insert((x, y).into());
+                }
+                '.' => {}
                 _ => panic!("Invalid character '{c}', line {y}, character {x}"),
             }
         }
@@ -80,7 +84,10 @@ fn calculate_line(point_a: Point, point_b: Point) -> Line {
     let x_diff = point_b.x as i32 - point_a.x as i32;
     let y_diff = point_b.y as i32 - point_a.y as i32;
 
-    let gcd = gcd(x_diff.unsigned_abs() as usize, y_diff.unsigned_abs() as usize) as u32;
+    let gcd = gcd(
+        x_diff.unsigned_abs() as usize,
+        y_diff.unsigned_abs() as usize,
+    ) as u32;
 
     Line {
         x_step: x_diff / gcd as i32,
@@ -93,7 +100,8 @@ fn calculate_bearing(point_a: Point, point_b: Point) -> f64 {
     let y_diff = point_b.y as i32 - point_a.y as i32;
 
     // take angle difference between x=0 in -y direction (upwards)
-    (((y_diff as f64).atan2(x_diff as f64) - (-1.0_f64.atan2(0.0_f64))).to_degrees() + 720.0) % 360.0
+    (((y_diff as f64).atan2(x_diff as f64) - (-1.0_f64.atan2(0.0_f64))).to_degrees() + 720.0)
+        % 360.0
 }
 
 fn can_see(asteroids: &HashSet<Point>, from: Point, to: Point) -> bool {
@@ -101,7 +109,8 @@ fn can_see(asteroids: &HashSet<Point>, from: Point, to: Point) -> bool {
         line: calculate_line(from, to),
         current: from,
         limit: to,
-    }.all(|x| !asteroids.contains(&x))
+    }
+    .all(|x| !asteroids.contains(&x))
 }
 
 mod types {
@@ -151,9 +160,7 @@ mod types {
 
     impl From<(u32, u32)> for Point {
         fn from((x, y): (u32, u32)) -> Self {
-            Point {
-                x, y
-            }
+            Point { x, y }
         }
     }
     impl From<(usize, usize)> for Point {

@@ -3,7 +3,7 @@ use itertools::Itertools;
 
 // const LOWER_LIMIT: f64 =  7.0;
 // const UPPER_LIMIT: f64 = 27.0;
-const LOWER_LIMIT: f64 =  200_000_000_000_000.0;
+const LOWER_LIMIT: f64 = 200_000_000_000_000.0;
 const UPPER_LIMIT: f64 = 400_000_000_000_000.0;
 
 #[derive(Debug, Clone)]
@@ -60,16 +60,17 @@ impl LinearPath {
 
         // would be nice to assert here that y is equal in both equations, but cannot compare floats
 
-        Some(
-            Point { x, y, z: 0.0 }
-        )
+        Some(Point { x, y, z: 0.0 })
     }
 }
 
 impl Hailstone {
     fn is_intersection_in_future(&self, intersection: &Point) -> bool {
-        match (self.velocity.y.is_sign_negative(), intersection.y < self.point.y) {
-            (true, true) => true, // heading toward intersection
+        match (
+            self.velocity.y.is_sign_negative(),
+            intersection.y < self.point.y,
+        ) {
+            (true, true) => true,   // heading toward intersection
             (true, false) => false, // heading away from intersection
             (false, true) => false, // heading away from intersection
             (false, false) => true, // heading toward intersection
@@ -86,42 +87,87 @@ fn main() {
     let paths = input.lines().map(parse_path).collect::<Vec<Hailstone>>();
     let mut total_possible_collisions = 0u32;
 
-    for (hailstone_a, hailstone_b) in paths.iter().tuple_combinations::<(&Hailstone, &Hailstone)>() {
-        println!("Hailstone A: {}, {} @ {}, {}", hailstone_a.point.x, hailstone_a.point.y, hailstone_a.velocity.x, hailstone_a.velocity.y);
-        println!("Hailstone B: {}, {} @ {}, {}", hailstone_b.point.x, hailstone_b.point.y, hailstone_b.velocity.x, hailstone_b.velocity.y);
+    for (hailstone_a, hailstone_b) in paths
+        .iter()
+        .tuple_combinations::<(&Hailstone, &Hailstone)>()
+    {
+        println!(
+            "Hailstone A: {}, {} @ {}, {}",
+            hailstone_a.point.x,
+            hailstone_a.point.y,
+            hailstone_a.velocity.x,
+            hailstone_a.velocity.y
+        );
+        println!(
+            "Hailstone B: {}, {} @ {}, {}",
+            hailstone_b.point.x,
+            hailstone_b.point.y,
+            hailstone_b.velocity.x,
+            hailstone_b.velocity.y
+        );
         match get_outcome(hailstone_a, hailstone_b) {
-            Outcome::PastCollisionBoth(intersection) => println!("Hailstones' paths crossed in the past for both hailstones (at x={}, y={})", intersection.x, intersection.y),
-            Outcome::PastCollisionA(intersection) => println!("Hailstones' paths crossed in the past for hailstone A (at x={}, y={})", intersection.x, intersection.y),
-            Outcome::PastCollisionB(intersection) => println!("Hailstones' paths crossed in the past for hailstone B (at x={}, y={})", intersection.x, intersection.y),
-            Outcome::FutureCollisionOutsideTestArea(intersection) => println!("Hailstones' paths will cross outside the test area (at x={}, y={})", intersection.x, intersection.y),
-            Outcome::NoCollisionPossible => println!("Hailstones' paths are parallel; they never intersect."),
+            Outcome::PastCollisionBoth(intersection) => println!(
+                "Hailstones' paths crossed in the past for both hailstones (at x={}, y={})",
+                intersection.x, intersection.y
+            ),
+            Outcome::PastCollisionA(intersection) => println!(
+                "Hailstones' paths crossed in the past for hailstone A (at x={}, y={})",
+                intersection.x, intersection.y
+            ),
+            Outcome::PastCollisionB(intersection) => println!(
+                "Hailstones' paths crossed in the past for hailstone B (at x={}, y={})",
+                intersection.x, intersection.y
+            ),
+            Outcome::FutureCollisionOutsideTestArea(intersection) => println!(
+                "Hailstones' paths will cross outside the test area (at x={}, y={})",
+                intersection.x, intersection.y
+            ),
+            Outcome::NoCollisionPossible => {
+                println!("Hailstones' paths are parallel; they never intersect.")
+            }
             Outcome::FutureCollisionInTestArea(intersection) => {
-                println!("Hailstones' paths will cross inside the test area (at x={}, y={})", intersection.x, intersection.y);
+                println!(
+                    "Hailstones' paths will cross inside the test area (at x={}, y={})",
+                    intersection.x, intersection.y
+                );
                 total_possible_collisions += 1;
-            },
+            }
         }
-        println!("y = {}x + {}", hailstone_a.path.gradient, hailstone_a.path.vertical_offset);
+        println!(
+            "y = {}x + {}",
+            hailstone_a.path.gradient, hailstone_a.path.vertical_offset
+        );
         println!("({}, {})", hailstone_a.point.x, hailstone_a.point.y);
-        println!("y = {}x + {}", hailstone_b.path.gradient, hailstone_b.path.vertical_offset);
+        println!(
+            "y = {}x + {}",
+            hailstone_b.path.gradient, hailstone_b.path.vertical_offset
+        );
         println!("({}, {})", hailstone_b.point.x, hailstone_b.point.y);
         println!("x={}", LOWER_LIMIT);
         println!("x={}", UPPER_LIMIT);
         println!();
-    };
+    }
 
     dbg!(total_possible_collisions);
-
-    
 }
 
 fn parse_path(line: &str) -> Hailstone {
     let (positions, velocities) = line.split(" @ ").collect_tuple().unwrap();
-    let (position_x, position_y, position_z) = positions.trim().split(", ").map(|s| s.trim().parse::<f64>().unwrap()).collect_tuple().unwrap();
-    let (velocity_x, velocity_y, velocity_z) = velocities.trim().split(", ").map(|s| s.trim().parse::<f64>().unwrap()).collect_tuple().unwrap();
+    let (position_x, position_y, position_z) = positions
+        .trim()
+        .split(", ")
+        .map(|s| s.trim().parse::<f64>().unwrap())
+        .collect_tuple()
+        .unwrap();
+    let (velocity_x, velocity_y, velocity_z) = velocities
+        .trim()
+        .split(", ")
+        .map(|s| s.trim().parse::<f64>().unwrap())
+        .collect_tuple()
+        .unwrap();
 
     let gradient = velocity_y / velocity_x;
     let vertical_offset = position_y - (gradient * position_x);
-
 
     Hailstone {
         point: Point {
@@ -151,10 +197,11 @@ fn get_outcome(hailstone_a: &Hailstone, hailstone_b: &Hailstone) -> Outcome {
             (false, true) => return Outcome::PastCollisionA(intersection),
             (true, true) => (),
         };
-        if  intersection.x > UPPER_LIMIT ||
-            intersection.x < LOWER_LIMIT ||
-            intersection.y > UPPER_LIMIT ||
-            intersection.y < LOWER_LIMIT {
+        if intersection.x > UPPER_LIMIT
+            || intersection.x < LOWER_LIMIT
+            || intersection.y > UPPER_LIMIT
+            || intersection.y < LOWER_LIMIT
+        {
             // outside of test area
             return Outcome::FutureCollisionOutsideTestArea(intersection);
         }

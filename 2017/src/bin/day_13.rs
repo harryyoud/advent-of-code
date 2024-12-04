@@ -65,14 +65,14 @@ impl Firewall {
     fn run_to_completion(&mut self, break_on_caught: bool) {
         loop {
             match self.move_forwards() {
-                TickResult::Ok => {},
+                TickResult::Ok => {}
                 TickResult::Finished => break,
                 TickResult::Caught => {
                     self.caught = true;
                     if break_on_caught {
                         break;
                     }
-                },
+                }
             };
             self.tick_layers();
         }
@@ -85,7 +85,6 @@ enum TickResult {
     Caught,
 }
 
-
 #[derive(Debug, Clone)]
 struct Layer {
     depth: usize,
@@ -95,7 +94,8 @@ struct Layer {
 
 #[derive(Debug, Clone)]
 enum Direction {
-    Up, Down
+    Up,
+    Down,
 }
 
 impl Layer {
@@ -111,7 +111,7 @@ impl Layer {
                     return;
                 }
                 self.position -= 1;
-            },
+            }
             Direction::Down => {
                 if self.position == self.depth - 1 {
                     self.travelling = Direction::Up;
@@ -119,7 +119,7 @@ impl Layer {
                     return;
                 }
                 self.position += 1;
-            },
+            }
         }
     }
 }
@@ -131,7 +131,10 @@ fn parse_input(input: &str) -> Firewall {
 
     for line in input.lines() {
         let (layer_num, depth) = line.split(": ").collect_tuple().unwrap();
-        let (layer_num, depth) = (layer_num.parse::<usize>().unwrap(), depth.parse::<usize>().unwrap());
+        let (layer_num, depth) = (
+            layer_num.parse::<usize>().unwrap(),
+            depth.parse::<usize>().unwrap(),
+        );
         max_layer_num = max_layer_num.max(layer_num);
         layer_map.insert(layer_num, depth);
     }
@@ -139,7 +142,11 @@ fn parse_input(input: &str) -> Firewall {
     let mut layers = vec![];
     for x in 0..=max_layer_num {
         match layer_map.get(&x) {
-            Some(depth) => layers.push(Some(Layer { travelling: Direction::Down, depth: *depth, position: 0 })),
+            Some(depth) => layers.push(Some(Layer {
+                travelling: Direction::Down,
+                depth: *depth,
+                position: 0,
+            })),
             None => layers.push(None),
         }
     }
@@ -155,7 +162,8 @@ fn parse_input(input: &str) -> Firewall {
 impl fmt::Display for Firewall {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f)?;
-        let max_depth = self.layers
+        let max_depth = self
+            .layers
             .iter()
             .filter_map(|x| x.as_ref().map(|a| a.depth))
             .max()
@@ -186,7 +194,7 @@ impl fmt::Display for Firewall {
                         } else {
                             write!(f, "[  ] ")?
                         }
-                    },
+                    }
                     None => {
                         if depth == 0 {
                             if self.position as usize == layer_num {
@@ -197,7 +205,7 @@ impl fmt::Display for Firewall {
                         } else {
                             write!(f, "     ")?
                         }
-                    },
+                    }
                 }
             }
             writeln!(f)?;

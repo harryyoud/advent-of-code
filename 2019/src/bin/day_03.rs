@@ -1,6 +1,6 @@
-use std::collections::HashSet;
-use itertools::Itertools;
 use aoc_2019::get_input;
+use itertools::Itertools;
+use std::collections::HashSet;
 
 const ORIGIN: Point = Point { x: 0, y: 0 };
 
@@ -16,10 +16,11 @@ fn parse_lines_from_input(input: &str) -> Vec<Vec<Point>> {
     input
         .lines()
         .map(|line| {
-            points_on_line(&line
-                .split(",")
-                .map(|vector| parse_move(vector))
-                .collect_vec()
+            points_on_line(
+                &line
+                    .split(",")
+                    .map(|vector| parse_move(vector))
+                    .collect_vec(),
             )
         })
         .collect_vec()
@@ -29,7 +30,10 @@ fn parse_move(input: &str) -> (Direction, u32) {
     let mut chars = input.chars();
     (
         Direction::parse(chars.next().expect("Ran out of characters")),
-        chars.collect::<String>().parse::<u32>().expect("Ran out of characters"),
+        chars
+            .collect::<String>()
+            .parse::<u32>()
+            .expect("Ran out of characters"),
     )
 }
 
@@ -56,10 +60,15 @@ fn closest_intersection_path(intersections: Vec<Point>, lines: Vec<Vec<Point>>) 
         .map(|intersection| {
             (
                 intersection,
-                lines.iter().map(|line| {
-                    line.iter().position(|point| *point == intersection)
-                        .expect("Could not find position of intersection in line") + 1
-                }).sum::<usize>(),
+                lines
+                    .iter()
+                    .map(|line| {
+                        line.iter()
+                            .position(|point| *point == intersection)
+                            .expect("Could not find position of intersection in line")
+                            + 1
+                    })
+                    .sum::<usize>(),
             )
         })
         .min_by_key(|(_point, combined_path_distance)| *combined_path_distance)
@@ -75,10 +84,22 @@ struct Point {
 impl Point {
     fn travel(&self, dir: Direction, amount: u32) -> Point {
         match dir {
-            Direction::Right => Self { x: self.x + amount as i32, ..*self },
-            Direction::Left  => Self { x: self.x - amount as i32, ..*self },
-            Direction::Up    => Self { y: self.y + amount as i32, ..*self },
-            Direction::Down  => Self { y: self.y - amount as i32, ..*self },
+            Direction::Right => Self {
+                x: self.x + amount as i32,
+                ..*self
+            },
+            Direction::Left => Self {
+                x: self.x - amount as i32,
+                ..*self
+            },
+            Direction::Up => Self {
+                y: self.y + amount as i32,
+                ..*self
+            },
+            Direction::Down => Self {
+                y: self.y - amount as i32,
+                ..*self
+            },
         }
     }
 
@@ -115,7 +136,7 @@ impl Direction {
             'L' => Left,
             'U' => Up,
             'D' => Down,
-            _ => panic!("Invalid direction")
+            _ => panic!("Invalid direction"),
         }
     }
 }

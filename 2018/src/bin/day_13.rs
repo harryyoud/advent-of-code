@@ -17,7 +17,10 @@ fn part_1(grid: &Grid) -> String {
 }
 
 fn part_2(grid: &Grid) -> String {
-    format!("({}, {})", grid.carts[0].position.0, grid.carts[0].position.1)
+    format!(
+        "({}, {})",
+        grid.carts[0].position.0, grid.carts[0].position.1
+    )
 }
 
 fn parse_input(input: &str) -> Grid {
@@ -59,7 +62,9 @@ impl Grid {
                 self.carts[idx].tick(&self.cells);
 
                 let curr_position = self.carts[idx].position;
-                let collisions = self.carts.iter_mut()
+                let collisions = self
+                    .carts
+                    .iter_mut()
                     .filter(|c| c.position == curr_position)
                     .collect_vec();
 
@@ -91,7 +96,8 @@ struct Cart {
 impl Cart {
     fn new(direction: Direction, position: (isize, isize)) -> Self {
         Cart {
-            direction, position,
+            direction,
+            position,
             next_junction_direction: JunctionMovement::Left,
             collided: false,
         }
@@ -108,27 +114,33 @@ impl Cart {
             Direction::Right => (cart.position.0 + 1, cart.position.1),
         };
 
-        match (cart.direction, map.get(&cart.position).expect("Track ends abruptly!")) {
+        match (
+            cart.direction,
+            map.get(&cart.position).expect("Track ends abruptly!"),
+        ) {
             (_, Cell::Crossroads) => {
                 match cart.next_junction_direction {
-                    JunctionMovement::StraightOn => {},
+                    JunctionMovement::StraightOn => {}
                     JunctionMovement::Left => cart.direction.turn_left(),
                     JunctionMovement::Right => cart.direction.turn_right(),
                 };
                 cart.next_junction_direction.next();
-            },
+            }
             (Direction::Up | Direction::Down, Cell::ForwardSlash) => cart.direction.turn_right(),
             (Direction::Left | Direction::Right, Cell::ForwardSlash) => cart.direction.turn_left(),
             (Direction::Up | Direction::Down, Cell::BackSlash) => cart.direction.turn_left(),
             (Direction::Left | Direction::Right, Cell::BackSlash) => cart.direction.turn_right(),
-            _ => {},
+            _ => {}
         }
     }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 enum Direction {
-    Up, Down, Left, Right
+    Up,
+    Down,
+    Left,
+    Right,
 }
 
 impl Direction {
@@ -166,7 +178,9 @@ impl Direction {
 
 #[derive(Copy, Clone, Debug)]
 enum JunctionMovement {
-    Left, StraightOn, Right
+    Left,
+    StraightOn,
+    Right,
 }
 
 impl JunctionMovement {

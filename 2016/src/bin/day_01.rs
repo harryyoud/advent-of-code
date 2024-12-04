@@ -15,7 +15,7 @@ fn main() {
     dbg!(part_2);
 }
 
-fn solve(movements: impl Iterator<Item=(char, i32)>) -> (u32, u32) {
+fn solve(movements: impl Iterator<Item = (char, i32)>) -> (u32, u32) {
     let mut visited: HashSet<(i32, i32)> = HashSet::new();
     let mut direction = Direction::North;
     let mut visited_twice = None;
@@ -25,7 +25,7 @@ fn solve(movements: impl Iterator<Item=(char, i32)>) -> (u32, u32) {
     for movement in movements {
         direction = direction.turn(movement.0);
 
-        for _ in 0..movement.1 {            
+        for _ in 0..movement.1 {
             match direction {
                 Direction::North => y += 1,
                 Direction::South => y -= 1,
@@ -45,7 +45,10 @@ fn solve(movements: impl Iterator<Item=(char, i32)>) -> (u32, u32) {
 }
 
 enum Direction {
-    North, South, East, West
+    North,
+    South,
+    East,
+    West,
 }
 
 impl Direction {

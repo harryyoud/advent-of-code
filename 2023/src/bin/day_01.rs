@@ -19,7 +19,7 @@ lazy_static! {
             ("six", 6),
             ("seven", 7),
             ("eight", 8),
-            ("nine", 9)
+            ("nine", 9),
         ] {
             h.insert(l.to_string(), n);
         }
@@ -30,8 +30,12 @@ lazy_static! {
 
 fn main() {
     let input = get_input(1);
-    let numerics = input.lines().fold(0u32, |acc, line| acc + extract_calibration_value_numerical(line));
-    let alphanumerics = input.lines().fold(0u32, |acc, line| acc + extract_calibration_value_alphanumeric(line));
+    let numerics = input.lines().fold(0u32, |acc, line| {
+        acc + extract_calibration_value_numerical(line)
+    });
+    let alphanumerics = input.lines().fold(0u32, |acc, line| {
+        acc + extract_calibration_value_alphanumeric(line)
+    });
     println!("Interpreting digits only: {}", numerics);
     println!("Interpreting digits and words: {}", alphanumerics);
 }
@@ -42,13 +46,12 @@ fn extract_calibration_value_numerical(line: &str) -> u32 {
 }
 
 fn extract_calibration_value_alphanumeric(line: &str) -> u32 {
-    let numbers: Vec<u32> = AC.find_overlapping_iter(line).map(|mat|
-        *MAP.get(&line[mat.start()..mat.end()]).unwrap()
-    ).collect();
+    let numbers: Vec<u32> = AC
+        .find_overlapping_iter(line)
+        .map(|mat| *MAP.get(&line[mat.start()..mat.end()]).unwrap())
+        .collect();
     (numbers.first().unwrap() * 10) + numbers.last().unwrap()
 }
-
-
 
 #[test]
 fn test_extraction1() {

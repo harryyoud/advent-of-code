@@ -1,10 +1,11 @@
-use std::collections::HashMap;
-use itertools::Itertools;
 use aoc_2020::get_input;
+use itertools::Itertools;
+use std::collections::HashMap;
 
 fn main() {
     let input = get_input(10);
-    let mut adapters = input.lines()
+    let mut adapters = input
+        .lines()
         .map(|x| x.parse::<u32>().unwrap())
         .collect_vec();
 
@@ -29,7 +30,8 @@ fn part_1(adapters: &[u32]) -> u32 {
 }
 
 fn part_2(adapters: &[u32]) -> u64 {
-    adapters.into_iter()
+    adapters
+        .into_iter()
         .tuple_windows()
         .collect_vec()
         .split(|(x, y)| **y - **x == 3)

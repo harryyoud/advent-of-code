@@ -1,11 +1,12 @@
-use std::collections::HashSet;
-use itertools::Itertools;
 use aoc_2020::get_input;
+use itertools::Itertools;
+use std::collections::HashSet;
 
 fn main() {
     let input = get_input(8);
 
-    let instructions: Vec<Instruction> = input.lines()
+    let instructions: Vec<Instruction> = input
+        .lines()
         .map(Instruction::try_from)
         .try_collect()
         .expect("Invalid instructions");
@@ -24,10 +25,10 @@ fn part_2(instructions: Vec<Instruction>) -> isize {
     for instructions in InstructionsChanger::new(instructions) {
         let mut machine = Machine::new(instructions);
         if matches!(machine.run_until(), ExitCondition::EndOfInstructions) {
-            return machine.accumulator
+            return machine.accumulator;
         }
     }
-    
+
     unreachable!("No solution found")
 }
 
@@ -58,16 +59,16 @@ impl Iterator for InstructionsChanger {
                 Instruction::Jump(x) => {
                     instructions[self.cursor] = Instruction::NoOp(x);
                     self.cursor += 1;
-                    return Some(instructions)
+                    return Some(instructions);
                 }
                 Instruction::NoOp(x) => {
                     instructions[self.cursor] = Instruction::Jump(x);
                     self.cursor += 1;
-                    return Some(instructions)
-                },
+                    return Some(instructions);
+                }
                 _ => {
                     self.cursor += 1;
-                },
+                }
             }
         }
         None
@@ -138,10 +139,10 @@ impl TryFrom<&str> for Instruction {
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let Some((ins_type, value)) = value.split_once(" ") else {
-            return Err(())
+            return Err(());
         };
         let Ok(value) = value.parse::<isize>() else {
-            return Err(())
+            return Err(());
         };
 
         match ins_type {

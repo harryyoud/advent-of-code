@@ -1,6 +1,6 @@
+use aoc_2016::assembunny;
 use aoc_2016::assembunny::AssembunnyMachine;
 use aoc_2016::get_input;
-use aoc_2016::assembunny;
 
 fn main() {
     let input = get_input(23);

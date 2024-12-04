@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-use itertools::Itertools;
 use aoc_2020::get_input;
+use itertools::Itertools;
+use std::collections::HashMap;
 
 fn main() {
     let input = get_input(15);
@@ -14,12 +14,18 @@ fn main() {
 }
 
 fn part_1(starting_numbers: Vec<u32>) -> u32 {
-    GameState::new(starting_numbers).into_iter().nth(2020 - 1).unwrap()
+    GameState::new(starting_numbers)
+        .into_iter()
+        .nth(2020 - 1)
+        .unwrap()
 }
 
 fn part_2(starting_numbers: Vec<u32>) -> u32 {
     // probably a more efficient way, but this is quite quick
-    GameState::new(starting_numbers).into_iter().nth(30000000 - 1).unwrap()
+    GameState::new(starting_numbers)
+        .into_iter()
+        .nth(30000000 - 1)
+        .unwrap()
 }
 
 struct GameState {
@@ -42,7 +48,7 @@ impl GameState {
     fn last_two_turns_for(&self, number: u32) -> Option<(usize, usize)> {
         let turns = self.spoken_on_turn.get(&number)?;
         if turns.len() < 2 {
-            return None
+            return None;
         };
         turns[turns.len() - 2..].into_iter().copied().next_tuple()
     }
@@ -76,7 +82,11 @@ impl Iterator for GameIterator {
             0
         };
 
-        self.state.spoken_on_turn.entry(out).or_default().push(self.state.current_turn);
+        self.state
+            .spoken_on_turn
+            .entry(out)
+            .or_default()
+            .push(self.state.current_turn);
         self.state.current_turn += 1;
         self.state.last_spoken = out;
 

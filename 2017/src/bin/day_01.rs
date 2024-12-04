@@ -14,7 +14,8 @@ fn main() {
 fn part_1(input: &str) -> u32 {
     let mut out: u32 = 0;
 
-    for (a, b) in input.chars()
+    for (a, b) in input
+        .chars()
         .chain(iter::once(input.chars().next().unwrap()))
         .tuple_windows()
     {
@@ -28,9 +29,7 @@ fn part_1(input: &str) -> u32 {
 fn part_2(input: &str) -> u32 {
     assert!(input.len() % 2 == 0);
     let left = input.chars();
-    let right = input.chars()
-        .cycle()
-        .skip(input.len() / 2);
+    let right = input.chars().cycle().skip(input.len() / 2);
 
     let mut out: u32 = 0;
 

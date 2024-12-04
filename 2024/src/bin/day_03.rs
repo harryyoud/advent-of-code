@@ -1,5 +1,5 @@
-use lazy_regex::regex;
 use aoc_2024::get_input;
+use lazy_regex::regex;
 
 fn main() {
     let input = get_input(3);
@@ -17,8 +17,5 @@ fn part_1(input: &str) -> u32 {
 
 // just delete everything between don't() and do()
 fn part_2(input: &str) -> u32 {
-    part_1(
-        &regex!(r#"(?s)don't\(\).*?do\(\)"#).replace_all(&input, "")
-    )
+    part_1(&regex!(r#"(?s)don't\(\).*?do\(\)"#).replace_all(&input, ""))
 }
-

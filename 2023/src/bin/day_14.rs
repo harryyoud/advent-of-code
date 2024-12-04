@@ -1,4 +1,7 @@
-use std::{collections::HashMap, fmt::{self, Write}};
+use std::{
+    collections::HashMap,
+    fmt::{self, Write},
+};
 
 use aoc_2023::get_input;
 
@@ -49,12 +52,15 @@ fn main() {
 
     for (y, line) in input.lines().enumerate() {
         for (x, c) in line.chars().enumerate() {
-            grid.tiles.insert((x, y), match c {
-                '#' => Tile::CubeRock,
-                'O' => Tile::RoundRock,
-                '.' => Tile::Empty,
-                _ => panic!("Unknown character"),
-            });
+            grid.tiles.insert(
+                (x, y),
+                match c {
+                    '#' => Tile::CubeRock,
+                    'O' => Tile::RoundRock,
+                    '.' => Tile::Empty,
+                    _ => panic!("Unknown character"),
+                },
+            );
         }
     }
 
@@ -74,7 +80,7 @@ fn main() {
             break;
         }
         seen.insert(stuff, i);
-    };
+    }
 
     for _ in 0..remaining_iterations {
         tilt_grid(&mut grid, Direction::North);
@@ -92,10 +98,14 @@ fn tilt_grid(grid: &mut Grid, direction: Direction) -> bool {
         let mut swaps: Vec<(usize, usize)> = vec![];
         let mut next_empty_space = 0usize;
         for right in 0..get_max_inner_iter(grid, &direction) {
-            match grid.tiles.get(&fix_tile_coords(grid, &direction, left, right)).unwrap() {
+            match grid
+                .tiles
+                .get(&fix_tile_coords(grid, &direction, left, right))
+                .unwrap()
+            {
                 Tile::CubeRock => {
                     next_empty_space = right + 1;
-                },
+                }
                 Tile::RoundRock => {
                     if right == next_empty_space {
                         next_empty_space += 1;
@@ -103,24 +113,39 @@ fn tilt_grid(grid: &mut Grid, direction: Direction) -> bool {
                     }
                     swaps.push((right, next_empty_space));
                     next_empty_space += 1;
-                },
-                Tile::Empty => {},
+                }
+                Tile::Empty => {}
             }
         }
         if !swaps.is_empty() {
             changed = true;
         }
         for (right1, right2) in swaps {
-            let right1t = grid.tiles.get(&fix_tile_coords(grid, &direction, left, right1)).unwrap().clone();
-            let right2t = grid.tiles.get(&fix_tile_coords(grid, &direction, left, right2)).unwrap().clone();
-            grid.tiles.insert(fix_tile_coords(grid, &direction, left, right1), right2t);
-            grid.tiles.insert(fix_tile_coords(grid, &direction, left, right2), right1t);
+            let right1t = grid
+                .tiles
+                .get(&fix_tile_coords(grid, &direction, left, right1))
+                .unwrap()
+                .clone();
+            let right2t = grid
+                .tiles
+                .get(&fix_tile_coords(grid, &direction, left, right2))
+                .unwrap()
+                .clone();
+            grid.tiles
+                .insert(fix_tile_coords(grid, &direction, left, right1), right2t);
+            grid.tiles
+                .insert(fix_tile_coords(grid, &direction, left, right2), right1t);
         }
     }
     changed
 }
 
-fn fix_tile_coords(grid: &Grid, direction: &Direction, l_idx: usize, r_idx: usize) -> (usize, usize) {
+fn fix_tile_coords(
+    grid: &Grid,
+    direction: &Direction,
+    l_idx: usize,
+    r_idx: usize,
+) -> (usize, usize) {
     match direction {
         Direction::North => (l_idx, r_idx),
         Direction::East => (grid.x_len - r_idx - 1, l_idx),

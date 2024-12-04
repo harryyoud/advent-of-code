@@ -34,13 +34,17 @@ fn solve(input: &str) -> (String, String) {
             if (0..=8).contains(&sixth) && part_2[sixth as usize].is_none() {
                 part_2[sixth as usize] = Some(format!("{:x?}", seventh).chars().next().unwrap());
             }
-            print!("\rpart_1: {:_<8} / part_2: {}", part_1.iter().collect::<String>(), part_2.iter().map(|x| x.unwrap_or('_')).collect::<String>());
+            print!(
+                "\rpart_1: {:_<8} / part_2: {}",
+                part_1.iter().collect::<String>(),
+                part_2.iter().map(|x| x.unwrap_or('_')).collect::<String>()
+            );
             let _ = io::stdout().flush();
         }
     }
     println!();
     (
         part_1.into_iter().collect(),
-        part_2.into_iter().map(|x| x.unwrap()).collect()
+        part_2.into_iter().map(|x| x.unwrap()).collect(),
     )
 }

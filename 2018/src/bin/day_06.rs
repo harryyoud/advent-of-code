@@ -5,16 +5,15 @@ use itertools::Itertools;
 
 fn main() {
     let input = get_input(6);
-//     let input = "1, 1
-// 1, 6
-// 8, 3
-// 3, 4
-// 5, 5
-// 8, 9";
+    //     let input = "1, 1
+    // 1, 6
+    // 8, 3
+    // 3, 4
+    // 5, 5
+    // 8, 9";
     let points_of_interest = parse_input(&input);
 
     dbg!(part_1(&points_of_interest));
-
 }
 
 fn part_1(points_of_interest: &[(isize, isize)]) -> usize {
@@ -33,11 +32,13 @@ fn part_1(points_of_interest: &[(isize, isize)]) -> usize {
                 *map.entry(z).or_insert(0) += 1;
                 continue;
             }
-            let nearest_pois = points_of_interest.iter()
+            let nearest_pois = points_of_interest
+                .iter()
                 .enumerate()
                 .min_set_by_key(|(_x, p)| manhattan_distance(point, **p))
                 .into_iter()
-                .map(|(x, _p)| x).collect_vec();
+                .map(|(x, _p)| x)
+                .collect_vec();
             if nearest_pois.len() > 1 {
                 continue;
             }
@@ -45,16 +46,26 @@ fn part_1(points_of_interest: &[(isize, isize)]) -> usize {
         }
     }
 
-    map.iter().filter(|(k, _v)| {
-        let p = points_of_interest[**k];
-        p.0 < max_x && p.0 > min_x && p.1 < max_y && p.0 > min_y
-    }).map(|(_k, v)| *v).max().unwrap()
+    map.iter()
+        .filter(|(k, _v)| {
+            let p = points_of_interest[**k];
+            p.0 < max_x && p.0 > min_x && p.1 < max_y && p.0 > min_y
+        })
+        .map(|(_k, v)| *v)
+        .max()
+        .unwrap()
 }
 
 fn parse_input(input: &str) -> Vec<(isize, isize)> {
-    input.lines().map(|line| {
-        line.split(", ").map(|x| x.parse().unwrap()).collect_tuple().unwrap()
-    }).collect()
+    input
+        .lines()
+        .map(|line| {
+            line.split(", ")
+                .map(|x| x.parse().unwrap())
+                .collect_tuple()
+                .unwrap()
+        })
+        .collect()
 }
 
 fn manhattan_distance(point: (isize, isize), other: (isize, isize)) -> usize {

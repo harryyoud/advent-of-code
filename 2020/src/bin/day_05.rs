@@ -1,5 +1,5 @@
-use itertools::Itertools;
 use aoc_2020::get_input;
+use itertools::Itertools;
 
 // Input is a binary space partition where F means lower half and B means upper half
 // Therefore, we can parse the row a binary number by replacing F with 0 and B with 1

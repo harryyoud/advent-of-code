@@ -3,7 +3,7 @@ use aoc_2015::get_input;
 fn main() {
     let input = get_input(4);
     let input = input.trim();
-    
+
     dbg!(part_1(input));
     dbg!(part_2(input));
 }

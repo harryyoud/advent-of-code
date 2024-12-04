@@ -1,6 +1,9 @@
 use std::collections::VecDeque;
 
-use aoc_2017::{duet_asm::{parsing::parse_instructions, Instruction, RegisterName, Registers}, get_input};
+use aoc_2017::{
+    duet_asm::{parsing::parse_instructions, Instruction, RegisterName, Registers},
+    get_input,
+};
 use itertools::Itertools;
 
 fn main() {
@@ -10,8 +13,15 @@ fn main() {
 
     dbg!(part_1(instructions.clone()));
 
-    let instructions = instructions.into_iter()
-        .map(|x| if matches!(x, Instruction::Recover(_)) { x.try_as_receive().unwrap() } else { x })
+    let instructions = instructions
+        .into_iter()
+        .map(|x| {
+            if matches!(x, Instruction::Recover(_)) {
+                x.try_as_receive().unwrap()
+            } else {
+                x
+            }
+        })
         .collect_vec();
 
     dbg!(part_2(instructions));
@@ -36,13 +46,17 @@ fn part_2(instructions: Vec<Instruction>) -> usize {
             (EndOfInstructions, _) => break,
             (_, EndOfInstructions) => break,
             (Waiting, Waiting) => break,
-            _ => {},
+            _ => {}
         }
 
         sound_card_1_sends += sound_card_1.sounds_out.len();
 
-        sound_card_1.sounds_in.extend(sound_card_0.sounds_out.drain(..).rev());
-        sound_card_0.sounds_in.extend(sound_card_1.sounds_out.drain(..).rev());
+        sound_card_1
+            .sounds_in
+            .extend(sound_card_0.sounds_out.drain(..).rev());
+        sound_card_0
+            .sounds_in
+            .extend(sound_card_1.sounds_out.drain(..).rev());
     }
 
     sound_card_1_sends
@@ -89,7 +103,7 @@ impl SoundCard {
         if self.cursor < 0 || self.cursor >= self.instructions.len() as isize {
             return ExecutionResult::EndOfInstructions;
         }
-        
+
         let instruction = &self.instructions[self.cursor as usize];
         let result;
 
@@ -97,26 +111,26 @@ impl SoundCard {
             Instruction::Send(x) => {
                 self.sounds_out.push(x.eval(&self.registers));
                 result = ExecutionResult::Ok;
-            },
+            }
             Instruction::Set(x, y) => {
                 self.registers.insert(*x, y.eval(&self.registers));
                 result = ExecutionResult::Ok;
-            },
+            }
             Instruction::AddAssign(x, y) => {
                 let y = y.eval(&self.registers);
                 *self.get_register(*x) += y;
                 result = ExecutionResult::Ok;
-            },
+            }
             Instruction::MultiplyAssign(x, y) => {
                 let y = y.eval(&self.registers);
                 *self.get_register(*x) *= y;
                 result = ExecutionResult::Ok;
-            },
+            }
             Instruction::ModuloAssign(x, y) => {
                 let y = y.eval(&self.registers);
                 *self.get_register(*x) %= y;
                 result = ExecutionResult::Ok;
-            },
+            }
             Instruction::Recover(x) => {
                 let x = x.eval(&self.registers);
                 if x != 0 {
@@ -128,7 +142,7 @@ impl SoundCard {
                 } else {
                     result = ExecutionResult::Ok;
                 }
-            },
+            }
             Instruction::Receive(x) => {
                 if let Some(sound) = self.sounds_in.pop_front() {
                     *self.get_register(*x) = sound;
@@ -148,7 +162,7 @@ impl SoundCard {
                     return ExecutionResult::Ok;
                 }
                 result = ExecutionResult::Ok;
-            },
+            }
             _ => panic!("Invalid instruction"),
         };
 

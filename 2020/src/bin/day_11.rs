@@ -1,7 +1,7 @@
+use aoc_2020::{get_input, Vec2d};
+use itertools::Itertools;
 use std::collections::{BTreeMap, HashSet};
 use std::fmt::{Display, Formatter, Write};
-use itertools::Itertools;
-use aoc_2020::{get_input, Vec2d};
 
 fn main() {
     let input = get_input(11);
@@ -16,7 +16,7 @@ fn main() {
     let grid = Grid::new(
         tiles.clone(),
         input.lines().count(),
-        input.lines().next().unwrap().len()
+        input.lines().next().unwrap().len(),
     );
 
     dbg!(part_1(grid.clone()));
@@ -94,14 +94,20 @@ impl Grid {
 
     fn new(tiles: BTreeMap<Vec2d, Tile>, height: usize, width: usize) -> Self {
         Self {
-            tiles, height, width,
+            tiles,
+            height,
+            width,
         }
     }
 
     fn tick_v1(&mut self) {
         let mut new = self.clone();
         for pos in self.tiles.keys() {
-            new.tiles.insert(*pos, self.next_state(*pos, &self.direct_neighbours(*pos), 4).unwrap());
+            new.tiles.insert(
+                *pos,
+                self.next_state(*pos, &self.direct_neighbours(*pos), 4)
+                    .unwrap(),
+            );
         }
         *self = new;
     }
@@ -109,7 +115,11 @@ impl Grid {
     fn tick_v2(&mut self) {
         let mut new = self.clone();
         for pos in self.tiles.keys() {
-            new.tiles.insert(*pos, self.next_state(*pos, &self.visible_neighbours(*pos), 5).unwrap());
+            new.tiles.insert(
+                *pos,
+                self.next_state(*pos, &self.visible_neighbours(*pos), 5)
+                    .unwrap(),
+            );
         }
         *self = new;
     }
@@ -121,7 +131,13 @@ impl Grid {
 
         match (state, occupied_neighbours) {
             (EmptySeat, 0) => Some(OccupiedSeat),
-            (OccupiedSeat, _) => if occupied_neighbours >= x { Some(EmptySeat) } else { Some(state) },
+            (OccupiedSeat, _) => {
+                if occupied_neighbours >= x {
+                    Some(EmptySeat)
+                } else {
+                    Some(state)
+                }
+            }
             _ => Some(state),
         }
     }
@@ -170,7 +186,7 @@ impl TryFrom<char> for Tile {
             '#' => Ok(OccupiedSeat),
             'L' => Ok(EmptySeat),
             '.' => Ok(Floor),
-            _ => Err(())
+            _ => Err(()),
         }
     }
 }

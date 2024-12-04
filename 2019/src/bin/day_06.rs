@@ -1,7 +1,7 @@
-use std::collections::HashMap;
+use aoc_2019::get_input;
 use itertools::Itertools;
 use pathfinding::prelude::dijkstra;
-use aoc_2019::get_input;
+use std::collections::HashMap;
 
 const CENTRE: &str = "COM";
 
@@ -11,7 +11,9 @@ fn main() {
     let mut inverse_orbits = HashMap::<&str, Vec<&str>>::new();
 
     for line in input.lines() {
-        let s = line.split_once(")").expect(&format!("Invalid input: {line}"));
+        let s = line
+            .split_once(")")
+            .expect(&format!("Invalid input: {line}"));
         orbits.entry(s.0).or_default().push(s.1);
         inverse_orbits.entry(s.1).or_default().push(s.0);
     }
@@ -26,27 +28,31 @@ fn part_1(orbits: &HashMap<&str, Vec<&str>>) -> usize {
     count
 }
 
-fn part_2(
-    orbits: &HashMap<&str, Vec<&str>>,
-    inverse_orbits: &HashMap<&str, Vec<&str>>
-) -> usize {
+fn part_2(orbits: &HashMap<&str, Vec<&str>>, inverse_orbits: &HashMap<&str, Vec<&str>>) -> usize {
     find_shortest_path("YOU", "SAN", orbits, inverse_orbits)
-        .expect("Unable to find a path").1 - 2
+        .expect("Unable to find a path")
+        .1
+        - 2
 }
 
 fn find_shortest_path<'a>(
     start: &'a str,
     end: &str,
     orbits: &'a HashMap<&str, Vec<&str>>,
-    inverse_orbits: &'a HashMap<&str, Vec<&str>>
+    inverse_orbits: &'a HashMap<&str, Vec<&str>>,
 ) -> Option<(Vec<&'a str>, usize)> {
     dijkstra(
         &start,
-        |x| orbits.get(x).unwrap_or(&vec![]).into_iter()
-            .chain(inverse_orbits.get(x).unwrap_or(&vec![]))
-            .map(|y| (*y, 1))
-            .collect_vec(),
-        |x| *x == end
+        |x| {
+            orbits
+                .get(x)
+                .unwrap_or(&vec![])
+                .into_iter()
+                .chain(inverse_orbits.get(x).unwrap_or(&vec![]))
+                .map(|y| (*y, 1))
+                .collect_vec()
+        },
+        |x| *x == end,
     )
 }
 
@@ -54,7 +60,7 @@ fn recurse_count(
     direct_orbits: &HashMap<&str, Vec<&str>>,
     current: &str,
     depth: usize,
-    count: &mut usize
+    count: &mut usize,
 ) {
     for orbitee in direct_orbits.get(current).unwrap_or(&vec![]) {
         *count += depth;

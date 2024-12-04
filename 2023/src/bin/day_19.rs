@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use aoc_2023::get_input;
 use itertools::Itertools;
 
-
 #[derive(Copy, Clone, Hash, PartialEq, Eq)]
 enum RatingType {
     CoolLooking,
@@ -51,7 +50,7 @@ struct Function {
     left_hand_side: RatingType,
     function_type: FunctionType,
     right_hand_side: u32,
-    result: FunctionResult
+    result: FunctionResult,
 }
 
 impl Function {
@@ -63,7 +62,7 @@ impl Function {
         let function_type = match function_type {
             '>' => FunctionType::GreaterThan,
             '<' => FunctionType::LessThan,
-            x => panic!("Invalid operator: {x}")
+            x => panic!("Invalid operator: {x}"),
         };
         let right_hand_side = function[2..].parse().unwrap();
         Self {
@@ -82,14 +81,14 @@ impl Function {
                 } else {
                     FunctionResult::Continue
                 }
-            },
+            }
             FunctionType::GreaterThan => {
                 if part.get(self.left_hand_side) > self.right_hand_side {
                     self.result.clone()
                 } else {
                     FunctionResult::Continue
                 }
-            },
+            }
         }
     }
 }
@@ -150,32 +149,54 @@ fn main() {
     let mut workflows: HashMap<&str, Workflow> = HashMap::new();
 
     for line in lines.take_while_ref(|l| !l.is_empty()) {
-        let (name, flow) = line.trim_end_matches('}').split('{').collect_tuple().unwrap();
+        let (name, flow) = line
+            .trim_end_matches('}')
+            .split('{')
+            .collect_tuple()
+            .unwrap();
         let mut functions = vec![];
         let mut flow = flow.split(',').peekable();
         while let Some(s) = flow.next() {
             if flow.peek().is_none() {
-                workflows.insert(name, Workflow {
-                    functions,
-                    finally: FunctionResult::from_str(s),
-                });
+                workflows.insert(
+                    name,
+                    Workflow {
+                        functions,
+                        finally: FunctionResult::from_str(s),
+                    },
+                );
                 break;
             }
             functions.push(Function::from_str(s));
-        };
+        }
     }
-    
+
     lines.next().unwrap();
 
     let mut part_a = 0;
 
     for line in lines {
-        let mut part = Part {x: 0, m: 0, a: 0, s: 0};
-        for rating in line.trim_start_matches('{').trim_end_matches('}').split(',') {
+        let mut part = Part {
+            x: 0,
+            m: 0,
+            a: 0,
+            s: 0,
+        };
+        for rating in line
+            .trim_start_matches('{')
+            .trim_end_matches('}')
+            .split(',')
+        {
             let (rating_type, rating_number) = rating.split('=').collect_tuple().unwrap();
-            part.update(RatingType::from_char(rating_type.chars().next().unwrap()), rating_number.parse::<u32>().unwrap());
+            part.update(
+                RatingType::from_char(rating_type.chars().next().unwrap()),
+                rating_number.parse::<u32>().unwrap(),
+            );
         }
-        if matches!(run_recursive(&workflows, "in", &part), FunctionResult::Accepted) {
+        if matches!(
+            run_recursive(&workflows, "in", &part),
+            FunctionResult::Accepted
+        ) {
             part_a += part.total_rating();
         }
     }
@@ -183,10 +204,14 @@ fn main() {
     dbg!(part_a);
 }
 
-fn run_recursive(workflows: &HashMap<&str, Workflow>, next_workflow: &str, part: &Part) -> FunctionResult {
+fn run_recursive(
+    workflows: &HashMap<&str, Workflow>,
+    next_workflow: &str,
+    part: &Part,
+) -> FunctionResult {
     match workflows.get(next_workflow).unwrap().run(part) {
         FunctionResult::Jump(x) => run_recursive(workflows, &x, part),
         FunctionResult::Continue => panic!("Returned continue from workflow"),
-        x => x
+        x => x,
     }
 }

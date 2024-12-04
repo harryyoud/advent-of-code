@@ -1,4 +1,7 @@
-use std::{collections::{BTreeMap, BTreeSet}, fmt};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    fmt,
+};
 
 use aoc_2016::get_input;
 use itertools::Itertools;
@@ -17,11 +20,7 @@ fn main() {
 }
 
 fn part_1(initial_state: &State) -> usize {
-    let Some(x) = dijkstra(
-        initial_state,
-        next_state,
-        |x| x.solved()
-    ) else {
+    let Some(x) = dijkstra(initial_state, next_state, |x| x.solved()) else {
         panic!("No solution found!");
     };
 
@@ -49,16 +48,14 @@ fn next_state(state: &State) -> Vec<(State, usize)> {
         .iter()
         .powerset()
         .filter(|x| [1, 2].contains(&x.len()))
-        .map(|x| BTreeSet::<Device>::from_iter(x.into_iter().cloned())
-    ) {
+        .map(|x| BTreeSet::<Device>::from_iter(x.into_iter().cloned()))
+    {
         let mut new_current_floor = items.clone();
 
         for item in items_to_move.iter() {
             new_current_floor.remove(item);
         }
-        if !is_combination_safe(&new_current_floor) ||
-            !is_combination_safe(&items_to_move)
-        {
+        if !is_combination_safe(&new_current_floor) || !is_combination_safe(&items_to_move) {
             continue;
         }
 
@@ -69,7 +66,9 @@ fn next_state(state: &State) -> Vec<(State, usize)> {
                 continue;
             }
             let mut new_state = state.clone();
-            new_state.floors.insert(state.current_floor, new_current_floor.clone());
+            new_state
+                .floors
+                .insert(state.current_floor, new_current_floor.clone());
             new_state.floors.insert(next_floor_num, next_floor);
             new_state.current_floor = next_floor_num;
             out.push((new_state, 1));
@@ -92,12 +91,12 @@ struct State {
 
 impl State {
     fn solved(&self) -> bool {
-        self
-            .floors
+        self.floors
             .iter()
             .filter(|(floor_num, _devices)| **floor_num != self.floors.len())
             .map(|(_floor_num, devices)| devices.len())
-            .sum::<usize>() == 0
+            .sum::<usize>()
+            == 0
     }
 
     fn next_movements(&self) -> Vec<usize> {
@@ -115,15 +114,27 @@ impl State {
 impl fmt::Debug for State {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for (floor_num, devices) in self.floors.iter().rev() {
-            writeln!(f,
+            writeln!(
+                f,
                 "F{floor_num} {} {}",
-                if self.current_floor == *floor_num {'E'} else {' '},
-                devices.iter().map(|x| {
-                    match x {
-                        Device::Generator(x) => format!("{}G", x.chars().next().unwrap().to_uppercase()),
-                        Device::Microchip(x) => format!("{}M", x.chars().next().unwrap().to_uppercase()),
-                    }
-                }).join(" "),
+                if self.current_floor == *floor_num {
+                    'E'
+                } else {
+                    ' '
+                },
+                devices
+                    .iter()
+                    .map(|x| {
+                        match x {
+                            Device::Generator(x) => {
+                                format!("{}G", x.chars().next().unwrap().to_uppercase())
+                            }
+                            Device::Microchip(x) => {
+                                format!("{}M", x.chars().next().unwrap().to_uppercase())
+                            }
+                        }
+                    })
+                    .join(" "),
             )?
         }
         Ok(())
@@ -153,21 +164,22 @@ impl Device {
             return true;
         };
 
-        if other_items.iter().any(|x: &Device| {
-            x.is_generator() && x.radiotype() == radiotype
-        }) {
+        if other_items
+            .iter()
+            .any(|x: &Device| x.is_generator() && x.radiotype() == radiotype)
+        {
             return true;
         }
 
-        if other_items.iter().any(|x: &Device| {
-            x.is_generator() && x.radiotype() != radiotype
-        }) {
+        if other_items
+            .iter()
+            .any(|x: &Device| x.is_generator() && x.radiotype() != radiotype)
+        {
             return false;
         }
         true
     }
 }
-
 
 fn parse_input(input: &str) -> BTreeMap<usize, BTreeSet<Device>> {
     let mut map = BTreeMap::new();
@@ -179,8 +191,14 @@ fn parse_input(input: &str) -> BTreeMap<usize, BTreeSet<Device>> {
 }
 
 fn parse_line(line: &str) -> (usize, BTreeSet<Device>) {
-    let (floor_info, items) = line.trim_end_matches('.').split(" contains ").collect_tuple().unwrap();
-    let floor_info = floor_info.trim_start_matches("The ").trim_end_matches(" floor");
+    let (floor_info, items) = line
+        .trim_end_matches('.')
+        .split(" contains ")
+        .collect_tuple()
+        .unwrap();
+    let floor_info = floor_info
+        .trim_start_matches("The ")
+        .trim_end_matches(" floor");
     let floor_info = match floor_info {
         "first" => 1,
         "second" => 2,

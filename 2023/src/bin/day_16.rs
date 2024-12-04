@@ -1,5 +1,5 @@
-use std::fmt::{self};
 use std::collections::{HashMap, HashSet};
+use std::fmt::{self};
 
 use aoc_2023::get_input;
 use itertools::Itertools;
@@ -37,13 +37,17 @@ impl fmt::Display for Grid {
                     write!(f, "#")?;
                     continue;
                 }
-                write!(f, "{}", match self.tiles.get(&(x, y)).unwrap() {
-                    Tile::Empty => '.',
-                    Tile::BottomLeftToTopRightMirror => '/',
-                    Tile::BottomRightToTopLeftMirror => '\\',
-                    Tile::HorizontalSplitter => '-',
-                    Tile::VerticalSplitter => '|',
-                })?
+                write!(
+                    f,
+                    "{}",
+                    match self.tiles.get(&(x, y)).unwrap() {
+                        Tile::Empty => '.',
+                        Tile::BottomLeftToTopRightMirror => '/',
+                        Tile::BottomRightToTopLeftMirror => '\\',
+                        Tile::HorizontalSplitter => '-',
+                        Tile::VerticalSplitter => '|',
+                    }
+                )?
             }
             writeln!(f)?;
         }
@@ -57,10 +61,11 @@ impl Grid {
             Direction::Up,
             Direction::Down,
             Direction::Left,
-            Direction::Right
-        ].into_iter().map(|dir|
-            self.energised.contains(&((x, y), dir))
-        ).any(|x| x)
+            Direction::Right,
+        ]
+        .into_iter()
+        .map(|dir| self.energised.contains(&((x, y), dir)))
+        .any(|x| x)
     }
 }
 
@@ -89,14 +94,17 @@ fn main() {
     };
     for (y, line) in input.lines().enumerate() {
         for (x, c) in line.chars().enumerate() {
-            grid.tiles.insert((x as isize, y as isize), match c {
-                '.' => Tile::Empty,
-                '/' => Tile::BottomLeftToTopRightMirror,
-                '\\' => Tile::BottomRightToTopLeftMirror,
-                '-' => Tile::HorizontalSplitter,
-                '|' => Tile::VerticalSplitter,
-                _ => panic!("Invalid character at ({x}, {y})"),
-            });
+            grid.tiles.insert(
+                (x as isize, y as isize),
+                match c {
+                    '.' => Tile::Empty,
+                    '/' => Tile::BottomLeftToTopRightMirror,
+                    '\\' => Tile::BottomRightToTopLeftMirror,
+                    '-' => Tile::HorizontalSplitter,
+                    '|' => Tile::VerticalSplitter,
+                    _ => panic!("Invalid character at ({x}, {y})"),
+                },
+            );
         }
     }
 
@@ -122,61 +130,81 @@ fn main() {
     dbg!(part_b);
 }
 
-fn calculate_energised(mut grid: Grid, start_point: (isize, isize), start_direction: Direction) -> usize {
+fn calculate_energised(
+    mut grid: Grid,
+    start_point: (isize, isize),
+    start_direction: Direction,
+) -> usize {
     let mut next_visit: HashSet<((isize, isize), Direction)> = HashSet::new();
     next_visit.insert((start_point, start_direction));
 
     loop {
         let this_visit = std::mem::take(&mut next_visit)
             .into_iter()
-            .filter(|((x, y), _dir)| {
-                x >= &0 && x < &grid.x_len && y >= &0 && y < &grid.y_len
-            })
-            .collect::<Vec<_>>()
-        ;
+            .filter(|((x, y), _dir)| x >= &0 && x < &grid.x_len && y >= &0 && y < &grid.y_len)
+            .collect::<Vec<_>>();
 
         for ((x, y), direction) in this_visit.clone().into_iter() {
-            if ! grid.energised.insert(((x, y), direction.clone())) {
+            if !grid.energised.insert(((x, y), direction.clone())) {
                 continue;
             };
             match grid.tiles.get(&(x, y)).unwrap() {
                 Tile::Empty => {
                     next_visit.insert(((x, y).move_dir(&direction), direction));
-                },
+                }
                 Tile::BottomLeftToTopRightMirror => {
                     match direction {
-                        Direction::Up => next_visit.insert(((x, y).move_dir(&Direction::Right), Direction::Right)),
-                        Direction::Down => next_visit.insert(((x, y).move_dir(&Direction::Left), Direction::Left)),
-                        Direction::Left => next_visit.insert(((x, y).move_dir(&Direction::Down), Direction::Down)),
-                        Direction::Right => next_visit.insert(((x, y).move_dir(&Direction::Up), Direction::Up)),
+                        Direction::Up => next_visit
+                            .insert(((x, y).move_dir(&Direction::Right), Direction::Right)),
+                        Direction::Down => {
+                            next_visit.insert(((x, y).move_dir(&Direction::Left), Direction::Left))
+                        }
+                        Direction::Left => {
+                            next_visit.insert(((x, y).move_dir(&Direction::Down), Direction::Down))
+                        }
+                        Direction::Right => {
+                            next_visit.insert(((x, y).move_dir(&Direction::Up), Direction::Up))
+                        }
                     };
-                },
+                }
                 Tile::BottomRightToTopLeftMirror => {
                     match direction {
-                        Direction::Up => next_visit.insert(((x, y).move_dir(&Direction::Left), Direction::Left)),
-                        Direction::Down => next_visit.insert(((x, y).move_dir(&Direction::Right), Direction::Right)),
-                        Direction::Left => next_visit.insert(((x, y).move_dir(&Direction::Up), Direction::Up)),
-                        Direction::Right => next_visit.insert(((x, y).move_dir(&Direction::Down), Direction::Down)),
+                        Direction::Up => {
+                            next_visit.insert(((x, y).move_dir(&Direction::Left), Direction::Left))
+                        }
+                        Direction::Down => next_visit
+                            .insert(((x, y).move_dir(&Direction::Right), Direction::Right)),
+                        Direction::Left => {
+                            next_visit.insert(((x, y).move_dir(&Direction::Up), Direction::Up))
+                        }
+                        Direction::Right => {
+                            next_visit.insert(((x, y).move_dir(&Direction::Down), Direction::Down))
+                        }
                     };
-                },
+                }
                 Tile::HorizontalSplitter => {
                     match direction {
                         Direction::Up | Direction::Down => {
                             next_visit.insert(((x, y).move_dir(&Direction::Left), Direction::Left));
-                            next_visit.insert(((x, y).move_dir(&Direction::Right), Direction::Right));
-                        },
-                        _ => { next_visit.insert(((x, y).move_dir(&direction), direction)); }
+                            next_visit
+                                .insert(((x, y).move_dir(&Direction::Right), Direction::Right));
+                        }
+                        _ => {
+                            next_visit.insert(((x, y).move_dir(&direction), direction));
+                        }
                     };
-                },
+                }
                 Tile::VerticalSplitter => {
                     match direction {
                         Direction::Left | Direction::Right => {
                             next_visit.insert(((x, y).move_dir(&Direction::Up), Direction::Up));
                             next_visit.insert(((x, y).move_dir(&Direction::Down), Direction::Down));
-                        },
-                        _ => { next_visit.insert(((x, y).move_dir(&direction), direction)); }
+                        }
+                        _ => {
+                            next_visit.insert(((x, y).move_dir(&direction), direction));
+                        }
                     };
-                },
+                }
             }
         }
 
@@ -185,5 +213,9 @@ fn calculate_energised(mut grid: Grid, start_point: (isize, isize), start_direct
         }
     }
 
-    grid.energised.iter().map(|((x, y), _d)| (x, y)).unique().count()
+    grid.energised
+        .iter()
+        .map(|((x, y), _d)| (x, y))
+        .unique()
+        .count()
 }

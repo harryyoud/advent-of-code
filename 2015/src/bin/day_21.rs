@@ -4,8 +4,7 @@ use aoc_2015::get_input;
 use aoc_lib::paragraphs::Paragraphs;
 use itertools::Itertools;
 
-const SHOP: &str = 
-r#"Weapons:    Cost  Damage  Armor
+const SHOP: &str = r#"Weapons:    Cost  Damage  Armor
 Dagger        8     4       0
 Shortsword   10     5       0
 Warhammer    25     6       0
@@ -80,16 +79,16 @@ fn part_1(
     let mut min_cost: u64 = u64::MAX;
 
     for (weapon, armour, rings) in get_shop_combinations(weapons, armour, rings) {
-        let cost = weapon.cost +
-            armour.map(|x| x.cost).unwrap_or(0) +
-            rings.0.map(|x| x.cost).unwrap_or(0) +
-            rings.1.map(|x| x.cost).unwrap_or(0);
+        let cost = weapon.cost
+            + armour.map(|x| x.cost).unwrap_or(0)
+            + rings.0.map(|x| x.cost).unwrap_or(0)
+            + rings.1.map(|x| x.cost).unwrap_or(0);
 
         match get_fight_outcome(boss, player, weapon, armour, rings) {
             Outcome::BossWins => (),
             Outcome::PlayerWins => {
                 min_cost = min_cost.min(cost);
-            },
+            }
         };
     }
 
@@ -106,15 +105,15 @@ fn part_2(
     let mut max_cost: u64 = u64::MIN;
 
     for (weapon, armour, rings) in get_shop_combinations(weapons, armour, rings) {
-        let cost = weapon.cost +
-            armour.map(|x| x.cost).unwrap_or(0) +
-            rings.0.map(|x| x.cost).unwrap_or(0) +
-            rings.1.map(|x| x.cost).unwrap_or(0);
+        let cost = weapon.cost
+            + armour.map(|x| x.cost).unwrap_or(0)
+            + rings.0.map(|x| x.cost).unwrap_or(0)
+            + rings.1.map(|x| x.cost).unwrap_or(0);
 
         match get_fight_outcome(boss, player, weapon, armour, rings) {
             Outcome::BossWins => {
                 max_cost = max_cost.max(cost);
-            },
+            }
             Outcome::PlayerWins => (),
         };
     }
@@ -122,17 +121,27 @@ fn part_2(
     max_cost
 }
 
-fn get_shop_combinations<'a>(weapons: &'a [Item], armour: &'a [Item], rings: &'a [Item]) -> impl Iterator<Item = (&'a Item, Option<&'a Item>, (Option<&'a Item>, Option<&'a Item>))> {
-    weapons.iter()
-        .cartesian_product(armour.iter()
-            .map(Some)
-            .chain(iter::once(None))
-        )
-        .cartesian_product(rings.iter()
-            .map(Some)
-            .chain(iter::once(None))
-            .chain(iter::once(None))
-            .tuple_combinations::<(_, _)>()
+fn get_shop_combinations<'a>(
+    weapons: &'a [Item],
+    armour: &'a [Item],
+    rings: &'a [Item],
+) -> impl Iterator<
+    Item = (
+        &'a Item,
+        Option<&'a Item>,
+        (Option<&'a Item>, Option<&'a Item>),
+    ),
+> {
+    weapons
+        .iter()
+        .cartesian_product(armour.iter().map(Some).chain(iter::once(None)))
+        .cartesian_product(
+            rings
+                .iter()
+                .map(Some)
+                .chain(iter::once(None))
+                .chain(iter::once(None))
+                .tuple_combinations::<(_, _)>(),
         )
         .map(|((weapon, armour), rings)| (weapon, armour, rings))
 }
@@ -144,7 +153,8 @@ fn get_fight_outcome(
     armour: Option<&Item>,
     rings: (Option<&Item>, Option<&Item>),
 ) -> Outcome {
-    let mut player: Character = player.clone()
+    let mut player: Character = player
+        .clone()
         .apply(Some(weapon))
         .apply(armour)
         .apply(rings.0)
@@ -152,11 +162,15 @@ fn get_fight_outcome(
     let mut boss = boss.clone();
 
     loop {
-        boss.hit_points = boss.hit_points.saturating_sub(player.damage.saturating_sub(boss.armour));
+        boss.hit_points = boss
+            .hit_points
+            .saturating_sub(player.damage.saturating_sub(boss.armour));
         if boss.hit_points == 0 {
             break Outcome::PlayerWins;
         }
-        player.hit_points = player.hit_points.saturating_sub(boss.damage.saturating_sub(player.armour));
+        player.hit_points = player
+            .hit_points
+            .saturating_sub(boss.damage.saturating_sub(player.armour));
         if player.hit_points == 0 {
             break Outcome::BossWins;
         }
@@ -189,7 +203,7 @@ fn parse_shop() -> (Vec<Item>, Vec<Item>, Vec<Item>) {
             "Weapons" => &mut weapons,
             "Armor" => &mut armour,
             "Rings" => &mut rings,
-            s => panic!("Invalid item type: {s}")
+            s => panic!("Invalid item type: {s}"),
         };
         for line in lines {
             v.push(parse_item(line));

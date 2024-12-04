@@ -20,19 +20,24 @@ fn main() {
     let mut iterations = 0usize;
 
     for i in 0.. {
-        let fighters = game.elves.iter()
+        let fighters = game
+            .elves
+            .iter()
             .chain(game.goblins.iter())
             .map(|(coord, fighter)| (*coord, fighter.class))
             .sorted_by_key(|(coord, _class)| (coord.y, coord.x))
             .collect_vec();
 
         for (mut coord, fighter_class) in fighters.into_iter() {
-            let enemy = game.neighbours(coord).into_iter().find(|(_c, s)| matches!(s, Square::Fighter(x) if *x == fighter_class.enemy()));
+            let enemy = game
+                .neighbours(coord)
+                .into_iter()
+                .find(|(_c, s)| matches!(s, Square::Fighter(x) if *x == fighter_class.enemy()));
 
-            if enemy.is_none() && let Some((_target, next_move, _path_len)) = game.next_move(
-                coord,
-                game.get_fighters(fighter_class.enemy()).iter()
-            ) {
+            if enemy.is_none()
+                && let Some((_target, next_move, _path_len)) =
+                    game.next_move(coord, game.get_fighters(fighter_class.enemy()).iter())
+            {
                 let map = game.get_fighters_mut(fighter_class);
                 let fighter = map.remove(&coord).unwrap();
                 map.insert(next_move, fighter);
@@ -41,12 +46,18 @@ fn main() {
 
             if let Some((enemy_coord, _square)) = enemy {
                 // fight instead of move
-                let Some(Fighter { damage: our_damage, .. }) = game.get_fighters(fighter_class).get(&coord) else {
+                let Some(Fighter {
+                    damage: our_damage, ..
+                }) = game.get_fighters(fighter_class).get(&coord)
+                else {
                     // we died on a previous iteration
                     continue;
                 };
                 let our_damage = *our_damage;
-                let enemy = game.get_fighters_mut(fighter_class.enemy()).get_mut(&enemy_coord).unwrap();
+                let enemy = game
+                    .get_fighters_mut(fighter_class.enemy())
+                    .get_mut(&enemy_coord)
+                    .unwrap();
 
                 enemy.health_points = enemy.health_points.saturating_sub(our_damage);
                 game.clean_dead();
@@ -67,7 +78,13 @@ fn main() {
     for (_, goblin) in game.goblins.iter() {
         dbg!(goblin.health_points);
     }
-    let score = iterations * game.elves.iter().chain(game.goblins.iter()).map(|(_coord, fighter)| fighter.health_points).sum::<usize>();
+    let score = iterations
+        * game
+            .elves
+            .iter()
+            .chain(game.goblins.iter())
+            .map(|(_coord, fighter)| fighter.health_points)
+            .sum::<usize>();
     dbg!(score);
 }
 
@@ -137,16 +154,28 @@ impl From<(isize, isize)> for Coord {
 
 impl Coord {
     fn up(&self) -> Coord {
-        Coord { x: self.x, y: self.y - 1 }
+        Coord {
+            x: self.x,
+            y: self.y - 1,
+        }
     }
     fn down(&self) -> Coord {
-        Coord { x: self.x, y: self.y + 1 }
+        Coord {
+            x: self.x,
+            y: self.y + 1,
+        }
     }
     fn left(&self) -> Coord {
-        Coord { x: self.x - 1, y: self.y }
+        Coord {
+            x: self.x - 1,
+            y: self.y,
+        }
     }
     fn right(&self) -> Coord {
-        Coord { x: self.x + 1, y: self.y }
+        Coord {
+            x: self.x + 1,
+            y: self.y,
+        }
     }
 }
 
@@ -163,18 +192,16 @@ struct Game {
 
 impl Game {
     fn is_square_empty(&self, coord: Coord) -> bool {
-        !(
-            self.walls.contains(&coord) &&
-            self.elves.contains_key(&coord) &&
-            self.goblins.contains_key(&coord)
-        )
+        !(self.walls.contains(&coord)
+            && self.elves.contains_key(&coord)
+            && self.goblins.contains_key(&coord))
     }
 
     fn coord_in_range(&self, coord: Coord) -> bool {
-        coord.x >= self.min_x &&
-        coord.x <= self.max_x &&
-        coord.y >= self.min_y &&
-        coord.y <= self.max_y
+        coord.x >= self.min_x
+            && coord.x <= self.max_x
+            && coord.y >= self.min_y
+            && coord.y <= self.max_y
     }
 
     fn get(&self, coord: Coord) -> Option<Square> {
@@ -183,16 +210,17 @@ impl Game {
         } else if self.walls.contains(&coord) {
             return Some(Square::Wall);
         } else if self.elves.contains_key(&coord) {
-            return Some(Square::Fighter(FighterClass::Elf))
+            return Some(Square::Fighter(FighterClass::Elf));
         } else if self.goblins.contains_key(&coord) {
-            return Some(Square::Fighter(FighterClass::Goblin))
+            return Some(Square::Fighter(FighterClass::Goblin));
         }
         Some(Square::Empty)
     }
 
     fn neighbours(&self, coord: Coord) -> Vec<(Coord, Square)> {
         // order is important - reading order is the tie breaker
-        [coord.up(), coord.left(), coord.right(), coord.down()].into_iter()
+        [coord.up(), coord.left(), coord.right(), coord.down()]
+            .into_iter()
             .map(|x| (x, self.get(x)))
             .filter(|(_x, s)| s.is_some())
             .map(|(x, s)| (x, s.unwrap()))
@@ -200,14 +228,22 @@ impl Game {
     }
 
     fn empty_neighbours(&self, coord: Coord) -> Vec<(Coord, Square)> {
-        self.neighbours(coord).into_iter().filter(|(_c, s)| s.can_occupy()).collect_vec()
+        self.neighbours(coord)
+            .into_iter()
+            .filter(|(_c, s)| s.can_occupy())
+            .collect_vec()
     }
 
-    fn next_move<'a>(&'a self, from: Coord, enemy_fighters: impl Iterator<Item = (&'a Coord, &'a Fighter)>) -> Option<(Coord, Coord, usize)> {
+    fn next_move<'a>(
+        &'a self,
+        from: Coord,
+        enemy_fighters: impl Iterator<Item = (&'a Coord, &'a Fighter)>,
+    ) -> Option<(Coord, Coord, usize)> {
         enemy_fighters
             .flat_map(|(coord, _fighter)| {
                 // Find empty squares around each target
-                self.empty_neighbours(*coord).into_iter()
+                self.empty_neighbours(*coord)
+                    .into_iter()
                     .map(|(coord, _square)| (coord))
             })
             // calculate path (djikstra) from 'from' to 'to'
@@ -228,8 +264,9 @@ impl Game {
         dijkstra(
             &from,
             |x| self.empty_neighbours(*x).into_iter().map(|(c, _s)| (c, 1)),
-            |c| *c == to
-        ).map(|(path, _len)| path)
+            |c| *c == to,
+        )
+        .map(|(path, _len)| path)
     }
 
     fn get_fighters(&self, class: FighterClass) -> &HashMap<Coord, Fighter> {
@@ -260,7 +297,6 @@ impl Game {
                 } else {
                     print!(".");
                 }
-
             }
             println!()
         }
@@ -298,10 +334,18 @@ fn parse_game_from_string(input: &str) -> Game {
     for (y, line) in input.lines().enumerate() {
         for (x, square) in line.chars().enumerate() {
             match square {
-                'E' => { map.elves.insert((x, y).into(), Fighter::new(FighterClass::Elf)); },
-                'G' => { map.goblins.insert((x, y).into(), Fighter::new(FighterClass::Goblin)); },
-                '#' => { map.walls.insert((x, y).into()); },
-                '.' => {},
+                'E' => {
+                    map.elves
+                        .insert((x, y).into(), Fighter::new(FighterClass::Elf));
+                }
+                'G' => {
+                    map.goblins
+                        .insert((x, y).into(), Fighter::new(FighterClass::Goblin));
+                }
+                '#' => {
+                    map.walls.insert((x, y).into());
+                }
+                '.' => {}
                 _ => panic!("Invalid character: {square} at {y}:{x}"),
             };
         }

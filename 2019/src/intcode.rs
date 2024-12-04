@@ -29,7 +29,7 @@ mod types {
                 8 => Equals,
                 9 => AdjustBase,
                 99 => Stop,
-                n => panic!("Invalid instruction type: {n}")
+                n => panic!("Invalid instruction type: {n}"),
             }
         }
     }
@@ -46,7 +46,6 @@ mod types {
         pub modes: Vec<OperandType>,
         pub r#type: InstructionType,
     }
-
 }
 
 fn extract_operand_type(number: i64, position: usize) -> OperandType {
@@ -54,7 +53,7 @@ fn extract_operand_type(number: i64, position: usize) -> OperandType {
         0 => OperandType::Position,
         1 => OperandType::Immediate,
         2 => OperandType::Relative,
-        n => panic!("Invalid OperandType: {n}")
+        n => panic!("Invalid OperandType: {n}"),
     }
 }
 
@@ -128,9 +127,15 @@ impl Machine {
     fn get_value(&self, parameter_index: usize) -> i64 {
         let arg_offset = self.program_cursor + parameter_index + 1;
         match extract_operand_type(self.program[self.program_cursor], parameter_index) {
-            OperandType::Position => *self.program.get(self.program[arg_offset] as usize).unwrap_or(&0),
+            OperandType::Position => *self
+                .program
+                .get(self.program[arg_offset] as usize)
+                .unwrap_or(&0),
             OperandType::Immediate => self.program[arg_offset],
-            OperandType::Relative => *self.program.get((self.program[arg_offset] + (self.relative_base)) as usize).unwrap_or(&0)
+            OperandType::Relative => *self
+                .program
+                .get((self.program[arg_offset] + (self.relative_base)) as usize)
+                .unwrap_or(&0),
         }
     }
 
@@ -166,7 +171,14 @@ impl Machine {
                 HitStopInstruction => {
                     if self.debug && self.outputs.len() > 1 {
                         println!("Checks failed:");
-                        for (cursor, instruction_type, operand_type, instruction_argument, resolved_output) in self.output_debug[..self.output_debug.len() - 1].iter() {
+                        for (
+                            cursor,
+                            instruction_type,
+                            operand_type,
+                            instruction_argument,
+                            resolved_output,
+                        ) in self.output_debug[..self.output_debug.len() - 1].iter()
+                        {
                             if *resolved_output == 0 {
                                 continue;
                             }
@@ -179,7 +191,7 @@ impl Machine {
                         }
                     }
                     break;
-                },
+                }
             }
         }
         self.state
@@ -194,42 +206,48 @@ impl Machine {
                 let (left, right) = (self.get_value(0), self.get_value(1));
                 self.set_value(2, left + right);
                 self.program_cursor += 4;
-            },
+            }
             InstructionType::Multiply => {
                 let (left, right) = (self.get_value(0), self.get_value(1));
                 self.set_value(2, left * right);
                 self.program_cursor += 4;
-            },
+            }
             InstructionType::JumpIfTrue => {
                 if self.get_value(0) != 0 {
                     self.program_cursor = self.get_value(1) as usize;
-                }else {
+                } else {
                     self.program_cursor += 3;
                 }
-            },
+            }
             InstructionType::JumpIfFalse => {
                 if self.get_value(0) == 0 {
                     self.program_cursor = self.get_value(1) as usize;
                 } else {
                     self.program_cursor += 3;
                 }
-            },
+            }
             InstructionType::LessThan => {
-                self.set_value(2, if self.get_value(0) < self.get_value(1) {
-                    1
-                } else {
-                    0
-                });
+                self.set_value(
+                    2,
+                    if self.get_value(0) < self.get_value(1) {
+                        1
+                    } else {
+                        0
+                    },
+                );
                 self.program_cursor += 4;
-            },
+            }
             InstructionType::Equals => {
-                self.set_value(2, if self.get_value(0) == self.get_value(1) {
-                    1
-                } else {
-                    0
-                });
+                self.set_value(
+                    2,
+                    if self.get_value(0) == self.get_value(1) {
+                        1
+                    } else {
+                        0
+                    },
+                );
                 self.program_cursor += 4;
-            },
+            }
             InstructionType::Input => {
                 if self.inputs.get(self.input_cursor).is_none() {
                     self.state = MachineState::NeedMoreInput;
@@ -238,15 +256,19 @@ impl Machine {
                 self.set_value(0, self.inputs[self.input_cursor]);
                 self.program_cursor += 2;
                 self.input_cursor += 1;
-            },
+            }
             InstructionType::Output => {
                 let output = self.get_value(0);
                 self.output_debug.push((
-                    self.program_cursor, instruction.r#type, instruction.modes, self.program[self.program_cursor], output
+                    self.program_cursor,
+                    instruction.r#type,
+                    instruction.modes,
+                    self.program[self.program_cursor],
+                    output,
                 ));
                 self.outputs.push(output);
                 self.program_cursor += 2;
-            },
+            }
             InstructionType::AdjustBase => {
                 self.relative_base += self.get_value(0);
                 self.program_cursor += 2;
@@ -254,7 +276,7 @@ impl Machine {
             InstructionType::Stop => {
                 self.state = MachineState::HitStopInstruction;
                 // don't advance cursor to make sure we continually hit stop to avoid overrunning
-            },
+            }
         }
         self.state
     }

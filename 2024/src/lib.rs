@@ -28,7 +28,7 @@ pub mod skip_nth {
     pub trait AocItertools: Iterator {
         fn skip_nth(self, n: usize) -> SkipNth<Self>
         where
-            Self: Sized
+            Self: Sized,
         {
             SkipNth {
                 iter: self,

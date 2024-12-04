@@ -30,23 +30,27 @@ fn part_1(replacements: &[(&str, &str)], molecule: &str) -> u64 {
 
 fn part_2(replacements: &[(&str, &str)], molecule: &str) -> u64 {
     unimplemented!("This is just a CPU destroyer");
-    let results = dijkstra(
-        &molecule.to_string(),
-        |x: &String| replacements.iter().flat_map(|(from, to)| {
-            x.match_indices(to).filter_map(move |(idx, _match)| {
-                let mut s: String = String::from_str(&x[0..idx]).unwrap();
-                s.push_str(&x[idx..].replacen(to, from, 1));
-                Some((s, 1))
-            }).collect_vec()
-        }).collect_vec(),
-        |x| *x == "e"
-    );
-    (results.unwrap().0.len() - 1) as u64
+    // let results = dijkstra(
+    //     &molecule.to_string(),
+    //     |x: &String| replacements.iter().flat_map(|(from, to)| {
+    //         x.match_indices(to).filter_map(move |(idx, _match)| {
+    //             let mut s: String = String::from_str(&x[0..idx]).unwrap();
+    //             s.push_str(&x[idx..].replacen(to, from, 1));
+    //             let l = s.len();
+    //             Some((s, l))
+    //         }).collect_vec()
+    //     }).collect_vec(),
+    //     |x| *x == "e"
+    // );
+    // (results.unwrap().0.len() - 1) as u64
 }
 
 fn parse_input(input: &String) -> (Vec<(&str, &str)>, &str) {
     let (replacements, mut molecule) = input.paragraphs().collect_tuple().unwrap();
-    let replacements = replacements.into_iter().map(|s| s.split(" => ").collect_tuple().unwrap()).collect_vec();
+    let replacements = replacements
+        .into_iter()
+        .map(|s| s.split(" => ").collect_tuple().unwrap())
+        .collect_vec();
     let molecule = molecule.last().unwrap();
 
     (replacements, molecule)

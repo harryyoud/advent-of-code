@@ -33,6 +33,7 @@ dependencies = [
  "aho-corasick",
  "aoc_lib",
  "itertools 0.12.1",
+ "lazy-regex",
  "md5",
  "num",
  "pathfinding",

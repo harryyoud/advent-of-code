@@ -42,8 +42,14 @@ impl Machine<'_> {
         while let Some(instruction) = self.instructions.get(self.cursor) {
             self.cursor += 1;
 
-            let left = *self.registers.get(instruction.comparison_left).unwrap_or(&0);
-            if !instruction.comparison.eval(left, instruction.comparison_right) {
+            let left = *self
+                .registers
+                .get(instruction.comparison_left)
+                .unwrap_or(&0);
+            if !instruction
+                .comparison
+                .eval(left, instruction.comparison_right)
+            {
                 continue;
             }
 
@@ -51,10 +57,10 @@ impl Machine<'_> {
             match instruction.operation {
                 Operation::Increment(x) => {
                     *register += x;
-                },
+                }
                 Operation::Decrement(x) => {
                     *register -= x;
-                },
+                }
             }
 
             self.highest_seen = self.highest_seen.max(*register);

@@ -4,7 +4,10 @@ use itertools::Itertools;
 fn main() {
     let input = get_input(24);
     let packages = {
-        let mut p = input.lines().map(|x| x.parse::<u128>().unwrap()).collect_vec();
+        let mut p = input
+            .lines()
+            .map(|x| x.parse::<u128>().unwrap())
+            .collect_vec();
         p.sort();
         p.into_iter().rev().collect_vec()
     };
@@ -33,14 +36,29 @@ fn find_smallest_fit_recursive(
     sum: u128,
     quantum_entanglement: u128,
     target: u128,
-    minimum_quantum_entanglement: &mut u128
+    minimum_quantum_entanglement: &mut u128,
 ) {
     if sum == target {
         *minimum_quantum_entanglement = (*minimum_quantum_entanglement).min(quantum_entanglement);
         return;
     }
-    if sum < target && quantum_entanglement < *minimum_quantum_entanglement && idx < packages.len() {
-        find_smallest_fit_recursive(packages, idx + 1, sum, quantum_entanglement, target, minimum_quantum_entanglement);
-        find_smallest_fit_recursive(packages, idx + 1, sum + packages[idx], quantum_entanglement * packages[idx], target, minimum_quantum_entanglement);
+    if sum < target && quantum_entanglement < *minimum_quantum_entanglement && idx < packages.len()
+    {
+        find_smallest_fit_recursive(
+            packages,
+            idx + 1,
+            sum,
+            quantum_entanglement,
+            target,
+            minimum_quantum_entanglement,
+        );
+        find_smallest_fit_recursive(
+            packages,
+            idx + 1,
+            sum + packages[idx],
+            quantum_entanglement * packages[idx],
+            target,
+            minimum_quantum_entanglement,
+        );
     }
 }

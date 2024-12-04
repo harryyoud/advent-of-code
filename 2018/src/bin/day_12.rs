@@ -14,20 +14,27 @@ fn main() {
 }
 
 fn part_1(plants: &HashSet<isize>, transformations: &HashMap<[bool; 5], bool>) -> isize {
-    simulate(plants.clone(), transformations, 20).into_iter().sum::<isize>()
+    simulate(plants.clone(), transformations, 20)
+        .into_iter()
+        .sum::<isize>()
 }
 
 fn part_2(plants: &HashSet<isize>, transformations: &HashMap<[bool; 5], bool>) -> isize {
     // at iterations of 5 x 10^x, answer is 21...428, where ... is (x - 2) number of 0
     // therefore 5 x 10^10, answer is 2_100_000_000_428
-    let x = simulate(plants.clone(), transformations, 5_000).into_iter().sum::<isize>();
-    let (a, b): (usize, usize) = format!("{x}").split_once('0').map(|(a, b)| (a.parse().unwrap(), b.parse().unwrap())).unwrap();
+    let x = simulate(plants.clone(), transformations, 5_000)
+        .into_iter()
+        .sum::<isize>();
+    let (a, b): (usize, usize) = format!("{x}")
+        .split_once('0')
+        .map(|(a, b)| (a.parse().unwrap(), b.parse().unwrap()))
+        .unwrap();
     format!("{a}00000000{b}").parse().unwrap()
 }
 
 fn parse_input(input: &str) -> (HashSet<isize>, HashMap<[bool; 5], bool>) {
     let mut lines = input.lines();
-    
+
     (
         lines
             .next()
@@ -43,7 +50,11 @@ fn parse_input(input: &str) -> (HashSet<isize>, HashMap<[bool; 5], bool>) {
             .map(|x| x.split_once(" => ").unwrap())
             .map(|(from, to)| {
                 (
-                    from.chars().map(|x| x == '#').collect_vec().try_into().unwrap(),
+                    from.chars()
+                        .map(|x| x == '#')
+                        .collect_vec()
+                        .try_into()
+                        .unwrap(),
                     to == "#",
                 )
             })
@@ -51,7 +62,11 @@ fn parse_input(input: &str) -> (HashSet<isize>, HashMap<[bool; 5], bool>) {
     )
 }
 
-fn simulate(mut plants: HashSet<isize>, transformations: &HashMap<[bool; 5], bool>, iterations: usize) -> HashSet<isize> {
+fn simulate(
+    mut plants: HashSet<isize>,
+    transformations: &HashMap<[bool; 5], bool>,
+    iterations: usize,
+) -> HashSet<isize> {
     let mut next_plants = HashSet::new();
 
     for i in 0..iterations {
@@ -59,7 +74,11 @@ fn simulate(mut plants: HashSet<isize>, transformations: &HashMap<[bool; 5], boo
             dbg!(i);
         }
         for index in (plants.iter().min().unwrap() - 2)..(plants.iter().max().unwrap() + 2) {
-            let window = ((index - 2)..=(index + 2)).map(|x| plants.contains(&x)).collect_vec().try_into().unwrap();
+            let window = ((index - 2)..=(index + 2))
+                .map(|x| plants.contains(&x))
+                .collect_vec()
+                .try_into()
+                .unwrap();
             if let Some(x) = transformations.get::<[bool; 5]>(&window) {
                 if *x {
                     next_plants.insert(index);

@@ -20,7 +20,12 @@ fn main() {
 fn part_1(reindeers: &[Reindeer]) -> u32 {
     let mut max_distance = 0u32;
 
-    for &Reindeer { speed, move_time, rest_time } in reindeers {
+    for &Reindeer {
+        speed,
+        move_time,
+        rest_time,
+    } in reindeers
+    {
         let mut distance_travelled = 0;
 
         let cycle = move_time + rest_time;
@@ -49,7 +54,7 @@ fn part_2(reindeers: &[Reindeer]) -> u32 {
         for (idx, reindeer) in reindeers.iter().enumerate() {
             let cycle = reindeer.move_time + reindeer.rest_time;
             let remaining = current_time % cycle;
-            
+
             if remaining < reindeer.move_time {
                 distances[idx] += reindeer.speed;
             }
@@ -57,7 +62,8 @@ fn part_2(reindeers: &[Reindeer]) -> u32 {
 
         let max_distance = distances.iter().max().unwrap();
 
-        distances.iter()
+        distances
+            .iter()
             .enumerate()
             .filter(|(_idx, dist)| *dist == max_distance)
             .map(|(idx, _dist)| idx)
@@ -68,10 +74,19 @@ fn part_2(reindeers: &[Reindeer]) -> u32 {
 }
 
 fn parse_input(input: &str) -> Vec<Reindeer> {
-    input.lines().map(|line| {
-        let (speed, move_time, rest_time) = line.split_whitespace().filter_map(|x| x.parse::<u32>().ok()).collect_tuple().unwrap();
-        Reindeer {
-            speed, move_time, rest_time
-        }
-    }).collect_vec()
+    input
+        .lines()
+        .map(|line| {
+            let (speed, move_time, rest_time) = line
+                .split_whitespace()
+                .filter_map(|x| x.parse::<u32>().ok())
+                .collect_tuple()
+                .unwrap();
+            Reindeer {
+                speed,
+                move_time,
+                rest_time,
+            }
+        })
+        .collect_vec()
 }

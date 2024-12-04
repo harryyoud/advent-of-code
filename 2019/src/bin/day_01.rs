@@ -5,9 +5,7 @@ fn main() {
 
     let module_masses: Vec<u32> = input
         .lines()
-        .map(|line|
-            line.parse::<u32>().expect("Valid number in input")
-        )
+        .map(|line| line.parse::<u32>().expect("Valid number in input"))
         .collect();
 
     dbg!(part_1(&module_masses));
@@ -15,11 +13,7 @@ fn main() {
 }
 
 fn part_1(module_masses: &[u32]) -> u32 {
-    module_masses
-        .iter()
-        .copied()
-        .map(calculate_fuel)
-        .sum()
+    module_masses.iter().copied().map(calculate_fuel).sum()
 }
 
 fn part_2(module_masses: &[u32]) -> u32 {

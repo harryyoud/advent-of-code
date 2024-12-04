@@ -1,213 +1,326 @@
+#![feature(assert_matches)]
+
 use aoc_2015::get_input;
-use itertools::Itertools;
+use lazy_regex::regex_captures;
+use pathfinding::prelude::dijkstra;
 
-const SPELLS: [Spell; 5] = [
-    Spell { instant_damage: 4, mana_cost: 53, heals: 0, effect: None },
-    Spell { instant_damage: 2, mana_cost: 73, heals: 2, effect: None },
-    Spell { instant_damage: 0, mana_cost: 113, heals: 0, effect: Some(Effect { effect_type: EffectType::Shield, remaining_turns: 6, amount: 7 })},
-    Spell { instant_damage: 0, mana_cost: 173, heals: 0, effect: Some(Effect { effect_type: EffectType::Damage, remaining_turns: 6, amount: 3 })},
-    Spell { instant_damage: 0, mana_cost: 229, heals: 0, effect: Some(Effect { effect_type: EffectType::Recharge, remaining_turns: 5, amount: 101 }) }
-];
+const DRAIN_POINTS: u32 = 2;
+const MAGIC_MISSILE_DAMAGE: u32 = 4;
+const SHIELD_ARMOR: u32 = 7;
+const RECHARGE_MANA: u32 = 101;
+const POISON_DAMAGE: u32 = 3;
 
-fn main() {
-    let input = get_input(22);
-    let (boss_hp, boss_damage) = parse_input(&input);
-
-    let boss = Boss {
-        hit_points: boss_hp,
-        damage: boss_damage,
-        effects: vec![],
-    };
-    let player = Player {
-        hit_points: 50,
-        mana: 500,
-        armour: 0,
-        shield: 0,
-        effects: vec![],
-    };
-    let mut min_mana = u64::MAX;
-    get_outcome(&boss, &player, &mut min_mana, 0);
-    dbg!(min_mana);
+#[derive(Debug, Clone, Eq, Hash, PartialEq)]
+struct BattleState {
+    player: Player,
+    boss: Boss,
+    spell_state: SpellState,
+    hard_mode: bool,
 }
 
-fn parse_input(input: &str) -> (i64, u64) {
-    let lines = input.lines()
-        .map(|line| line.split_once(": ").unwrap().1)
-        .collect_tuple::<(_, _)>()
-        .unwrap();
-
-    (
-        lines.0.parse().unwrap(),
-        lines.1.parse().unwrap(),
-    )
-}
-
-fn get_outcome(boss: &Boss, player: &Player, min_mana: &mut u64, used_mana: u64) {
-    for spell in SPELLS.iter() {
-        let mut boss = boss.clone();
-        let mut player = player.clone();
-
-        if player.mana < (spell.mana_cost + used_mana) || used_mana > *min_mana {
-            continue;
+impl BattleState {
+    fn armor(&self) -> Option<u32> {
+        if self.spell_state.shield_timer > 0 {
+            Some(SHIELD_ARMOR)
+        } else {
+            None
         }
-        player.tick();
-        boss.tick();
-        if boss.is_dead() {
-            println!("Boss died {used_mana}");
-            *min_mana = (*min_mana).min(used_mana + spell.mana_cost);
+    }
+
+    fn apply_effects(&mut self) {
+        if self.spell_state.poison_timer > 0 {
+            self.spell_state.poison_timer -= 1;
+            self.boss.hit_points -= POISON_DAMAGE as i32;
         }
-        if let Some(effect) = spell.effect.as_ref() {
-            if player.add_effect(effect.clone()).is_err() {
-                continue;
-            };
-            if boss.add_effect(effect.clone()).is_err() {
-                continue;
+        if self.spell_state.recharge_timer > 0 {
+            self.spell_state.recharge_timer -= 1;
+            self.player.mana_remaining += RECHARGE_MANA as i32;
+        }
+        if self.spell_state.shield_timer > 0 {
+            self.spell_state.shield_timer -= 1;
+        }
+    }
+
+    fn check_result(&self) -> Option<TurnResult> {
+        if self.player.hit_points <= 0 {
+            return Some(TurnResult::PlayerDied);
+        }
+        if self.player.mana_remaining <= 0 {
+            return Some(TurnResult::PlayerRanOutOfMana);
+        }
+        if self.boss.hit_points <= 0 {
+            return Some(TurnResult::BossDied);
+        }
+        None
+    }
+
+    fn cast(&mut self, spell: Spell) -> Option<TurnResult> {
+        if self.player.mana_remaining <= spell.cost() as i32 {
+            return Some(TurnResult::PlayerRanOutOfMana);
+        }
+        match spell {
+            Spell::MagicMissile => {
+                self.boss.hit_points -= MAGIC_MISSILE_DAMAGE as i32;
+            }
+            Spell::Drain => {
+                self.boss.hit_points -= DRAIN_POINTS as i32;
+                self.player.hit_points += DRAIN_POINTS as i32;
+            }
+            Spell::Shield => {
+                if self.spell_state.shield_timer > 0 {
+                    return Some(TurnResult::EffectAlreadyInUse);
+                }
+                self.spell_state.shield_timer = 6;
+            }
+            Spell::Poison => {
+                if self.spell_state.poison_timer > 0 {
+                    return Some(TurnResult::EffectAlreadyInUse);
+                }
+                self.spell_state.poison_timer = 6;
+            }
+            Spell::Recharge => {
+                if self.spell_state.recharge_timer > 0 {
+                    return Some(TurnResult::EffectAlreadyInUse);
+                }
+                self.spell_state.recharge_timer = 5;
             }
         }
-        if spell.instant_damage > 0 {
-            boss.hit_points -= spell.instant_damage as i64;
-        }
-        if spell.heals > 0 {
-            player.hit_points += spell.heals as i64;
-        }
-        if boss.is_dead() {
-            println!("Boss died {used_mana}");
-            *min_mana = (*min_mana).min(used_mana + spell.mana_cost);
+        self.player.mana_remaining -= spell.cost() as i32;
+        self.player.mana_spent += spell.cost();
+        None
+    }
+
+    fn tick(&mut self, spell: Spell) -> Option<TurnResult> {
+        // Player turn
+        if self.hard_mode {
+            self.player.hit_points -= 1;
         }
 
-        player.tick();
-        boss.tick();
-        if boss.is_dead() {
-            println!("Boss died {used_mana}");
-            *min_mana = (*min_mana).min(used_mana + spell.mana_cost);
+        if let Some(result) = self.check_result() {
+            return Some(result);
         }
-        player.hit_points -= (boss.damage.saturating_sub(player.armour + player.shield).max(1)) as i64;
-        if player.is_dead() {
-            continue;
+        self.apply_effects();
+        if let Some(result) = self.cast(spell) {
+            return Some(result);
+        }
+        if let Some(result) = self.check_result() {
+            return Some(result);
         }
 
-        get_outcome(&boss, &player, min_mana, used_mana + spell.mana_cost)
+        // boss turn
+        self.apply_effects();
+        if let Some(result) = self.check_result() {
+            return Some(result);
+        }
+        self.player.hit_points -= (self.boss.damage - self.armor().unwrap_or(0)).max(1) as i32;
+        if let Some(result) = self.check_result() {
+            return Some(result);
+        }
+
+        None
     }
 }
 
-
-
-#[derive(Clone)]
-struct Boss {
-    hit_points: i64,
-    damage: u64,
-    effects: Vec<Effect>,
+#[derive(Debug, Copy, Clone, Eq, Hash, PartialEq)]
+enum TurnResult {
+    EffectAlreadyInUse,
+    PlayerDied,
+    PlayerRanOutOfMana,
+    BossDied,
 }
 
-impl Boss {
-    fn tick(&mut self) {
-        for effect in self.effects.iter_mut() {
-            match effect.effect_type {
-                EffectType::Damage => {
-                    effect.remaining_turns = effect.remaining_turns.saturating_sub(1);
-                    if effect.remaining_turns == 0 {
-                        continue;
-                    }
-                    self.hit_points -= effect.amount as i64;
-                },
-                _ => {},
-            }
-        }
-        self.effects.retain(|x| x.remaining_turns > 0);
-    }
-
-    fn add_effect(&mut self, effect: Effect) -> Result<(), ()> {
-        if !self.can_add_effect_type(effect.effect_type) {
-            return Err(());
-        }
-        self.effects.push(effect);
-        Ok(())
-    }
-
-    fn can_add_effect_type(&self, effect_type: EffectType) -> bool {
-        self.effects.iter().all(|x| x.effect_type != effect_type)
-    }
-
-    fn is_dead(&self) -> bool {
-        self.hit_points <= 0
-    }
-}
-
-#[derive(Clone)]
+#[derive(Debug, Clone, Eq, Hash, PartialEq)]
 struct Player {
-    hit_points: i64,
-    mana: u64,
-    armour: u64,
-    shield: u64,
-    effects: Vec<Effect>,
+    hit_points: i32,
+    mana_remaining: i32,
+    mana_spent: u32,
 }
 
-impl Player {
-    fn tick(&mut self) {
-        for effect in self.effects.iter_mut() {
-            match effect.effect_type {
-                EffectType::Shield => {
-                    effect.remaining_turns = effect.remaining_turns.saturating_sub(1);
-                    self.shield = effect.amount;
-                    if effect.remaining_turns == 0 {
-                        self.shield = 0;
-                        continue;
-                    }
-                },
-                EffectType::Recharge => {
-                    effect.remaining_turns = effect.remaining_turns.saturating_sub(1);
-                    self.mana += effect.amount;
-                    if effect.remaining_turns == 0 {
-                        continue;
-                    }
-                },
-                _ => {}
-            }
-        }
-        self.effects.retain(|x| x.remaining_turns > 0);
-    }
-    
-    fn add_effect(&mut self, effect: Effect) -> Result<(), ()> {
-        if !self.can_add_effect_type(effect.effect_type) {
-            return Err(());
-        }
-        match effect.effect_type {
-            EffectType::Shield => {
-                self.shield = effect.amount;
-            },
-            _ => {},
-        }
-        self.effects.push(effect);
-        Ok(())
-    }
-
-    fn can_add_effect_type(&self, effect_type: EffectType) -> bool {
-        self.effects.iter().all(|x| x.effect_type != effect_type)
-    }
-
-    fn is_dead(&self) -> bool {
-        self.hit_points <= 0
-    }
+#[derive(Debug, Clone, Eq, Hash, PartialEq)]
+struct Boss {
+    hit_points: i32,
+    damage: u32,
 }
 
-#[derive(Clone)]
-struct Effect {
-    effect_type: EffectType,
-    remaining_turns: u64,
-    amount: u64,
+#[derive(Default, Debug, Clone, Eq, Hash, PartialEq)]
+struct SpellState {
+    shield_timer: u32,
+    recharge_timer: u32,
+    poison_timer: u32,
 }
 
-#[derive(PartialEq, Eq, Copy, Clone)]
-enum EffectType {
+#[derive(Debug, Copy, Clone, Eq, Hash, PartialEq)]
+enum Spell {
+    MagicMissile,
+    Drain,
     Shield,
-    Damage,
+    Poison,
     Recharge,
 }
 
-#[derive(Clone)]
-struct Spell {
-    instant_damage: u64,
-    mana_cost: u64,
-    heals: u64,
-    effect: Option<Effect>,
+impl Spell {
+    fn cost(&self) -> u32 {
+        use Spell::*;
+        match self {
+            MagicMissile => 53,
+            Drain => 73,
+            Shield => 113,
+            Poison => 173,
+            Recharge => 229,
+        }
+    }
+
+    fn all() -> [Self; 5] {
+        [
+            Spell::MagicMissile,
+            Spell::Drain,
+            Spell::Shield,
+            Spell::Poison,
+            Spell::Recharge,
+        ]
+    }
+}
+
+fn main() {
+    let input = get_input(22);
+    let boss = parse_input(&input);
+
+    dbg!(part_1(boss.clone()));
+    dbg!(part_2(boss.clone()));
+}
+
+fn part_1(boss: Boss) -> u32 {
+    let initial_state = BattleState {
+        boss,
+        player: Player {
+            hit_points: 50,
+            mana_remaining: 500,
+            mana_spent: 0,
+        },
+        spell_state: SpellState::default(),
+        hard_mode: false,
+    };
+    find_lowest_mana_cost_route(initial_state)
+}
+
+fn part_2(boss: Boss) -> u32 {
+    let initial_state = BattleState {
+        boss,
+        player: Player {
+            hit_points: 50,
+            mana_remaining: 500,
+            mana_spent: 0,
+        },
+        spell_state: SpellState::default(),
+        hard_mode: true,
+    };
+    find_lowest_mana_cost_route(initial_state)
+}
+
+fn find_lowest_mana_cost_route(initial_state: BattleState) -> u32 {
+    dijkstra(
+        &(initial_state, None, Spell::MagicMissile),
+        |(state, _result, _spell)| next_state(state),
+        |(_, result, _)| matches!(result, Some(TurnResult::BossDied)),
+    )
+    .unwrap()
+    .1
+}
+
+fn next_state(
+    state: &BattleState,
+) -> impl Iterator<Item = ((BattleState, Option<TurnResult>, Spell), u32)> {
+    let state = state.clone();
+    Spell::all()
+        .into_iter()
+        .map(move |spell| {
+            let mut state = state.clone();
+            let result = state.tick(spell);
+            ((state, result, spell), spell.cost())
+        })
+        .filter(|((_state, result, _spell), _spell_cost)| {
+            if let Some(result) = result {
+                matches!(result, TurnResult::BossDied)
+            } else {
+                true
+            }
+        })
+}
+
+fn parse_input(input: &str) -> Boss {
+    let (boss_hp, boss_dmg) = regex_captures!(r"^Hit Points: (\d+)\nDamage: (\d+)\n?$", input)
+        .map(|(_, hp, dmg)| (hp.parse::<u32>().unwrap(), dmg.parse::<u32>().unwrap()))
+        .unwrap();
+    Boss {
+        hit_points: boss_hp as i32,
+        damage: boss_dmg,
+    }
+}
+
+#[test]
+fn example_1() {
+    use std::assert_matches::assert_matches;
+
+    let spells = [Spell::Poison, Spell::MagicMissile];
+
+    let mut state = BattleState {
+        boss: Boss {
+            hit_points: 13,
+            damage: 8,
+        },
+        player: Player {
+            hit_points: 10,
+            mana_remaining: 250,
+            mana_spent: 0,
+        },
+        spell_state: SpellState::default(),
+        hard_mode: false,
+    };
+
+    let mut result = None;
+    for spell in spells.into_iter() {
+        result = state.tick(spell);
+    }
+
+    assert!(state.boss.hit_points <= 0);
+    assert_matches!(result, Some(TurnResult::BossDied));
+    assert_eq!(state.player.mana_remaining, 24);
+    assert_eq!(state.player.hit_points, 2);
+}
+
+#[test]
+fn example_2() {
+    use std::assert_matches::assert_matches;
+
+    let spells = [
+        Spell::Recharge,
+        Spell::Shield,
+        Spell::Drain,
+        Spell::Poison,
+        Spell::MagicMissile,
+    ];
+
+    let mut state = BattleState {
+        boss: Boss {
+            hit_points: 14,
+            damage: 8,
+        },
+        player: Player {
+            hit_points: 10,
+            mana_remaining: 250,
+            mana_spent: 0,
+        },
+        spell_state: SpellState::default(),
+        hard_mode: false,
+    };
+
+    let mut result = None;
+    for spell in spells.into_iter() {
+        result = state.tick(spell);
+    }
+
+    assert!(state.boss.hit_points <= 0);
+    assert_matches!(result, Some(TurnResult::BossDied));
+    assert_eq!(state.player.hit_points, 1);
+    assert_eq!(state.player.mana_remaining, 114);
 }

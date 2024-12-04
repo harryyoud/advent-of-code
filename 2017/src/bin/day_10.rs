@@ -1,4 +1,7 @@
-use aoc_2017::{get_input, knot_hasher::{bytes_to_hex, hash, twist}};
+use aoc_2017::{
+    get_input,
+    knot_hasher::{bytes_to_hex, hash, twist},
+};
 use itertools::Itertools;
 
 fn main() {
@@ -22,4 +25,3 @@ fn part_1(input: &str) -> usize {
 fn part_2(plaintext: &str) -> String {
     bytes_to_hex(&hash(plaintext))
 }
-

@@ -30,12 +30,20 @@ fn decompressed_line_len(line: &str, recurse: bool) -> usize {
         };
 
         if x == '(' {
-            let comp_instruction = iter.take_while_ref(|(_, c)| *c != ')').map(|(_, c)| c).collect::<String>();
-            let (comp_len, comp_amount) = comp_instruction.split('x').map(|x| x.parse::<usize>().unwrap()).collect_tuple().unwrap();
+            let comp_instruction = iter
+                .take_while_ref(|(_, c)| *c != ')')
+                .map(|(_, c)| c)
+                .collect::<String>();
+            let (comp_len, comp_amount) = comp_instruction
+                .split('x')
+                .map(|x| x.parse::<usize>().unwrap())
+                .collect_tuple()
+                .unwrap();
             let _ = iter.next(); // )
             if recurse {
                 let start = comp_instruction.len() + i + 2;
-                length += decompressed_line_len(&line[start..(start + comp_len)], true) * comp_amount;
+                length +=
+                    decompressed_line_len(&line[start..(start + comp_len)], true) * comp_amount;
             } else {
                 length += comp_len * comp_amount;
             }

@@ -4,9 +4,11 @@ use itertools::Itertools;
 fn main() {
     let input = get_input(19);
     let number_of_elves = input.parse::<usize>().unwrap();
-    let elves = (0..number_of_elves).map(|idx| Elf {
-        next_elf: (idx + 1) % number_of_elves,
-    }).collect_vec();
+    let elves = (0..number_of_elves)
+        .map(|idx| Elf {
+            next_elf: (idx + 1) % number_of_elves,
+        })
+        .collect_vec();
 
     dbg!(part_1(&elves));
     dbg!(part_2(&elves));

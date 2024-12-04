@@ -13,7 +13,10 @@ fn main() {
 }
 
 fn part_1(mut recipes: RecipeWorker, input: &str) -> String {
-    recipes.run_until_n_recipes(input.parse().unwrap()).iter().join("")
+    recipes
+        .run_until_n_recipes(input.parse().unwrap())
+        .iter()
+        .join("")
 }
 
 fn part_2(mut recipes: RecipeWorker, input: &str) -> usize {
@@ -21,11 +24,11 @@ fn part_2(mut recipes: RecipeWorker, input: &str) -> usize {
 }
 
 fn number_to_digits(number: &str) -> Vec<usize> {
-    number.chars()
+    number
+        .chars()
         .map(|c| c.to_digit(10).unwrap() as usize)
         .collect_vec()
 }
-
 
 #[derive(Clone)]
 struct RecipeWorker {
@@ -36,7 +39,11 @@ struct RecipeWorker {
 impl RecipeWorker {
     fn tick(&mut self) -> usize {
         let original_length = self.scoreboard.len();
-        let score = self.cursors.iter().map(|x| self.scoreboard[*x]).sum::<usize>();
+        let score = self
+            .cursors
+            .iter()
+            .map(|x| self.scoreboard[*x])
+            .sum::<usize>();
         let recipe_1 = score / 10;
         let recipe_2 = score % 10;
 
@@ -62,8 +69,10 @@ impl RecipeWorker {
                 break;
             }
         }
-    
-        self.scoreboard[iterations..(iterations+10)].try_into().unwrap()
+
+        self.scoreboard[iterations..(iterations + 10)]
+            .try_into()
+            .unwrap()
     }
 
     // returns first index of match, but will only pick
@@ -75,8 +84,10 @@ impl RecipeWorker {
             for offset in 0..recipes_made {
                 // if we made 2 recipes we need to check the final 5, but also 5 offset backwards by 1 at the end
                 // slightly over-engineered in case in the future we make 3 recipes in one tick
-                if self.scoreboard.len() >= pattern.len() + offset &&
-                    pattern == &self.scoreboard[(self.scoreboard.len() - pattern.len() - offset)..(self.scoreboard.len() - offset)]
+                if self.scoreboard.len() >= pattern.len() + offset
+                    && pattern
+                        == &self.scoreboard[(self.scoreboard.len() - pattern.len() - offset)
+                            ..(self.scoreboard.len() - offset)]
                 {
                     return self.scoreboard.len() - (pattern.len() + offset);
                 }

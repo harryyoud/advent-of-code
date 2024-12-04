@@ -12,8 +12,7 @@ fn main() {
 }
 
 fn part_1(bots: &HashMap<u32, Bot>) -> u32 {
-    bots
-        .iter()
+    bots.iter()
         .filter(|(_bot_num, bot)| bot.has_61_17())
         .map(|(bot_num, _bot)| *bot_num)
         .next()
@@ -29,22 +28,28 @@ fn process(bots: &mut HashMap<u32, Bot>, outputs: &mut HashMap<u32, u32>) {
 
     while let Some(next_bot) = bots
         .iter()
-        .filter(|(_bot_num, bot)| bot.can_process()).find(|(bot_num, _bot)| !processed.contains(*bot_num))
+        .filter(|(_bot_num, bot)| bot.can_process())
+        .find(|(bot_num, _bot)| !processed.contains(*bot_num))
     {
         processed.insert(*next_bot.0);
 
-        let (
-            (low_val, low_dest),
-            (high_val, high_dest)
-        ) = next_bot.1.process_chip();
+        let ((low_val, low_dest), (high_val, high_dest)) = next_bot.1.process_chip();
 
         match low_dest {
-            Destination::Bot(bot_num) => { bots.get_mut(&bot_num).unwrap().push_chip(low_val); },
-            Destination::Output(output_num) =>{ outputs.insert(output_num, low_val); },
+            Destination::Bot(bot_num) => {
+                bots.get_mut(&bot_num).unwrap().push_chip(low_val);
+            }
+            Destination::Output(output_num) => {
+                outputs.insert(output_num, low_val);
+            }
         }
         match high_dest {
-            Destination::Bot(bot_num) => { bots.get_mut(&bot_num).unwrap().push_chip(high_val); },
-            Destination::Output(output_num) => { outputs.insert(output_num, high_val); },
+            Destination::Bot(bot_num) => {
+                bots.get_mut(&bot_num).unwrap().push_chip(high_val);
+            }
+            Destination::Output(output_num) => {
+                outputs.insert(output_num, high_val);
+            }
         }
     }
 }
@@ -57,27 +62,50 @@ fn parse_input(input: &str) -> (HashMap<u32, Bot>, HashMap<u32, u32>) {
     for line in input.lines() {
         let captures = re.captures(line).unwrap();
         if let Some(bot_num) = captures.name("bot_from") {
-            let low_dest = captures.name("low_goes_to_num").unwrap().as_str().parse().unwrap();
+            let low_dest = captures
+                .name("low_goes_to_num")
+                .unwrap()
+                .as_str()
+                .parse()
+                .unwrap();
             let low_dest = match captures.name("low_goes_to_type").unwrap().as_str() {
                 "bot" => Destination::Bot(low_dest),
                 "output" => Destination::Output(low_dest),
-                _ => panic!("Invalid destination type")
+                _ => panic!("Invalid destination type"),
             };
-            let high_dest = captures.name("high_goes_to_num").unwrap().as_str().parse().unwrap();
+            let high_dest = captures
+                .name("high_goes_to_num")
+                .unwrap()
+                .as_str()
+                .parse()
+                .unwrap();
             let high_dest = match captures.name("high_goes_to_type").unwrap().as_str() {
                 "bot" => Destination::Bot(high_dest),
                 "output" => Destination::Output(high_dest),
-                _ => panic!("Invalid destination type")
+                _ => panic!("Invalid destination type"),
             };
-            bots.insert(bot_num.as_str().parse().unwrap(), Bot {
-                low_destination: low_dest,
-                high_destination: high_dest,
-                chips: (None, None),
-            });
+            bots.insert(
+                bot_num.as_str().parse().unwrap(),
+                Bot {
+                    low_destination: low_dest,
+                    high_destination: high_dest,
+                    chips: (None, None),
+                },
+            );
         } else {
             fixed_values.insert(
-                captures.name("value_from").unwrap().as_str().parse().unwrap(),
-                captures.name("value_goes_to_bot_num").unwrap().as_str().parse().unwrap(),
+                captures
+                    .name("value_from")
+                    .unwrap()
+                    .as_str()
+                    .parse()
+                    .unwrap(),
+                captures
+                    .name("value_goes_to_bot_num")
+                    .unwrap()
+                    .as_str()
+                    .parse()
+                    .unwrap(),
             );
         }
     }
@@ -135,7 +163,7 @@ impl Bot {
     }
 
     fn has_61_17(&self) -> bool {
-        self.chips.0.unwrap().min(self.chips.1.unwrap()) == 17 &&
-        self.chips.0.unwrap().max(self.chips.1.unwrap()) == 61
+        self.chips.0.unwrap().min(self.chips.1.unwrap()) == 17
+            && self.chips.0.unwrap().max(self.chips.1.unwrap()) == 61
     }
 }

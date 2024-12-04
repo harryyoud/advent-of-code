@@ -40,19 +40,36 @@ fn main() {
     let input = get_input(8);
     let mut input = input.lines();
     let mut map: HashMap<String, Waypoint> = HashMap::new();
-    let directions: Vec<Direction> = input.next().unwrap().chars().map(Direction::from_char).collect();
+    let directions: Vec<Direction> = input
+        .next()
+        .unwrap()
+        .chars()
+        .map(Direction::from_char)
+        .collect();
     input.next().unwrap();
-    
+
     for line in input {
         let (waypoint_name, points) = line.split(" = ").collect_tuple().unwrap();
-        let (left, right) = points.trim_matches(|c| c == ')' || c == '(').split(", ").collect_tuple().unwrap();
-        map.insert(waypoint_name.to_string(), Waypoint {
-            name: waypoint_name.to_string(),
-            left: left.to_string(), right: right.to_string(),
-        });
+        let (left, right) = points
+            .trim_matches(|c| c == ')' || c == '(')
+            .split(", ")
+            .collect_tuple()
+            .unwrap();
+        map.insert(
+            waypoint_name.to_string(),
+            Waypoint {
+                name: waypoint_name.to_string(),
+                left: left.to_string(),
+                right: right.to_string(),
+            },
+        );
     }
 
-    let locations = map.keys().filter(|x| x.ends_with('A')).map(|x| map.get(x).unwrap()).collect_vec();
+    let locations = map
+        .keys()
+        .filter(|x| x.ends_with('A'))
+        .map(|x| map.get(x).unwrap())
+        .collect_vec();
     let mut counts = vec![];
 
     for location in locations {
@@ -63,7 +80,9 @@ fn main() {
             if current_location.name.ends_with('Z') {
                 break;
             }
-            current_location = map.get(current_location.get_destination(direction)).unwrap();
+            current_location = map
+                .get(current_location.get_destination(direction))
+                .unwrap();
         }
         counts.push(moved)
     }

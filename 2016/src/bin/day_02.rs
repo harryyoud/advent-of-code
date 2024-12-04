@@ -40,18 +40,18 @@ fn part_2(movements: &Vec<Vec<Direction>>) -> String {
     let mut keypad = Keypad {
         cursor: '5',
         columns: vec![
-            vec![          '5'          ],
-            vec![     '2', '6', 'A'     ],
+            vec!['5'],
+            vec!['2', '6', 'A'],
             vec!['1', '3', '7', 'B', 'D'],
-            vec![     '4', '8', 'C',    ],
-            vec![          '9'          ],
+            vec!['4', '8', 'C'],
+            vec!['9'],
         ],
         rows: vec![
-            vec![          '1'          ],
-            vec![     '2', '3', '4'     ],
+            vec!['1'],
+            vec!['2', '3', '4'],
             vec!['5', '6', '7', '8', '9'],
-            vec![     'A', 'B', 'C',    ],
-            vec![          'D'          ],
+            vec!['A', 'B', 'C'],
+            vec!['D'],
         ],
     };
 
@@ -68,19 +68,28 @@ fn part_2(movements: &Vec<Vec<Direction>>) -> String {
 }
 
 fn parse_input(input: &str) -> Vec<Vec<Direction>> {
-    input.lines()
-        .map(|x| x.chars().map(|c| match c {
-            'D' => Direction::Down,
-            'U' => Direction::Up,
-            'R' => Direction::Right,
-            'L' => Direction::Left,
-            s => panic!("Invalid direction: {s}"),
-        }).collect_vec()).collect_vec()
+    input
+        .lines()
+        .map(|x| {
+            x.chars()
+                .map(|c| match c {
+                    'D' => Direction::Down,
+                    'U' => Direction::Up,
+                    'R' => Direction::Right,
+                    'L' => Direction::Left,
+                    s => panic!("Invalid direction: {s}"),
+                })
+                .collect_vec()
+        })
+        .collect_vec()
 }
 
 #[derive(Copy, Clone)]
 enum Direction {
-    Up, Left, Down, Right
+    Up,
+    Left,
+    Down,
+    Right,
 }
 
 struct Keypad {
@@ -100,25 +109,41 @@ impl Keypad {
     }
 
     fn move_up(&self) -> char {
-        let column = self.columns.iter().find(|a| a.iter().any(|b| *b == self.cursor)).unwrap();
+        let column = self
+            .columns
+            .iter()
+            .find(|a| a.iter().any(|b| *b == self.cursor))
+            .unwrap();
         let pos = column.iter().position(|x| *x == self.cursor).unwrap();
         column[pos.saturating_sub(1)]
     }
 
     fn move_left(&self) -> char {
-        let row = self.rows.iter().find(|a| a.iter().any(|b| *b == self.cursor)).unwrap();
+        let row = self
+            .rows
+            .iter()
+            .find(|a| a.iter().any(|b| *b == self.cursor))
+            .unwrap();
         let pos = row.iter().position(|x| *x == self.cursor).unwrap();
         row[pos.saturating_sub(1)]
     }
 
     fn move_down(&self) -> char {
-        let column = self.columns.iter().find(|a| a.iter().any(|b| *b == self.cursor)).unwrap();
+        let column = self
+            .columns
+            .iter()
+            .find(|a| a.iter().any(|b| *b == self.cursor))
+            .unwrap();
         let pos = column.iter().position(|x| *x == self.cursor).unwrap();
         column[(pos + 1).min(column.len() - 1)]
     }
 
     fn move_right(&self) -> char {
-        let row = self.rows.iter().find(|a| a.iter().any(|b| *b == self.cursor)).unwrap();
+        let row = self
+            .rows
+            .iter()
+            .find(|a| a.iter().any(|b| *b == self.cursor))
+            .unwrap();
         let pos = row.iter().position(|x| *x == self.cursor).unwrap();
         row[(pos + 1).min(row.len() - 1)]
     }

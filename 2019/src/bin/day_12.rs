@@ -1,7 +1,7 @@
-use std::collections::HashSet;
+use aoc_2019::{get_input, lcm};
 use itertools::repeat_n;
 use regex::Regex;
-use aoc_2019::{get_input, lcm};
+use std::collections::HashSet;
 use types::*;
 
 const N: usize = 3;
@@ -44,7 +44,10 @@ fn part_2(system: Vec<Body<N>>) -> usize {
             seen.insert(dimension.clone());
         }
     }
-    dimension_repeat.into_iter().reduce(|a, b| lcm(a, b)).unwrap()
+    dimension_repeat
+        .into_iter()
+        .reduce(|a, b| lcm(a, b))
+        .unwrap()
 }
 
 fn tick<const DIMENSIONS: usize>(system: Vec<Body<DIMENSIONS>>) -> Vec<Body<DIMENSIONS>> {
@@ -71,7 +74,9 @@ fn parse_input(input: &str) -> Vec<Body<N>> {
     let mut bodies = vec![];
     let re = Regex::new(r#"^<x=(?<x>-?\d+), y=(?<y>-?\d+), z=(?<z>-?\d+)>$"#).unwrap();
     for (line_number, line) in input.lines().enumerate() {
-        let caps = re.captures(line).expect(&format!("Line {line_number} is not in expected format: {line}"));
+        let caps = re.captures(line).expect(&format!(
+            "Line {line_number} is not in expected format: {line}"
+        ));
         bodies.push(Body {
             position: Position::new([
                 caps["x"].parse().unwrap(),
@@ -130,4 +135,3 @@ mod types {
         }
     }
 }
-

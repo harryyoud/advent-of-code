@@ -13,20 +13,18 @@ fn main() {
 }
 
 fn part_1(input: u64) -> usize {
-    bfs(
-        &START,
-        |x| get_candidates(*x, input),
-        |x| *x == END
-    )
+    bfs(&START, |x| get_candidates(*x, input), |x| *x == END)
         .expect("No path found")
-        .len() - 1
+        .len()
+        - 1
 }
 
 fn part_2(input: u64) -> usize {
-    dijkstra_reach(
-        &START,
-        |x, _cost| get_candidates(*x, input).into_iter().map(|a| (a, 1)),
-    ).filter(|x| x.total_cost <= 50).count()
+    dijkstra_reach(&START, |x, _cost| {
+        get_candidates(*x, input).into_iter().map(|a| (a, 1))
+    })
+    .filter(|x| x.total_cost <= 50)
+    .count()
 }
 
 fn is_open((x, y): (u64, u64), input: u64) -> bool {

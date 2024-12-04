@@ -33,7 +33,7 @@ fn run_program(registers: &mut HashMap<char, u64>, instructions: &[Instruction])
             None => break,
             Some(Instruction::Half { register }) => {
                 registers.get_mut(register).map(|x| *x /= 2);
-            },
+            }
             Some(Instruction::Triple { register }) => {
                 registers.get_mut(register).map(|x| *x *= 3);
             }
@@ -43,13 +43,13 @@ fn run_program(registers: &mut HashMap<char, u64>, instructions: &[Instruction])
             Some(Instruction::Jump { amount }) => {
                 pointer = ((pointer as isize) + (*amount as isize)) as usize;
                 continue;
-            },
+            }
             Some(Instruction::JumpIfEven { register, amount }) => {
                 if registers.get(register).unwrap() % 2 == 0 {
                     pointer = ((pointer as isize) + (*amount as isize)) as usize;
                     continue;
                 }
-            },
+            }
             Some(Instruction::JumpIfOne { register, amount }) => {
                 if *registers.get(register).unwrap() == 1 {
                     pointer = ((pointer as isize) + (*amount as isize)) as usize;
@@ -67,24 +67,32 @@ fn parse_input(input: &str) -> Vec<Instruction> {
     for line in input.lines() {
         let (instruction, detail) = line.split_once(' ').unwrap();
         instructions.push(match instruction {
-            "hlf" => Instruction::Half { register: detail.chars().next().unwrap() },
-            "tpl" => Instruction::Triple { register: detail.chars().next().unwrap() },
-            "inc" => Instruction::Increment { register: detail.chars().next().unwrap() },
-            "jmp" => Instruction::Jump { amount: detail.parse().unwrap() },
+            "hlf" => Instruction::Half {
+                register: detail.chars().next().unwrap(),
+            },
+            "tpl" => Instruction::Triple {
+                register: detail.chars().next().unwrap(),
+            },
+            "inc" => Instruction::Increment {
+                register: detail.chars().next().unwrap(),
+            },
+            "jmp" => Instruction::Jump {
+                amount: detail.parse().unwrap(),
+            },
             "jie" => {
                 let (register, amount) = detail.split_once(", ").unwrap();
                 Instruction::JumpIfEven {
                     register: register.chars().next().unwrap(),
                     amount: amount.parse().unwrap(),
                 }
-            },
+            }
             "jio" => {
                 let (register, amount) = detail.split_once(", ").unwrap();
                 Instruction::JumpIfOne {
                     register: register.chars().next().unwrap(),
                     amount: amount.parse().unwrap(),
                 }
-            },
+            }
             s => panic!("Invalid instruction: {s}"),
         });
     }

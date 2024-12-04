@@ -25,7 +25,8 @@ fn part_1(results: &HashMap<u64, u64>) -> u64 {
 }
 
 fn part_2(results: &HashMap<u64, u64>) -> u64 {
-    results.iter()
+    results
+        .iter()
         .min_by_key(|(k, _v)| **k)
         .map(|(_k, v)| *v)
         .unwrap()

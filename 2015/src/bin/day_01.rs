@@ -20,7 +20,7 @@ fn part_2(input: &str) -> usize {
         match c {
             '(' => floor += 1,
             ')' => floor -= 1,
-            _ => panic!("invalid character, pos {pos}")
+            _ => panic!("invalid character, pos {pos}"),
         }
         if floor == -1 {
             // problem is 1-indexed, enumerate() is 0-indexed

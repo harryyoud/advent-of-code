@@ -18,10 +18,7 @@ fn part_2(input: &str) -> String {
 }
 
 fn fill_until(input: &str, disk_len: usize) -> String {
-    let mut out = iterate(
-            input.to_owned(),
-            |x| build_string(x)
-        )
+    let mut out = iterate(input.to_owned(), |x| build_string(x))
         .skip_while(|x: &String| x.len() < disk_len)
         .next()
         .unwrap();
@@ -35,7 +32,13 @@ fn build_string(input: &str) -> String {
         .chars()
         .rev()
         .map(|c| {
-            if c == '0' { '1' } else if c == '1' { '0' } else { panic!("char not 0 or 1") }
+            if c == '0' {
+                '1'
+            } else if c == '1' {
+                '0'
+            } else {
+                panic!("char not 0 or 1")
+            }
         })
         .collect::<String>();
     format!("{a}0{b}")

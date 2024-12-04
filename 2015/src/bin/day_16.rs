@@ -58,29 +58,87 @@ struct Sue {
 
 impl Sue {
     fn is_match_exact(&self, template: &Sue) -> bool {
-        self.children.map(|x| x == template.children.unwrap()).unwrap_or(true) &&
-        self.cats.map(|x| x == template.cats.unwrap()).unwrap_or(true) &&
-        self.samoyeds.map(|x| x == template.samoyeds.unwrap()).unwrap_or(true) &&
-        self.pomeranians.map(|x| x == template.pomeranians.unwrap()).unwrap_or(true) &&
-        self.akitas.map(|x| x == template.akitas.unwrap()).unwrap_or(true) &&
-        self.vizslas.map(|x| x == template.vizslas.unwrap()).unwrap_or(true) &&
-        self.goldfish.map(|x| x == template.goldfish.unwrap()).unwrap_or(true) &&
-        self.trees.map(|x| x == template.trees.unwrap()).unwrap_or(true) &&
-        self.cars.map(|x| x == template.cars.unwrap()).unwrap_or(true) &&
-        self.perfumes.map(|x| x == template.perfumes.unwrap()).unwrap_or(true)
+        self.children
+            .map(|x| x == template.children.unwrap())
+            .unwrap_or(true)
+            && self
+                .cats
+                .map(|x| x == template.cats.unwrap())
+                .unwrap_or(true)
+            && self
+                .samoyeds
+                .map(|x| x == template.samoyeds.unwrap())
+                .unwrap_or(true)
+            && self
+                .pomeranians
+                .map(|x| x == template.pomeranians.unwrap())
+                .unwrap_or(true)
+            && self
+                .akitas
+                .map(|x| x == template.akitas.unwrap())
+                .unwrap_or(true)
+            && self
+                .vizslas
+                .map(|x| x == template.vizslas.unwrap())
+                .unwrap_or(true)
+            && self
+                .goldfish
+                .map(|x| x == template.goldfish.unwrap())
+                .unwrap_or(true)
+            && self
+                .trees
+                .map(|x| x == template.trees.unwrap())
+                .unwrap_or(true)
+            && self
+                .cars
+                .map(|x| x == template.cars.unwrap())
+                .unwrap_or(true)
+            && self
+                .perfumes
+                .map(|x| x == template.perfumes.unwrap())
+                .unwrap_or(true)
     }
 
     fn is_match_ranges(&self, template: &Sue) -> bool {
-        self.children.map(|x| x == template.children.unwrap()).unwrap_or(true) &&
-        self.cats.map(|x| x > template.cats.unwrap()).unwrap_or(true) &&
-        self.samoyeds.map(|x| x == template.samoyeds.unwrap()).unwrap_or(true) &&
-        self.pomeranians.map(|x| x < template.pomeranians.unwrap()).unwrap_or(true) &&
-        self.akitas.map(|x| x == template.akitas.unwrap()).unwrap_or(true) &&
-        self.vizslas.map(|x| x == template.vizslas.unwrap()).unwrap_or(true) &&
-        self.goldfish.map(|x| x < template.goldfish.unwrap()).unwrap_or(true) &&
-        self.trees.map(|x| x > template.trees.unwrap()).unwrap_or(true) &&
-        self.cars.map(|x| x == template.cars.unwrap()).unwrap_or(true) &&
-        self.perfumes.map(|x| x == template.perfumes.unwrap()).unwrap_or(true)
+        self.children
+            .map(|x| x == template.children.unwrap())
+            .unwrap_or(true)
+            && self
+                .cats
+                .map(|x| x > template.cats.unwrap())
+                .unwrap_or(true)
+            && self
+                .samoyeds
+                .map(|x| x == template.samoyeds.unwrap())
+                .unwrap_or(true)
+            && self
+                .pomeranians
+                .map(|x| x < template.pomeranians.unwrap())
+                .unwrap_or(true)
+            && self
+                .akitas
+                .map(|x| x == template.akitas.unwrap())
+                .unwrap_or(true)
+            && self
+                .vizslas
+                .map(|x| x == template.vizslas.unwrap())
+                .unwrap_or(true)
+            && self
+                .goldfish
+                .map(|x| x < template.goldfish.unwrap())
+                .unwrap_or(true)
+            && self
+                .trees
+                .map(|x| x > template.trees.unwrap())
+                .unwrap_or(true)
+            && self
+                .cars
+                .map(|x| x == template.cars.unwrap())
+                .unwrap_or(true)
+            && self
+                .perfumes
+                .map(|x| x == template.perfumes.unwrap())
+                .unwrap_or(true)
     }
 }
 
@@ -93,7 +151,10 @@ fn parse_sue(input: &str) -> Sue {
 
     let (_, sue_info) = input.split_once(": ").unwrap();
 
-    for (property, amount) in sue_info.split(", ").map(|s| s.split(": ").collect_tuple().unwrap()) {
+    for (property, amount) in sue_info
+        .split(", ")
+        .map(|s| s.split(": ").collect_tuple().unwrap())
+    {
         let amount = Some(amount.parse().unwrap());
 
         match property {
@@ -107,9 +168,9 @@ fn parse_sue(input: &str) -> Sue {
             "trees" => sue.trees = amount,
             "cars" => sue.cars = amount,
             "perfumes" => sue.perfumes = amount,
-            s => panic!("Invalid property: {s}")
+            s => panic!("Invalid property: {s}"),
         }
     }
-    
+
     sue
 }

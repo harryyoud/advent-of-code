@@ -9,8 +9,7 @@ fn main() {
 }
 
 fn parse_input(line: &str) -> [u64; 3] {
-    line
-        .split('x')
+    line.split('x')
         .map(|x| x.parse::<u64>().unwrap())
         .collect_vec()
         .try_into()
@@ -21,7 +20,8 @@ fn part_1(input: &str) -> u64 {
     let mut total = 0_u64;
 
     for line in input.lines() {
-        let areas = parse_input(line).iter()
+        let areas = parse_input(line)
+            .iter()
             .tuple_combinations()
             .map(|(a, b)| a * b)
             .collect_vec();

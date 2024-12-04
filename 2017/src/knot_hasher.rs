@@ -4,7 +4,12 @@ const MAGIC_SUFFIX: [u8; 5] = [17, 31, 73, 47, 23];
 const CHUNK_LENGTH: usize = 16;
 
 pub fn hash(plaintext: &str) -> Vec<u8> {
-    let instructions = plaintext.trim().chars().map(|x| x as u8).chain(MAGIC_SUFFIX).collect_vec();
+    let instructions = plaintext
+        .trim()
+        .chars()
+        .map(|x| x as u8)
+        .chain(MAGIC_SUFFIX)
+        .collect_vec();
     let hash = twist(&instructions, 64);
     xor_shrink(&hash)
 }
@@ -39,7 +44,8 @@ pub fn twist(instructions: &[u8], rounds: usize) -> Vec<u8> {
 fn xor_shrink(input: &[u8]) -> Vec<u8> {
     assert!(input.len() % CHUNK_LENGTH == 0);
 
-    input.iter()
+    input
+        .iter()
         .chunks(CHUNK_LENGTH)
         .into_iter()
         .map(|x: itertools::Chunk<'_, std::slice::Iter<'_, u8>>| {

@@ -13,7 +13,10 @@ fn main() {
 }
 
 fn part_1(grid: &Grid, start: (Point, Tile, Axis)) -> String {
-    solve(grid, start).into_iter().map(|(letter, _cost)| letter).collect()
+    solve(grid, start)
+        .into_iter()
+        .map(|(letter, _cost)| letter)
+        .collect()
 }
 fn part_2(grid: &Grid, start: (Point, Tile, Axis)) -> usize {
     // offset by one, as start point counts as 1
@@ -21,13 +24,9 @@ fn part_2(grid: &Grid, start: (Point, Tile, Axis)) -> usize {
 }
 
 fn solve(grid: &Grid, start: (Point, Tile, Axis)) -> Vec<(char, usize)> {
-    let path = dijkstra_all(
-        &start,
-        |x| neighbours(grid, *x).into_iter().map(|a| (a, 1))
-    );
-    
-    path
-        .into_iter()
+    let path = dijkstra_all(&start, |x| neighbours(grid, *x).into_iter().map(|a| (a, 1)));
+
+    path.into_iter()
         .filter_map(|((_point, tile, _axis), (_optimal_parent, cost))| {
             if let Tile::PointOfInterest(letter) = tile {
                 return Some((letter, cost));
@@ -56,16 +55,19 @@ enum Axis {
 }
 
 impl Axis {
- fn opposite(self) -> Self {
-    use Axis::*;
-    match self {
-        Vertical => Horizontal,
-        Horizontal => Vertical,
+    fn opposite(self) -> Self {
+        use Axis::*;
+        match self {
+            Vertical => Horizontal,
+            Horizontal => Vertical,
+        }
     }
- }
 }
 
-fn neighbours(grid: &Grid, (point, tile, mut axis): (Point, Tile, Axis)) -> Vec<(Point, Tile, Axis)> {
+fn neighbours(
+    grid: &Grid,
+    (point, tile, mut axis): (Point, Tile, Axis),
+) -> Vec<(Point, Tile, Axis)> {
     if matches!(tile, Tile::Corner) {
         axis = axis.opposite();
     }
@@ -80,41 +82,46 @@ fn neighbours(grid: &Grid, (point, tile, mut axis): (Point, Tile, Axis)) -> Vec<
 
 fn movements_for_axis(point: Point, axis: Axis) -> [Point; 2] {
     match axis {
-        Axis::Vertical => [
-            (point.0, point.1 - 1),
-            (point.0, point.1 + 1),
-        ],
-        Axis::Horizontal => [
-            (point.0 - 1, point.1),
-            (point.0 + 1, point.1),
-        ],
+        Axis::Vertical => [(point.0, point.1 - 1), (point.0, point.1 + 1)],
+        Axis::Horizontal => [(point.0 - 1, point.1), (point.0 + 1, point.1)],
     }
 }
 
 fn parse_input(input: &str) -> (Grid, (Point, Tile, Axis)) {
     let mut grid = Grid::new();
 
-    for (point, cell) in input.lines()
+    for (point, cell) in input
+        .lines()
         .enumerate()
-        .flat_map(|(y, row)| row.chars().enumerate().map(move |(x, cell)| ((x as isize, y as isize), cell)))
+        .flat_map(|(y, row)| {
+            row.chars()
+                .enumerate()
+                .map(move |(x, cell)| ((x as isize, y as isize), cell))
+        })
         .filter(|(_point, cell)| !cell.is_whitespace())
     {
-        grid.insert(point, match cell {
-            '|' => Tile::Vertical,
-            '-' => Tile::Horizontal,
-            '+' => Tile::Corner,
-            c => {
-                if c.is_ascii_uppercase() {
-                    Tile::PointOfInterest(c)
-                } else {
-                    panic!("Invalid character: ({}, {}): {c}", point.0, point.1);
+        grid.insert(
+            point,
+            match cell {
+                '|' => Tile::Vertical,
+                '-' => Tile::Horizontal,
+                '+' => Tile::Corner,
+                c => {
+                    if c.is_ascii_uppercase() {
+                        Tile::PointOfInterest(c)
+                    } else {
+                        panic!("Invalid character: ({}, {}): {c}", point.0, point.1);
+                    }
                 }
-            }
-        });
+            },
+        );
     }
 
     let first_point = {
-        let mut iter = grid.iter().filter(|((_x, y), _tile)| *y == 0).map(|((x, y), tile)| ((*x, *y), *tile));
+        let mut iter = grid
+            .iter()
+            .filter(|((_x, y), _tile)| *y == 0)
+            .map(|((x, y), tile)| ((*x, *y), *tile));
         let first_point = iter.next().expect("No point found on top row");
         assert!(iter.next().is_none(), "More than one point on top row");
         first_point

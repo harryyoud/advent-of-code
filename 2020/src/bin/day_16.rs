@@ -1,7 +1,7 @@
+use aoc_2020::get_input;
+use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
 use std::ops::RangeInclusive;
-use itertools::Itertools;
-use aoc_2020::get_input;
 
 type Ticket = Vec<u32>;
 
@@ -32,15 +32,22 @@ fn part_2(specification: TicketSpecification, my_ticket: Ticket, nearby_tickets:
 
     // make Map[field_name => Set[legal_index]] of possible positions for each rule
     // by checking against columns of ticket fields
-    let mut valid_field_positions = specification.rules.
-        iter()
+    let mut valid_field_positions = specification
+        .rules
+        .iter()
         .map(|(field_name, rule)| {
-            (field_name, (0..rule_count).filter(|idx| {
-                valid_tickets
-                    .iter()
-                    .all(|ticket| rule.in_range(ticket[*idx]))
-            }).collect::<HashSet<_>>())
-        }).collect::<HashMap<_, _>>();
+            (
+                field_name,
+                (0..rule_count)
+                    .filter(|idx| {
+                        valid_tickets
+                            .iter()
+                            .all(|ticket| rule.in_range(ticket[*idx]))
+                    })
+                    .collect::<HashSet<_>>(),
+            )
+        })
+        .collect::<HashMap<_, _>>();
 
     // loop and lock in rules that can be in one position only
     // then remove that possible position from all the other rules
@@ -59,11 +66,13 @@ fn part_2(specification: TicketSpecification, my_ticket: Ticket, nearby_tickets:
             .iter()
             .filter(|(_, possible_positions)| possible_positions.len() == 1)
             .next()
-            .map(|(field_name, possible_positions)| (
-                **field_name,
-                // extract only possible position, verified above
-                *possible_positions.into_iter().next().unwrap()
-            ))
+            .map(|(field_name, possible_positions)| {
+                (
+                    **field_name,
+                    // extract only possible position, verified above
+                    *possible_positions.into_iter().next().unwrap(),
+                )
+            })
             .unwrap();
 
         final_field_positions[final_position] = Some(field_name);
@@ -76,7 +85,11 @@ fn part_2(specification: TicketSpecification, my_ticket: Ticket, nearby_tickets:
     my_ticket
         .into_iter()
         .enumerate()
-        .filter(|(idx, _number)| final_field_positions[*idx].unwrap().starts_with("departure "))
+        .filter(|(idx, _number)| {
+            final_field_positions[*idx]
+                .unwrap()
+                .starts_with("departure ")
+        })
         .map(|(_idx, number)| number as u64)
         .product()
 }
@@ -91,9 +104,7 @@ impl TicketSpecification<'_> {
         ticket
             .into_iter()
             .copied()
-            .filter(|number| {
-                !self.rules.values().any(|rule| rule.in_range(*number))
-            })
+            .filter(|number| !self.rules.values().any(|rule| rule.in_range(*number)))
             .reduce(|x, y| x + y)
     }
 }
@@ -111,15 +122,20 @@ impl TicketRule {
 
 fn parse_input(input: &str) -> (TicketSpecification, Ticket, Vec<Ticket>) {
     let (rules, my_ticket, nearby_tickets) = input.split("\n\n").next_tuple().unwrap();
-    let rules = rules.lines()
+    let rules = rules
+        .lines()
         .map(|rule| {
             let (field_name, ranges) = rule.split_once(": ").unwrap();
-            let ranges = ranges.split(" or ").map(|range| {
-                let (lower, upper) = range.split_once("-").unwrap();
-                lower.parse().unwrap()..=upper.parse().unwrap()
-            }).collect_vec();
+            let ranges = ranges
+                .split(" or ")
+                .map(|range| {
+                    let (lower, upper) = range.split_once("-").unwrap();
+                    lower.parse().unwrap()..=upper.parse().unwrap()
+                })
+                .collect_vec();
             (field_name, TicketRule { ranges })
-        }).collect();
+        })
+        .collect();
 
     let my_ticket = my_ticket
         .lines()
@@ -133,7 +149,12 @@ fn parse_input(input: &str) -> (TicketSpecification, Ticket, Vec<Ticket>) {
     let nearby_tickets = nearby_tickets
         .lines()
         .skip(1)
-        .map(|ticket| ticket.split(",").map(|x| x.parse::<u32>().unwrap()).collect_vec())
+        .map(|ticket| {
+            ticket
+                .split(",")
+                .map(|x| x.parse::<u32>().unwrap())
+                .collect_vec()
+        })
         .collect_vec();
 
     (TicketSpecification { rules }, my_ticket, nearby_tickets)

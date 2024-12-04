@@ -11,14 +11,32 @@ fn main() {
         let (cards, bid) = {
             let (cards, bid) = line.split_whitespace().collect_tuple().unwrap();
             let bid = bid.parse::<u32>().unwrap();
-            let cards = cards.chars().map(|x| Card::parse(&x).unwrap()).collect_vec();
+            let cards = cards
+                .chars()
+                .map(|x| Card::parse(&x).unwrap())
+                .collect_vec();
             (cards, bid)
         };
         let hand_type_a = calculate_rank(&cards);
-        let hand_a = Hand { cards: cards.clone(), hand_type: hand_type_a };
-        let cards = cards.into_iter().map(|x| if matches!(x, Card::Jack) { Card::Joker } else { x }).collect_vec();
+        let hand_a = Hand {
+            cards: cards.clone(),
+            hand_type: hand_type_a,
+        };
+        let cards = cards
+            .into_iter()
+            .map(|x| {
+                if matches!(x, Card::Jack) {
+                    Card::Joker
+                } else {
+                    x
+                }
+            })
+            .collect_vec();
         let hand_type_b = calculate_best_rank(&cards);
-        let hand_b = Hand { cards, hand_type: hand_type_b };
+        let hand_b = Hand {
+            cards,
+            hand_type: hand_type_b,
+        };
         hands_a.push((hand_a, bid));
         hands_b.push((hand_b, bid));
     }
@@ -40,8 +58,8 @@ fn calculate_rank(cards: &Vec<Card>) -> HandRank {
     return match (
         cards.iter().unique().count(),
         counts.values().min().unwrap(),
-        counts.values().max().unwrap()
-    ){
+        counts.values().max().unwrap(),
+    ) {
         (1, _, _) => HandRank::FiveOfAKind,
         (2, _, 4) => HandRank::FourOfAKind,
         (2, 2, 3) => HandRank::FullHouse,
@@ -58,11 +76,20 @@ fn calculate_best_rank(cards: &Vec<Card>) -> HandRank {
     if joker_count == 0 {
         return calculate_rank(cards);
     };
-    CARDS.iter().filter(|x| !matches!(x, Card::Jack)).map(|possible_card| {
-        calculate_rank(&cards.clone().into_iter().map(|x|
-            if x == Card::Joker { *possible_card } else { x }
-        ).collect_vec())
-    }).max().unwrap()
+    CARDS
+        .iter()
+        .filter(|x| !matches!(x, Card::Jack))
+        .map(|possible_card| {
+            calculate_rank(
+                &cards
+                    .clone()
+                    .into_iter()
+                    .map(|x| if x == Card::Joker { *possible_card } else { x })
+                    .collect_vec(),
+            )
+        })
+        .max()
+        .unwrap()
 }
 
 pub const CARDS: [Card; 13] = [
@@ -113,18 +140,22 @@ pub enum Card {
 
 impl fmt::Display for Card {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Card {{{}}}", match &self {
-            Card::Number(n) => match n {
-                2..=9 => n.to_string().chars().next().unwrap(),
-                10 => 'T',
-                _ => panic!("Impossible card {}", n),
-            },
-            Card::Ace => 'A',
-            Card::King => 'K',
-            Card::Queen => 'Q',
-            Card::Jack => 'J',
-            Card::Joker => 'J',
-        })
+        write!(
+            f,
+            "Card {{{}}}",
+            match &self {
+                Card::Number(n) => match n {
+                    2..=9 => n.to_string().chars().next().unwrap(),
+                    10 => 'T',
+                    _ => panic!("Impossible card {}", n),
+                },
+                Card::Ace => 'A',
+                Card::King => 'K',
+                Card::Queen => 'Q',
+                Card::Jack => 'J',
+                Card::Joker => 'J',
+            }
+        )
     }
 }
 

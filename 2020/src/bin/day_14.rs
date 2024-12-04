@@ -1,25 +1,34 @@
-use std::collections::HashMap;
+use aoc_2020::get_input;
 use bitvec::prelude::*;
 use itertools::Itertools;
 use lazy_regex::regex_captures;
-use aoc_2020::get_input;
+use std::collections::HashMap;
 
 const WIDTH: usize = 36;
-type U36 = BitVec::<u64, Msb0>;
+type U36 = BitVec<u64, Msb0>;
 
 fn main() {
     let input = get_input(14);
 
     // massage input into Vec<(mask, Vec<(address, value)>)>
     //                         &str       |-u64-|  |u64|
-    let input = input.split("mask = ")
+    let input = input
+        .split("mask = ")
         .filter(|x| !x.is_empty())
         .map(|x| {
             let mut iter = x.lines();
-            (iter.next().unwrap(), iter.map(|line| {
-                let (_, address, value) = regex_captures!(r#"^mem\[(\d+)\] = (\d+)$"#, line).unwrap();
-                (address.parse::<u64>().unwrap(), value.parse::<u64>().unwrap())
-            }).collect_vec())
+            (
+                iter.next().unwrap(),
+                iter.map(|line| {
+                    let (_, address, value) =
+                        regex_captures!(r#"^mem\[(\d+)\] = (\d+)$"#, line).unwrap();
+                    (
+                        address.parse::<u64>().unwrap(),
+                        value.parse::<u64>().unwrap(),
+                    )
+                })
+                .collect_vec(),
+            )
         })
         .collect_vec();
 
@@ -61,7 +70,11 @@ fn from_binary(input: &str) -> u64 {
 }
 
 fn split_mask(input: &str) -> (u64, u64) {
-    assert_eq!(input.len(), WIDTH, "Mask string representation must be {WIDTH} bits wide exactly");
+    assert_eq!(
+        input.len(),
+        WIDTH,
+        "Mask string representation must be {WIDTH} bits wide exactly"
+    );
 
     let set_mask = input.replace('X', "0");
     let unset_mask = input.replace('X', "1");
@@ -70,11 +83,10 @@ fn split_mask(input: &str) -> (u64, u64) {
 }
 
 fn decode_address(original_address: u64, mask: &str) -> Vec<u64> {
-    mask
-        .chars()
+    mask.chars()
         .zip(U36::from_element(original_address)[(64 - WIDTH)..].into_iter())
         .map(|(mask_char, addr_bit)| match mask_char {
-            '0' => vec![*addr_bit],     // keep as original
+            '0' => vec![*addr_bit],   // keep as original
             '1' => vec![true],        // override
             'X' => vec![false, true], // "floating"
             _ => panic!("Invalid input"),

@@ -11,7 +11,10 @@ struct Grid {
 
 #[derive(PartialEq, Eq, Hash, Clone, Debug)]
 enum Direction {
-    Up, Down, Left, Right
+    Up,
+    Down,
+    Left,
+    Right,
 }
 
 impl Direction {
@@ -29,7 +32,14 @@ impl Grid {
     //     y >= 0 && y < self.y_len as isize
     // }
 
-    fn moves(&self, min: isize, max: isize, x: isize, y: isize, direction: &Direction) -> Vec<(((isize, isize), Direction), u32)> {
+    fn moves(
+        &self,
+        min: isize,
+        max: isize,
+        x: isize,
+        y: isize,
+        direction: &Direction,
+    ) -> Vec<(((isize, isize), Direction), u32)> {
         let mut out = vec![];
         for dir in direction.turns() {
             let mut total_cost = 0u32;
@@ -63,7 +73,8 @@ fn main() {
 
     for (y, line) in input.lines().enumerate() {
         for (x, c) in line.chars().enumerate() {
-            grid.inner.insert((x as isize, y as isize), c.to_digit(10).unwrap());
+            grid.inner
+                .insert((x as isize, y as isize), c.to_digit(10).unwrap());
         }
     }
 
@@ -77,13 +88,19 @@ fn get_answer(grid: &Grid, min: isize, max: isize) -> u32 {
     let result_down = dijkstra(
         &((0isize, 0isize), Direction::Down),
         |((x, y), direction)| grid.moves(min, max, *x, *y, direction),
-        |((x, y), _)| *x as usize == &grid.x_len - 1 && *y as usize == &grid.y_len - 1
-    ).unwrap();
+        |((x, y), _)| *x as usize == &grid.x_len - 1 && *y as usize == &grid.y_len - 1,
+    )
+    .unwrap();
     let result_right = dijkstra(
         &((0isize, 0isize), Direction::Right),
         |((x, y), direction)| grid.moves(min, max, *x, *y, direction),
-        |((x, y), _)| *x as usize == &grid.x_len - 1 && *y as usize == &grid.y_len - 1
-    ).unwrap();
+        |((x, y), _)| *x as usize == &grid.x_len - 1 && *y as usize == &grid.y_len - 1,
+    )
+    .unwrap();
 
-    if result_down.1 > result_right.1 { result_right.1 } else { result_down.1 }
+    if result_down.1 > result_right.1 {
+        result_right.1
+    } else {
+        result_down.1
+    }
 }

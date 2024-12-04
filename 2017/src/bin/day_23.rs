@@ -1,8 +1,14 @@
-use aoc_2017::{duet_asm::{parsing::parse_instructions, Instruction, Operand, Registers}, get_input};
+use aoc_2017::{
+    duet_asm::{parsing::parse_instructions, Instruction, Operand, Registers},
+    get_input,
+};
 
 fn main() {
     let input = get_input(23);
-    let instructions = parse_instructions(&input).into_iter().collect::<Result<Vec<_>, _>>().unwrap();
+    let instructions = parse_instructions(&input)
+        .into_iter()
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap();
 
     dbg!(part_1(instructions.clone()));
     dbg!(part_2(instructions.clone()));
@@ -45,19 +51,19 @@ impl Machine {
             match instruction {
                 Set(x, y) => {
                     self.registers.insert(*x, self.eval(*y));
-                },
+                }
                 SubtractAssign(x, y) => {
                     *self.registers.entry(*x).or_insert(0) -= self.eval(*y);
                 }
                 MultiplyAssign(x, y) => {
                     *self.registers.entry(*x).or_insert(0) *= self.eval(*y);
                     self.multiply_instruction_count += 1;
-                },
+                }
                 JumpIfNotZero(x, y) => {
                     if self.eval(*x) != 0 {
                         self.cursor += self.eval(*y) - 1;
                     }
-                },
+                }
                 _ => panic!("Invalid instruction"),
             }
             self.cursor += 1;

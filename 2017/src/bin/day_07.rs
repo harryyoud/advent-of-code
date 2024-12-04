@@ -32,44 +32,60 @@ impl Node {
             return None;
         }
 
-        let counts = self.children.iter()
-            .counts_by(|x| x.recursive_weight());
-        let odd_one_out = counts.iter()
+        let counts = self.children.iter().counts_by(|x| x.recursive_weight());
+        let odd_one_out = counts
+            .iter()
             .filter(|(_weight, count)| **count == 1)
             .map(|(weight, _count)| *weight)
-            .next().unwrap();
-        let others = counts.iter()
+            .next()
+            .unwrap();
+        let others = counts
+            .iter()
             .filter(|(_weight, count)| **count > 1)
             .map(|(weight, _count)| *weight)
-            .next().unwrap();
+            .next()
+            .unwrap();
 
-        let uneven_child = self.children.iter()
+        let uneven_child = self
+            .children
+            .iter()
             .find(|x| x.recursive_weight() == odd_one_out)
             .unwrap();
 
         match uneven_child.find_uneven_weight_recursive() {
             Some(x) => Some(x),
             None => Some(
-                uneven_child.weight.checked_add_signed(others as isize - odd_one_out as isize).unwrap()
+                uneven_child
+                    .weight
+                    .checked_add_signed(others as isize - odd_one_out as isize)
+                    .unwrap(),
             ),
         }
     }
 
     fn are_children_balanced(&self) -> bool {
-        self.children.iter().map(|x| x.recursive_weight()).all_equal()
+        self.children
+            .iter()
+            .map(|x| x.recursive_weight())
+            .all_equal()
     }
 
     fn recursive_weight(&self) -> usize {
         if self.children.is_empty() {
             return self.weight;
         }
-        self.weight + self.children.iter().map(|x| x.recursive_weight()).sum::<usize>()
+        self.weight
+            + self
+                .children
+                .iter()
+                .map(|x| x.recursive_weight())
+                .sum::<usize>()
     }
 }
 
 fn build_tree(input: &str) -> Node {
-    let mut nodes: HashMap::<&str, Node> = HashMap::new();
-    let mut mapping: HashMap::<&str, Vec<&str>> = HashMap::new();
+    let mut nodes: HashMap<&str, Node> = HashMap::new();
+    let mut mapping: HashMap<&str, Vec<&str>> = HashMap::new();
 
     for line in input.lines() {
         let (node_name, weight);
@@ -101,11 +117,13 @@ fn build_tree(input: &str) -> Node {
 }
 
 fn find_root(mapping: &HashMap<&str, Vec<&str>>) -> String {
-    let parents = mapping.iter()
+    let parents = mapping
+        .iter()
         .filter(|(_name, children)| !children.is_empty())
         .map(|(a, _b)| *a)
         .collect::<HashSet<_>>();
-    let children = mapping.iter()
+    let children = mapping
+        .iter()
         .flat_map(|(_name, children)| children)
         .cloned()
         .collect::<HashSet<_>>();

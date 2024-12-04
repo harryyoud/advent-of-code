@@ -31,10 +31,10 @@ fn recursive_find_num(x: &Value) -> i32 {
             for val in vals {
                 total += recursive_find_num(val);
             }
-        },
+        }
         Value::Number(num) => {
             total += num.as_i64().unwrap() as i32;
-        },
+        }
         Value::Object(map) => {
             for (_k, v) in map.iter() {
                 if *v == Value::String("red".to_string()) {
@@ -42,7 +42,7 @@ fn recursive_find_num(x: &Value) -> i32 {
                 }
                 total += recursive_find_num(v);
             }
-        },
+        }
         _ => (),
     };
     total

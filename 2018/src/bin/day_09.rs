@@ -23,7 +23,9 @@ fn part_2(player_count: usize, last_marble: usize) -> usize {
 
 fn solve(player_count: usize, last_marble: usize) -> usize {
     let mut circle = LinkedList::<usize>::from_iter([0]);
-    let mut cursor = Circle { cursor: circle.cursor_front_mut() };
+    let mut cursor = Circle {
+        cursor: circle.cursor_front_mut(),
+    };
     let mut current_player = 1;
     let mut player_scores = HashMap::<usize, usize>::new();
 
@@ -48,7 +50,7 @@ fn solve(player_count: usize, last_marble: usize) -> usize {
 
 /* We need to wrap CursorMut to ignore the "ghost element" */
 struct Circle<'a> {
-    cursor: CursorMut<'a, usize>
+    cursor: CursorMut<'a, usize>,
 }
 
 impl Circle<'_> {
@@ -91,6 +93,10 @@ impl Circle<'_> {
 
 fn parse_input(input: &str) -> (usize, usize) {
     // "435 players; last marble is worth 71184 points"
-    let (_, player_count, last_marble) = regex_captures!(r#"^(\d+) players; last marble is worth (\d+) points$"#, input.trim()).unwrap();
+    let (_, player_count, last_marble) = regex_captures!(
+        r#"^(\d+) players; last marble is worth (\d+) points$"#,
+        input.trim()
+    )
+    .unwrap();
     (player_count.parse().unwrap(), last_marble.parse().unwrap())
 }

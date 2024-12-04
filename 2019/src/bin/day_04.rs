@@ -1,5 +1,5 @@
-use itertools::Itertools;
 use aoc_2019::get_input;
+use itertools::Itertools;
 
 fn main() {
     let input = get_input(4);
@@ -15,13 +15,9 @@ fn main() {
         .map(to_digits)
         .filter(|x| is_increasing(x));
 
-    let part_1 = increasing.clone()
-        .filter(|x| has_double(x))
-        .count();
+    let part_1 = increasing.clone().filter(|x| has_double(x)).count();
 
-    let part_2 = increasing
-        .filter(|x| has_only_double(x))
-        .count();
+    let part_2 = increasing.filter(|x| has_only_double(x)).count();
 
     dbg!(part_1);
     dbg!(part_2);
@@ -52,7 +48,11 @@ fn has_double(input: &[u8]) -> bool {
 
 // We assume the slice is increasing, so we can just count occurrences of each digit
 fn has_only_double(input: &[u8]) -> bool {
-    input.into_iter().counts().into_iter().any(|(_digit, count)| count == 2)
+    input
+        .into_iter()
+        .counts()
+        .into_iter()
+        .any(|(_digit, count)| count == 2)
 }
 
 fn is_increasing(input: &[u8]) -> bool {

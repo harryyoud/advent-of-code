@@ -14,13 +14,17 @@ fn main() {
 }
 
 fn part_1(grid: &HashMap<(usize, usize), Vec<usize>>) -> usize {
-    grid.iter().filter(|(_coord, squares)| squares.len() > 1).count()
+    grid.iter()
+        .filter(|(_coord, squares)| squares.len() > 1)
+        .count()
 }
 
 fn part_2(squares: &[Square], grid: &HashMap<(usize, usize), Vec<usize>>) -> usize {
-    squares.iter().find(|square| {
-        square.points().all(|coord| grid[&coord].len() == 1)
-    }).unwrap().num
+    squares
+        .iter()
+        .find(|square| square.points().all(|coord| grid[&coord].len() == 1))
+        .unwrap()
+        .num
 }
 
 fn build_grid(squares: &[Square]) -> HashMap<(usize, usize), Vec<usize>> {
@@ -34,7 +38,8 @@ fn build_grid(squares: &[Square]) -> HashMap<(usize, usize), Vec<usize>> {
 }
 
 fn parse_line(line: &str) -> Square {
-    let re = regex!(r#"^#(?<num>\d+) @ (?<x_start>\d+),(?<y_start>\d+): (?<x_len>\d+)x(?<y_len>\d+)$"#);
+    let re =
+        regex!(r#"^#(?<num>\d+) @ (?<x_start>\d+),(?<y_start>\d+): (?<x_len>\d+)x(?<y_len>\d+)$"#);
     let captures = re.captures(line).unwrap();
     let x_start = captures["x_start"].parse().unwrap();
     let y_start = captures["y_start"].parse().unwrap();

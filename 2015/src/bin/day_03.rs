@@ -33,7 +33,7 @@ fn part_1(input: &str) -> u64 {
     points_visited.insert(Point(0, 0));
 
     let mut current_point = Point(0, 0);
-    
+
     for c in input.chars() {
         current_point = move_point(current_point, c);
         points_visited.insert(current_point);
@@ -48,7 +48,7 @@ fn part_2(input: &str) -> u64 {
 
     let mut current_point_a = Point(0, 0);
     let mut current_point_b = Point(0, 0);
-    
+
     for (a, b) in input.chars().tuples() {
         current_point_a = move_point(current_point_a, a);
         points_visited.insert(current_point_a);

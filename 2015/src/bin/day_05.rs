@@ -14,15 +14,16 @@ fn main() {
 fn is_nice_part_2(word: &str) -> bool {
     let mut found_pair = false;
     let mut pairs: HashMap<(char, char), Vec<usize>> = HashMap::new();
-    for (pos, (a, b)) in word
-        .chars()
-        .tuple_windows()
-        .enumerate() {
-        pairs.entry((a, b))
+    for (pos, (a, b)) in word.chars().tuple_windows().enumerate() {
+        pairs
+            .entry((a, b))
             .and_modify(|x| x.push(pos))
             .or_insert(vec![pos]);
     }
-    'outer: for ((_a, _b), positions) in pairs.iter().filter(|((_a, _b), positions)| positions.len() >= 2) {
+    'outer: for ((_a, _b), positions) in pairs
+        .iter()
+        .filter(|((_a, _b), positions)| positions.len() >= 2)
+    {
         for (pos_a, pos_b) in positions.iter().tuple_combinations() {
             if pos_a.abs_diff(*pos_b) >= 2 {
                 found_pair = true;
@@ -39,7 +40,7 @@ fn is_nice_part_2(word: &str) -> bool {
     for (a, _b, c) in word.chars().tuple_windows() {
         if a == c {
             found_pair = true;
-            break
+            break;
         }
     }
 
@@ -47,21 +48,14 @@ fn is_nice_part_2(word: &str) -> bool {
 }
 
 fn part_2(input: &str) -> u64 {
-    input
-        .lines()
-        .map(is_nice_part_2)
-        .filter(|x| *x)
-        .count() as u64
+    input.lines().map(is_nice_part_2).filter(|x| *x).count() as u64
 }
 
 fn is_nice_part_1(word: &str) -> bool {
-    let bad_list = [
-        "ab", "cd", "pq", "xy"
-    ];
+    let bad_list = ["ab", "cd", "pq", "xy"];
     let good_list = [
-        "aa", "bb", "cc", "dd", "ee", "ff", "gg", "hh", "ii",
-        "jj", "kk", "ll", "mm", "nn", "oo", "pp", "qq", "rr",
-        "ss", "tt", "uu", "vv", "ww", "xx", "yy", "zz"
+        "aa", "bb", "cc", "dd", "ee", "ff", "gg", "hh", "ii", "jj", "kk", "ll", "mm", "nn", "oo",
+        "pp", "qq", "rr", "ss", "tt", "uu", "vv", "ww", "xx", "yy", "zz",
     ];
     let vowels = ['a', 'e', 'i', 'o', 'u'];
 
@@ -79,9 +73,5 @@ fn is_nice_part_1(word: &str) -> bool {
 }
 
 fn part_1(input: &str) -> u64 {
-    input
-        .lines()
-        .map(is_nice_part_1)
-        .filter(|x| *x)
-        .count() as u64
+    input.lines().map(is_nice_part_1).filter(|x| *x).count() as u64
 }
